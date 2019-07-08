@@ -1,0 +1,216 @@
+\documentclass[12pt, a4paper]{report} \usepackage[titletoc]{appendix}
+%\linespread{1.5}
+%\usepackage{lineno}
+%\linenumbers
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype} % optional, for aesthetics
+\usepackage{tabularx} % nice to have
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{cite}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{parskip}
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{xcolor}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\setlist[enumerate]{label*=\arabic*.}
+\usepackage{makecell}
+\usepackage{kantlipsum}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{appendix}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{array}
+\usepackage{subcaption}
+%\usepackage{caption}
+\graphicspath{{images/}} 
+\usepackage{geometry}
+\geometry{a4paper,left=4cm,top=3cm,bottom=3cm,right=3cm}
+\usepackage{multirow}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,allcolors=blue}
+\usepackage{hypcap}
+\usepackage{courier}
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily,
+    frame=none, 
+    breaklines=true,
+    numbers=left,
+    xleftmargin=2.5em,
+    framexleftmargin=0em,
+    emphstyle=\textbf,
+    float=t
+}
+\lstdefinestyle{ocl}{
+    emph={
+        context, inv
+    }
+}
+\lstdefinestyle{cbp}{
+    basicstyle=\ttfamily\scriptsize,
+    emph={
+        session, create, type,
+        set, to, add, hire
+    }
+}
+\lstdefinestyle{xmi}{
+    basicstyle=\ttfamily\scriptsize,
+    emph={
+        Node, children
+    }
+}
+\lstdefinestyle{xml}{
+    basicstyle=\ttfamily\scriptsize,
+    emph={
+        register, create, add, to, resource, at,
+        from, eattribute, remove, ereference,
+        set, unset, session, Roy, Jen,
+        Moss, Richmond
+    }
+}
+\lstdefinestyle{java}{
+    basicstyle=\ttfamily\scriptsize,
+    emph={
+        case, $unset$,
+        instanceof, else, if, void,
+        new, UnsetEAttributeEvent,
+        UnsetEReferenceEvent,
+        @override, public, class, extends
+    }
+}
+\lstdefinestyle{eol}{
+    basicstyle=\ttfamily\scriptsize,
+    emph={
+        var, new, for, in, create, set, with, type, at,
+        unset, to, add, remove, delete, register, move,
+        from, position, from, move-within, session, \.
+    }
+}
+
+\hyphenation{op-tical net-works semi-conduc-tor Hybrid-Change-Event-Adapter Hybrid-XMI-Change-Event-Adapater
+    Hybrid-Neo-EMF-Change-Event-Adapater change-events Change-Event-Adapter EContent-Adapter notify-Changed Hybrid-Resource Resource-Impl state-Based-Resource cbp-Output-Stream Output-Stream Hybrid-Change-Event-Adapater Output-Stream Hybrid-XMI-Resource-Impl Hybrid-Neo-EMF-Resource-Impl Persistence-Resource change events
+}
+
+
+\definecolor{gray1}{gray}{0.90}
+\definecolor{gray2}{gray}{0.95}
+
+%\renewcommand{\thelstlisting}{\arabic{lstlisting}}
+\renewcommand{\labelitemi}{$\bullet$}
+\newcommand{\AndA}{\textnormal{\textbf{and }}}
+\newcommand{\Is}{\textnormal{\textbf{is }}}
+\newcommand{\Not}{\textnormal{\textbf{not }}}
+\newcommand{\In}{\textnormal{\textbf{in }}}
+\newcommand{\Or}{\textnormal{\textbf{or }}}
+\newcommand{\eqnum}{\refstepcounter{equation}\textup{\tagform@{\theequation}}}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+
+\textbf{\large Change-Based Model Persistence}
+
+\vfill
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\linewidth]{uoy}
+\label{fig:uoy}
+\end{figure}
+\vfill
+
+Alfa Ryano Yohannis\\
+ary506@york.ac.uk
+
+\vspace{1cm}
+
+Supervisors:\\
+Dimitris Kolovos\\
+Fiona Polack\\
+Horacio Hoyos Rodriguez
+\vspace{1cm}
+
+Department of Computer Science\\
+University of York\\
+United Kingdom\\
+\vspace{1cm}
+\today
+
+\vfill
+A Thesis Submitted in Partial Fulfillment of the Requirements\\
+for the Degree of Doctor of Philosophy in Computer Science
+
+
+\end{center}
+\end{titlepage}
+
+
+\begin{abstract}
+\label{abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Most of the models in Model-Driven Engineering are persisted in state-based formats. While state-based persistence has certain advantages, it is problematic when it comes to detecting changes in large-scale models. As an alternative, this work proposes a change-based approach that involves persisting the full sequence of changes made to models. Persisting a model in a change-based format has the potential to deliver benefits over state-based persistence, such as the ability to detect changes, compare and merge models much faster and more precisely, which can then yield positive knock-on effects on helping developers compare and merge models in collaborative modelling environments. Nevertheless, change-based persistence also comes with downsides, such as ever-growing model file sizes and increased model loading time. So far, the initial implementation has been presented at the FlexMDE 2017 workshop, the proposed algorithm to optimise the loading time of change-based persistence has been presented at the ECMFA 2018 conference, and a paper discussing hybrid model persistence also has been presented at the Models and Evolution 2018 workshop. Currently, this research is still working on the change-based model comparison and merging. The thesis writing up is planned to start next year. An adjustment of the previous research plan is also presented in this report.
+\end{abstract}
+
+\tableofcontents
+\addcontentsline{toc}{chapter}{Contents}
+
+\cleardoublepage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\cleardoublepage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+\cleardoublepage
+\lstlistoflistings
+\addcontentsline{toc}{chapter}{Listings}
+
+\cleardoublepage
+\chapter*{Preface}
+
+\cleardoublepage
+\chapter*{Acknowledgements}
+This work was partly supported through a scholarship managed by 
+\emph{Lembaga Pengelola Dana Pendidikan Indonesia}
+(Indonesia Endowment Fund for Education).
+
+\cleardoublepage
+\chapter*{Declaration}
+I declare that this thesis is a presentation of original work and 
+I am the sole author. This work has not previously been presented 
+for an award at this, or any other, University. All sources are 
+acknowledged as References.
+
+\cleardoublepage
+\input{Chapter-01}
+\input{Chapter-02}
+\input{Chapter-03}
+\input{Chapter-04}
+\input{Chapter-05}
+\input{Chapter-06}
+\input{Chapter-07}
+\input{Chapter-08}
+
+\begin{appendices}
+\end{appendices}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{abbrv}
+\bibliography{references}
+
+
+\end{document}

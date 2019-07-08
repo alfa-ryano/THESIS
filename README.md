@@ -1,2 +1,0 @@
-# THESIS
- My Thesis Report

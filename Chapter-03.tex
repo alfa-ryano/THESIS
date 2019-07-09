@@ -1,5 +1,63 @@
 \chapter{Literature Review}
-This work has conducted a literature review and existing tool exploration to identify problem that provide motivation for research. The problem and motivation are presented in Section \ref{sec:background}. The summary of the literature review and existing tool exploration is presented in Table \ref{table:summary_literature_review}.
+This work has conducted a literature review and existing tool exploration to 
+identify problem that provide motivation for research. 
+
+\section{Identifying Changes in Models}
+\label{sec:identifying_changes_in models}
+There are two approaches in the literature for identifying changes in models 
+in order to enable incremental re-execution of model processing operations.
+
+\textbf{Notifications}. In this approach, the incremental execution 
+engine needs to hook into the notification facilities 
+provided by the modelling tool through which the developer edits the model, 
+so that the engine can directly receive notifications as soon as 
+changes happen (e.g. a new employee (\emph{e4}) has been added, 
+the name property of employee \emph{e4} has been changed to ``Richmond"). 
+This is an approach taken by the IncQuery incremental pattern matching 
+framework \cite{DBLP:conf/ecmdafa/RathHV12} and the ReactiveATL incremental model-to-model 
+transformation engine \cite{DBLP:conf/ecmdafa/OgunyomiRK15}. The main advantage of this 
+approach is that precise and fine-grained change notifications are provided 
+for free by the modelling tool (and thus do not need to be computed by the 
+execution engine---which as discussed below can be expensive and inefficient). 
+On the downside, this approach is a poor fit for collaborative development 
+settings where modelling and automated model processing activities are 
+performed by different members of the team.
+
+\textbf{Model Differencing}. This approach eliminates the coupling between 
+modelling tools and incremental execution engines. Instead of depending on 
+live notifications, in this approach the developer in charge of automated model 
+processing, needs to have access to a copy of the last version of the model that 
+the model processing program (e.g. the model-to-text transformation) was 
+executed upon, so that it can be compared against the current version of 
+the model (e.g. using a model-differencing framework such as SiDiff or 
+EMFCompare) and the delta can be computed on demand. The main advantage of 
+this approach is that it works well in a collaborative development environment 
+where typically developers have distinct roles and responsibilities. On the 
+downside, model comparison and differencing are computationally expensive and 
+memory-greedy (both versions of the model need to be loaded into memory before 
+they can be compared), thus largely undermining the time and resource saving 
+potentials of incremental re-execution. This approach is adopted by the Xpand 
+model-to-text transformation language. According to the developers of the 
+language, using this approach, a speed-up of only around 50\% is observed 
+compared to non-incremental transformation\footnote{\url{http://wiki.eclipse.org/Xpand/
+        New_And_Noteworthy\#Incremental_Generation}}, 
+which is consistent with our experience from using Xpand.
+
+In summary, incremental model processing currently delivers significant 
+performance benefits only in a single-developer environment where the modeller 
+is also responsible for performing all the (incremental) model processing 
+operations. As a result, in collaborative development environments, 
+developers need to either forgo incremental model processing altogether 
+or to work around this limitation by manually steering model processing 
+programs to process only subsets of their models, which is cumbersome and 
+error prone.
+
+
+\section{State-based Model vs. Change-based Model}
+\label{sec:state-based_model_vs_change-based_model}
+ The summary of 
+the literature review and existing tool exploration is presented in
+Table \ref{table:summary_literature_review}.
 
 \begin{table}[t!]
     \centering
@@ -67,3 +125,11 @@ This work has conducted a literature review and existing tool exploration to ide
         \hline
     \end{tabular} 
 \end{table}
+
+\section{EMF Compare}
+\label{sec:emf_compare}
+
+\section{EMF Store}
+\label{sec:emf_store}
+
+

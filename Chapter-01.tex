@@ -1,14 +1,51 @@
 \chapter{Introduction}
 \label{ch:introduction}
-This Chapter briefly presents the background of this work as well as the research questions that will be addressed in this project. Several research objectives are then defined to answer the research questions. Lastly, research outputs and scoping are also presented. 
+This Chapter briefly presents the background of this work as well as the research questions that will be 
+addressed in this project. Several research objectives are then defined to answer the research questions. 
+Lastly, research outputs and scoping are also presented. 
 
 \section{Background}
 \label{sec:background}
-Most of the models in the context of Model-Driven Engineering are persisted in state-based formats. In such approaches, model files contain snapshots of the models' contents, and activities like version control and change detection are left to external systems such as file-based version-control systems and model differencing facilities. Activities such as change-detection (identifying parts that have changed in a model compared to a previous version) and model comparison (finding differences between models) are computationally consuming for state-based models \cite{Kolovos:2009:DMM:1564596.1564641}.  Thus, a new approach is needed to make the computation more efficient.
+Most of the models in the context of Model-Driven Engineering are persisted in state-based formats. 
+In such approaches, model files contain snapshots of the models' contents, and activities like version control 
+and change detection are left to external systems such as file-based version-control systems and model differencing 
+facilities. Activities such as change-detection (identifying parts that have changed in a model compared 
+to a previous version) and model comparison (finding differences between models) are computationally consuming
+for state-based models \cite{Kolovos:2009:DMM:1564596.1564641}. Thus, a new approach is needed to make the 
+computation more efficient.
 
-As an alternative to state-based persistence, this work proposes that a model can also be persisted in a change-based format, which persists the full sequence of \emph{changes} made to the model instead. The concept of change-based persistence is not new and has been used in persisting changes to software, object-oriented databases, and hierarchical documents \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05}. The change-based approach can improve detecting differences more precisely at the semantic level -- that is by providing finer-granularity information (e.g. types of changes, the order of the changes, elements that were changed, previous values, etc.) -- and therefore provide support to resolve them \cite{mens2002state}. The ordered nature of change-based persistence means that changes made to a model can be identified sequentially without having to explore and compare all elements of the model and its previous version. Based on these arguments, this work explores the advantages and shortcomings of change-based persistence as an alternative approach to state-based persistence for models conforming to 3-layer metamodelling architectures such as EMF and MOF. Persisting models in a change-based format can bring a number of envisioned benefits over state-based persistence, such as the ability to detect changes much faster and more precisely, which can then have positive knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments, and (2) incremental model management ( e.g. incremental query \cite{DBLP:conf/ecmdafa/RathHV12} and model-to-text transformation \cite{Ogunyomi2018}). 
+As an alternative to state-based persistence, this work proposes that a model can also be persisted in a change-based format, 
+which persists the full sequence of \emph{changes} made to the model instead. 
+The concept of change-based persistence is not new and has been used in persisting changes to software, 
+object-oriented databases, and hierarchical documents 
+\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05}. 
+The change-based approach can improve detecting differences more precisely at the semantic 
+level -- that is by providing finer-granularity information (e.g. types of changes, the order of the changes, 
+elements that were changed, previous values, etc.) -- and therefore provide support to resolve them \cite{mens2002state}. 
+The ordered nature of change-based persistence means that changes made to a model can be identified sequentially without 
+having to explore and compare all elements of the model and its previous version. Based on these arguments, 
+this work explores the advantages and shortcomings of change-based persistence as an alternative approach to 
+state-based persistence for models conforming to 3-layer metamodelling architectures such as EMF and MOF. 
+Persisting models in a change-based format can bring a number of envisioned benefits over state-based persistence, 
+such as the ability to detect changes much faster and more precisely, which can then have positive 
+knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments, 
+and (2) incremental model management ( e.g. incremental query \cite{DBLP:conf/ecmdafa/RathHV12} and 
+model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}). 
 
-Nevertheless, change-based persistence also comes with downsides, such as ever-growing model files \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and increased model loading time \cite{mens2002state} which increase storage and computation costs. A model that is frequently modified will increase considerably in file size since every change is added to the file. The increased file size (proportional to the number of persisted changes) will, in turn, increase the loading time of the model since all changes have to be replayed to reconstruct the model's eventual state. These downsides have to be mitigated to enable the practical adoption of change-based persistence. One approach to reducing the file size of change-based models is by removing changes that do not affect the eventual state of the model. For the increased loading time, it can be mitigated by ignoring -- i.e. not replaying -- changes that are cancelled out by later changes or employing change-based and state-based persistence side-by-side so that the benefits of state-based persistence on loading time can be obtained. Other downsides are change-based persistence requires integration with existing tools -- since it is still a non-standard approach -- for its adoption \cite{koegel2010emfstore}, and still has limited support for standard, text-based version controls for collaborative development \cite{koegel2010emfstore}. These downsides can be addressed by developing a change-based persistence plugin for a specific development environment (e.g. Eclipse) and persisting changes in text-based format to support text-based version controls (e.g. Git, SVN).
+Nevertheless, change-based persistence also comes with downsides, such as ever-growing model files 
+\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and increased model loading time \cite{mens2002state}
+which increase storage and computation costs. A model that is frequently modified will increase considerably in file size 
+since every change is added to the file. The increased file size (proportional to the number of persisted changes) will, 
+in turn, increase the loading time of the model since all changes have to be replayed to reconstruct the model's 
+eventual state. These downsides have to be mitigated to enable the practical adoption of change-based persistence. 
+One approach to reducing the file size of change-based models is by removing changes that do not affect the eventual 
+state of the model. For the increased loading time, it can be mitigated by ignoring -- i.e. not replaying -- changes 
+that are cancelled out by later changes or employing change-based and state-based persistence side-by-side so that the
+benefits of state-based persistence on loading time can be obtained. Other downsides are change-based persistence requires 
+integration with existing tools -- since it is still a non-standard approach -- for its adoption \cite{koegel2010emfstore}, 
+and still has limited support for standard, text-based version controls for collaborative development \cite{koegel2010emfstore}. 
+These downsides can be addressed by developing a change-based persistence plugin for a specific development environment 
+(e.g. Eclipse) and persisting changes in text-based format to support text-based version controls (e.g. Git, SVN).
 
 \section{Research Questions}
 \label{sec:research_questions}
@@ -16,49 +53,41 @@ The hypothesis of this work is that \textbf{``Change-based persistence reduces t
 
 To assess the validity of the hypothesis, this work aims to answer the following research questions: 
 \begin{enumerate} 
-    \item \textbf{How to persist models in a change-based format? How does it perform compared to state-based persistence on saving changes?} 
-    
-    The concept of change-based persistence has to be translated into an implementation in a modelling framework context so that it can be applied for model persistence, and therefore its impact on model change-detection, model comparison, and model merging can be assessed.
-    %It is expected that every change made to a model can be persisted by the implementation. Replaying all the persisted changes can reconstruct the same model as the model persisted in state-based format. 
-    %It is also expected that change-based persistence will outperform state-based persistence on time required for saving changes since change-based persistence will only require persisting changes of a model while state-based persistence will persist the whole model. 
-    
-    %\item \textbf{How to mitigate the ever-growing file size and increased loading time of change-based models? To what extent can they be reduced?} 
-    %
-    %Change-based persistence comes with the downsides of larger file sizes and increased loading time. Mitigating these side effects will is essential for facilitating the practical adoption of change-based persistence. For the increased file size, the size can be reduced by removing changes that do not affect the eventual state of the model. For the increased loading time, it can be mitigated by ignoring -- not replaying -- changes that are cancelled out by subsequent changes or employing change-based and state-based persistence side-by-side (hybrid approach). Employing both persistence side-by-side can maintain the benefit of state-based persistence on loading time. It is expected that the mitigation approaches will (1) lead to loading time that is closer to the loading time of state-based format, (2) significantly load models faster than loading change-based models naively, and (3) significantly reduce change-based model file sizes compared to the naive approach on saving change-based model files. 
-    %
-    %For reducing the loading time using change-based and state-based persistence side-by-side, the impact of the approach will also be investigated on several qualities. It is expected that a hybrid persistence approach will: (1) be significantly slower than change-based persistence on persisting changes and slightly slower than state-based persistence on saving time as the hybrid approach will need to save changes to the other two types of persistence, (2) consume more disk space compared to change-based or state-based persistence since the hybrid approach will use them both simultaneously, and (3) facilitate loading time that is closer to the loading time of state-based persistence. 
-    
-    \item \textbf{How to detect changes in change-based models -- comparing them to their ancestors/previous versions? To what extent does change-detection in change-based models perform compared to change-detection in state-based models?} 
-    
-    The purpose of using change-based persistence in this work is to improve change-detection. The change-based persistence will have change-detection time that is smaller than the change-detection time of state-based persistence.        
-    
-    \item \textbf{How to compare change-based models that come from the same ancestor? How does the comparison of change-based models perform compared to the state-based model comparison?} 
-    
-    The knock-on effect of faster change-detection on model comparison will also be investigated. Due to the nature of change-based models, the mechanism to perform change-based model comparison will differ substantially from the current state-based model comparison. It is expected that comparison of change-based models will be significantly faster than the comparison of state-based models.
-    
-    \item \textbf{How to merge different change-based models that come from the same ancestor? How does the merging perform compared to model merging in state-based persistence?}
-    
-    Another knock-on effect of faster change-detection of change-based persistence is faster model merging. Similar to the change-based model comparison, the mechanism to merge change-based models will differ substantially from merging state-based models. It is expected that the change-based model merging will be much faster than state-based model merging.   
-    
+\item \textbf{How to persist models in a change-based format? How does it perform compared to state-based persistence on saving changes?} 
+
+The concept of change-based persistence has to be translated into an implementation in a modelling framework context so that it can be applied for model persistence, and therefore its impact on model change-detection, model comparison, and model merging can be assessed.
+
+\item \textbf{How to detect changes in change-based models -- comparing them to their ancestors/previous versions? To what extent does change-detection in change-based models perform compared to change-detection in state-based models?} 
+
+The purpose of using change-based persistence in this work is to improve change-detection. The change-based persistence will have change-detection time that is smaller than the change-detection time of state-based persistence.        
+
+\item \textbf{How to compare change-based models that come from the same ancestor? How does the comparison of change-based models perform compared to the state-based model comparison?} 
+
+The knock-on effect of faster change-detection on model comparison will also be investigated. Due to the nature of change-based models, the mechanism to perform change-based model comparison will differ substantially from the current state-based model comparison. It is expected that comparison of change-based models will be significantly faster than the comparison of state-based models.
+
+\item \textbf{How to merge different change-based models that come from the same ancestor? How does the merging perform compared to model merging in state-based persistence?}
+
+Another knock-on effect of faster change-detection of change-based persistence is faster model merging. Similar to the change-based model comparison, the mechanism to merge change-based models will differ substantially from merging state-based models. It is expected that the change-based model merging will be much faster than state-based model merging.   
+
 \end{enumerate}
 
 \section{Research Objectives}
 \label{sec:research_objectives}
 This research aims to meet the following research objectives to answer the research questions.
 \begin{enumerate}
-    \item Develop an implementation of change-based persistence so it can be applied to persist models in change-based format, and evaluate the correctness of change-based models that it produces and its performance on saving changes against state-based persistence. 
-    \item Develop a solution to detect changes in change-based models, and compare its execution time and memory footprint against change-detection in state-based models.
-    \item Develop a solution to compare change-based models, and compare its execution time and memory footprint against model comparison in state-based models.
-    \item Develop a solution to merge different change-based models, and compare its execution time and memory footprint against model-merging in state-based models. 
+\item Develop an implementation of change-based persistence so it can be applied to persist models in change-based format, and evaluate the correctness of change-based models that it produces and its performance on saving changes against state-based persistence. 
+\item Develop a solution to detect changes in change-based models, and compare its execution time and memory footprint against change-detection in state-based models.
+\item Develop a solution to compare change-based models, and compare its execution time and memory footprint against model comparison in state-based models.
+\item Develop a solution to merge different change-based models, and compare its execution time and memory footprint against model-merging in state-based models. 
 \end{enumerate}
 
 \section{Research Outputs}
 \label{sec:research_outputs}
 By the end of this research, these following outputs will have been produced:
 \begin{enumerate}
-    \item Prototypes for change-based persistence. 
-    \item Solutions -- including their implementation and evaluation -- for file size and loading time reduction, change-detection (finding parts that already changed of a model compared to its previous version/ancestor), model comparison (finding differences between models that come from the same ancestor), and model merging of change-based persistence.
-    \item Publications and a thesis documenting the outcomes of this research.
+\item Prototypes for change-based persistence. 
+\item Solutions -- including their implementation and evaluation -- for file size and loading time reduction, change-detection (finding parts that already changed of a model compared to its previous version/ancestor), model comparison (finding differences between models that come from the same ancestor), and model merging of change-based persistence.
+\item Publications and a thesis documenting the outcomes of this research.
 \end{enumerate}
 
 

@@ -42,7 +42,7 @@ Sect. \ref{sec:challenges_and_future_works} respectively.
 Section \ref{sec:evaluation_strategy} presents our evaluation strategy 
 and Sect. \ref{sec:conclusions} concludes this paper.
 
-\section{Running Example: Episode 1}
+\section{Running Example}
 \label{sec:running_example_1}
 In this section, I introduce a running example to explain the key-concept of incrementality and how change-based model persistence addresses it. The running example will develops throughout this thesis as I introduce new concepts, such as presenting related work in the literature review, explaining the proposed approaches to address the slow loading of change-based models, and discussing how change-based model persistence can be exploited to optimise model differencing and conflict detection.
 
@@ -72,26 +72,6 @@ Let's say that there is a project to develop a simplified class diagram model of
     \label{fig:class_diagram_rpg}
 \end{figure}
 
-\begin{lstlisting}[style=xmi,caption={State-based representation of the model of Figure \ref{fig:class_diagram_origin} in (simplified) XMI.},label=lst:xmimodel]
-<uml:Model>
-  <packagedElement type=Class id="character" name="Character">
-    <operation id="attack" name="attack">
-      <parameter id="gem" name="gem"/>
-      <parameter id="target" name="target"/>
-      <parameter id="weapon" name="weapon"/>
-    </operation>
-  </packagedElement>
-  <packagedElement type=Class id="troll" name="Troll"/>
-  <packagedElement type=Class id="giant" name="Giant">
-    <operation id="cast" name="cast"/>
-  </packagedElement>
-  <packagedElement type=Class id="knight" name="Knight">
-    <operation id="smash" name="smash"/>
-  </packagedElement>
-  <packagedElement type=Class id="mage" name="Mage"/>
-</uml:Model>
-\end{lstlisting}
-
 \section{The Key-Challenge of Incrementality}
 \label{sec:the_key_challenge_of_ _incrementality}
 To illustrate the key-challenge of incrementality, I use the example in Fig. \ref{fig:class_diagram_rpg}. Let's say that after every modification to the model in Fig. \ref{fig:class_diagram_origin}, the model needs to be:
@@ -115,7 +95,7 @@ and overwrite all documentation files. On the contrary, an
 incremental model-to-text transformation, would identify that it only needs to delete the documentation file of class \textsf{Giant} and generate documentation files for classes \textsf{Character} and \textsf{Troll} -- but not the documentation files of classes \textsf{Knight} and \textsf{Mage}, as these cannot have been affected by the changes made to the model.
 
 While the overhead of executing transformations and validation constraints 
-on small models like the one in Fig. \ref{fig:class_diagram_origin} is negligible, non-incremental execution can become a significant bottleneck for large evolving models. As stressed in Selic's seminal work \cite{selic2003pragmatics}, with reference to model-to-text transformation, ``... \textsf{this is particularly true in the latter phases of the development cycle when programmers make many small changes as they fine-tune the system. To keep this overhead low, it is crucial for the code generators to have sophisticated change impact analysis capabilities that minimize the amount of code regeneration}".
+on small models like the one in Fig. \ref{fig:class_diagram_origin} is negligible, non-incremental execution can become a significant bottleneck for large evolving models. As stressed in Selic's seminal work \cite{selic2003pragmatics}, with reference to model-to-text transformation, ``... \textsf{this is particularly true in the latter phases of the development cycle when programmers make many small changes as they fine-tune the system. To keep this overhead low, it is crucial for the code generators to have sophisticated change impact analysis capabilities that minimize the amount of code regeneration}''.
 
 As demonstrated by the pioneering work of Egyed \cite{egyed2011automatically}, 
 to achieve incremental re-execution of (deterministic) queries on 
@@ -179,7 +159,27 @@ In summary, incremental model processing currently delivers significant performa
 \label{sec:proposed_approach}
 The ambition of this research is to enable high-performance incremental model management in collaborative software development environments by challenging one of the fundamental assumptions of contemporary modelling frameworks and tools: as opposed to persisting snapshots of the state of models (which is what virtually all modelling tools and frameworks currently do), this work proposes turning models inside out and persisting their change history instead.
 
-\begin{lstlisting}[style=xml,caption={Change-based representation of the model of Figure \ref{fig:modified_chart}.},label=lst:cbpmodel]
+\begin{lstlisting}[style=xmi,caption={State-based representation of the model of Figure \ref{fig:class_diagram_left} in (simplified) XMI.},label=lst:xmimodel_left]
+<uml:Model>
+  <packagedElement type=Class id="character" name="Hero">
+    <operation id="attack" name="attack">
+      <parameter id="gem" name="gem"/>
+      <parameter id="weapon" name="weapon"/>
+      <parameter id="target" name="target"/>
+   </operation>  
+  </packagedElement>
+  <packagedElement type=Class id="troll" name="Ogre"/>
+  <packagedElement type=Class id="knight" name="Knight">
+    <generalization id="leftGen" general="character"/>
+    <operation id="smash" name="smash"/>
+  </packagedElement>
+  <packagedElement type=Class id="mage" name="Mage"/>
+</uml:Model>
+\end{lstlisting}
+
+\begin{wrapfigure}[34]{r}{0.60\textwidth}
+\vspace{-12pt}
+\begin{lstlisting}[style=eol,caption={Change-based representation of the model in Figure \ref{fig:class_diagram_left}.},label=lst:cbpmodel]
 session "Jane-01"
 create character type Class
 set character.name to "Character" 
@@ -224,10 +224,11 @@ unset giant.name from "Giant" to null composite r2
 delete giant comp r2
 set troll.name from "Troll" to "Ogre"
 \end{lstlisting}
+\end{wrapfigure}
 
-To illustrate the proposed approach, List. \ref{lst:xmimodel} shows a state-based representation of the model of Fig. \ref{fig:modified_chart} in (simplified) XMI, and List. \ref{lst:cbpmodel} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of List. \ref{lst:cbpmodel} captures the complete sequence of change events (create/set/add/remove/delete) that were performed on the model since its creation, organised in editing sessions (2 editing sessions in the case of this model). Replaying these changes produces the same state as the one captured in List. \ref{lst:xmimodel}, so the proposed representation carries at least as much information as the state-based representation.
+To illustrate the proposed approach, List. \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and List. \ref{lst:cbpmodel} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of List. \ref{lst:cbpmodel} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions (2 editing sessions in the case of this model). Replaying these changes produces the same state as the one captured in List. \ref{lst:xmimodel_left}, so the proposed representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in List. \ref{lst:cbpmodel} is the simplified version of the actual format used in a  change-based file in List. \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
 
-Such a representation is particularly suitable for incremental model processing. For example, if the model-to-text transformation discussed above ``remembers" that in its previous invocation it had processed up to editing session \textsf{s1} of the model, it can readily identify the changes that have been made to the model since then (i.e. in session \textsf{s2} –- lines 15-20) instead of having to rediscover them through (expensive) state-based model differencing.
+Such a representation is particularly suitable for incremental model processing. For example, if the model-to-text transformation discussed above ``remembers" that in its previous invocation it had processed up to editing session \textsf{Jane-01} (lines 1-29) of the model, it can readily identify the changes that have been made to the model since then (i.e. in session \textsf{Bob-01} -- lines 30-43) instead of having to rediscover them through (expensive) state-based model differencing.
 
 \section{Prototype Implementation}
 \label{sec:prototype_implementation}
@@ -242,9 +243,10 @@ This work has implemented a prototype\footnote{The prototype is available under 
 
 Since not all change events are relevant to change-based persistence (e.g. EMF also produces change notifications when listeners/adapted are added/removed from the model), this work has defined a set of event classes to represent events of interest. The event classes are depicted in Fig. \ref{fig:events} as subclasses of the \textsf{ChangeEvent} abstract class.
 
-The \textsf{ChangeEvent} class has a mutli-valued \textsf{values} attribute which can accommodate both single-valued (e.g. set/add) or mutli-valued events (e.g. addAll/removeAll). \textsf{ChangeEvent} can also accommodate different types of values, such as \textsf{EObject}s for \textsf{EReferenceEvents}, and primitive values (e.g. Integer, String) for \textsf{EAttributeEvents}. The \textsf{ChangeEvent} class also has a position attribute to hold the  index of an \textsf{EObject} or a literal when they are added to a \textsf{Resource}, \textsf{EReference}, or \textsf{EAttribute} with multiple values (Lst. \ref{lst:cbpmodel}, line 3, 6, 9, 12, 14, 17, 20). 
+The \textsf{ChangeEvent} class has a multi-valued \textsf{values} attribute which can accommodate both single-valued (e.g. set/add) or multi-valued events (e.g. addAll/removeAll). \textsf{ChangeEvent} can also accommodate different types of values, such as \textsf{EObject}s for \textsf{EReferenceEvents}, and primitive values (e.g. Integer, String) for \textsf{EAttributeEvents}. The \textsf{ChangeEvent} class also has a position attribute to hold the  index of an \textsf{EObject} or a literal when they are added to a \textsf{Resource}, \textsf{EReference}, or \textsf{EAttribute} with multiple values. 
 
-Every time an \textsf{EObject} is added to the model, a \textsf{CreateEObjectEvent} and an \textsf{AddToResourceEvent} are recorded (lines 2-3, 5-6, 8-9, and 16-17 in Lst. \ref{lst:cbpmodel}). When an EObject is deleted, or moved to a containment \textsf{EReference} deeper in the model (Lst. \ref{lst:cbpmodel}, line 12, 14, 20), a \textsf{RemoveFromResourceEvent} (Lst. \ref{lst:cbpmodel}, line 11, 13, 19) is recorded.
+Every time an \textsf{EObject} is added to the model, a \textsf{CreateEObjectEvent} and an \textsf{AddToResourceEvent} are recorded. When an EObject is deleted, or moved to a containment \textsf{EReference} deeper in the model, a \textsf{RemoveFromResourceEvent}
+ is recorded.
 
 The \textsf{ChangeEventAdapter} receives EMF change notifications in its \textsf{notifyChanged()} method and filters and transforms them into appropriate change events. As an example of how notifications are filtered and transformed, Listing \ref{lst:javacode} shows how the prototype handles \textsf{Notification.UNSET} events based on the type of the changed feature i.e. an \textsf{UnsetEAttributeEvent} is instantiated if the feature of the notifier is an \textsf{EAttribute}, or an \textsf{UnsetEReferenceEvent}  is created if the notifier is an \textsf{EReference}. The transformed instances are then stored into a list of events in \textsf{ChangeEventAdapter} (\textsf{changeEvents}) for persistence. 
 

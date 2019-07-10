@@ -58,12 +58,15 @@
         context, inv
     }
 }
-\lstdefinestyle{cbp}{
-    basicstyle=\ttfamily\scriptsize,
-    emph={
-        session, create, type,
-        set, to, add, hire
-    }
+\lstdefinestyle{cbpfile}{
+  basicstyle=\ttfamily\scriptsize,
+  emph={
+    session, register, create, delete, add, resource,
+    set eattribute, epackage, eclass, value, old,
+    position, from, to, unset, ereference, unset, eattribute,
+    move, in, ereference, eobject, literal,
+    remove, composite, time, id
+  }
 }
 \lstdefinestyle{xmi}{
     basicstyle=\ttfamily\scriptsize,
@@ -95,6 +98,7 @@
     emph={
         var, new, for, in, create, set, with, type, at,
         unset, to, add, remove, delete, register, move,
+        composite,
         from, position, from, move-within, session, \.
     }
 }
@@ -205,9 +209,7 @@ acknowledged as References.
 \input{Chapter-08}
 
 \begin{appendices}
-\chapter{Change-based Persistence Files}
-
-
+\input{appendix_cbp}
 \end{appendices}
 
 \cleardoublepage

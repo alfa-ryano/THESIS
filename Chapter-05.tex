@@ -349,53 +349,6 @@ We evaluated the performance of our hybrid persistence prototype against XMI and
 
 As it can be noticed in Table \ref{table:time_memory_footprint}, all cases experience a slight slowdown on loading and saving time (hybrid approach's $mean$ $>$ state-based approach's $mean$). However, almost for all NeoEMF cases, the slowdown is not significant, which means that side-effect of the hybrid approach on loading and saving time is still acceptable. The hybrid approach also produces more memory footprint compared to the state-based-only approach. Nevertheless, considering the cost of main memory, this condition is acceptable in almost all real-world scenarios.
 
-
-
-
-%\vspace{-20pt}
-%\subsection{Change Detection}
-%\label{sec:change_detection}
-%
-%\vspace{-10pt}
-%We evaluated the contribution of CBP, as part of the hybrid model persistence, on model change detection. In this evaluation, we used four versions of the Epsilon project UML2 model: committed versions 8, 44, 181, and 388: details are in Table \ref{table:version_description}. As the scenario for the evaluation, we identify the elements in the older model (lower version number) that do not exist in the newer model (higher version number). Our dataset comprises the pairs, 008 and 044, 008 and 181, and 008 and 383.
-%
-%We used two methods to identify deleted elements. First, we iterated through events in the change-based representation of the pairs' hybrid-model representation (\emph{the hybrid method}). Second, we performed a model-to-model comparison between the two states of the paired versions (8 vs 44, 8 vs 181, 8 vs 388) using EMF Compare and selected diffs representing deleted elements (\emph{the state-based method}). We compared both methods on the time they required to identify all the deleted elements. We performed measurement 22 times for each pair and method to calculate the time. Fig. \ref{table:version_description} shows the result of the comparison. 
-%
-%%\begin{figure}[ht]
-%%    \includegraphics[width=\linewidth]{images/delete_detection_epsilon_average}
-%%    \caption{The time required for hybrid and state-based methods on detecting older version's elements that do not exist in newer versions.}
-%%    \label{fig:delete_detection_epsilon_average}
-%%\end{figure}
-%
-%%\vspace{-40pt}
-%As can be noticed in Table \ref{table:version_description}, identifying changed elements using the hybrid method is distinctly faster than using the state-based method (rows 3 and 4), except when the models being compared are small in size (row 1). Considering the increasing number of elements and events in Table \ref{table:version_description}, the change identification time of the hybrid method tends to grow linearly as the number of events increases, whereas the stated-based method tends to grow exponentially as the number of elements increases.
-%
-%\vspace{-20pt}
-%\begin{table}[ht]
-%    \centering
-%    \caption{Description of version 8, 44, 181, and 388 of the Epsilon project's UML2 model, and delete detection time of hybrid and state-based methods.}
-%    \label{table:version_description}
-%    \begin{tabular}{| r | r | r | r | r || r | r | r | r | r |}
-%        \hline 
-%        \multirow{2}{*}{\textbf{\thead{Ver-\\sions}}} & \multirow{2}{*}{\textbf{\thead{Element\\Counts}}} & \multirow{2}{*}{\textbf{\thead{Delta\\Elements\\(from\\ver. 8)}}} & \multirow{2}{*}{\textbf{\thead{Event\\Counts}}} & \multirow{2}{*}{\textbf{\thead{Delta\\Events\\(from\\ver. 8)}}} & \multicolumn{4}{c|}{\textbf{\thead{Time for Delete Detection\\ in Seconds (from ver. 8)}}} \\
-%        \hhline{~~~~~----}
-%        & & & & & \multicolumn{2}{c|}{\textbf{\thead{Hybrid}}} & \multicolumn{2}{c|}{\textbf{\thead{State-based}}} \\
-%        \hhline{~~~~~----}
-%        & & & & & \textbf{\thead{\textit{mean}}}& \textbf{\thead{\textit{sd}}} &  \textbf{\thead{\textit{mean}}}& \textbf{\thead{\textit{sd}}} \\
-%        \hline 
-%        008	& 25,993 & 0	& 90,888 & 0 & --- & --- & --- & --- \\
-%        044	& 31,240 & 5,247	& 166,659 & 75,771 & 14.28 & 0.36 & 10.81 & 0.16  \\
-%        181	& 34,196 & 8,203	& 250,073 & 159,185 & 28.62 & 0.17 & 72.69 & 1.28 \\
-%        388	& 48,482 & 22,489 & 332,315 & 241,427 & 42.93 & 0.18 & 277.77 & 4.70 \\
-%        \hline 
-%    \end{tabular}
-%    \justify
-%\end{table}
-
-%\subsection{Threats to Validity and Limitations}
-%\label{sec:threats_to_validity_and_limitations}
-%Since change-based model persistence is a relatively new concept, there are hardly any such models available in public repositories that we could reuse for evaluating our prototype. So far, we have only tested the hybrid model persistence approach on synthesised models which may not be representative of the characteristics of models created by people.
-
 \vspace{-20pt}
 \section{Discussion}
 \label{sec:discussion}
@@ -407,23 +360,12 @@ Hybrid model persistence performs slightly slower -- statistically significant f
 
 The main drawback of hybrid model persistence is that it consumes more memory when loading and saving and storage space for persisting models compared to state-based representation only (Sections \ref{sec:model_loading_time} and \ref{sec:storage_space_usage}). However, considering the cost of main memory and storage, the trade-off can be acceptable in most real-world scenarios.
 
-\vspace{-10pt}
-\section{Related Work}
-\label{sec:related_work}
-%Change-based persistence approaches have been used widely in incremental model management engines (e.g. IncQuery \cite{DBLP:conf/ecmdafa/RathHV12}, ReactiveATL \cite{DBLP:conf/ecmdafa/OgunyomiRK15}) usually by harnessing the notification facilities provided by the underlying modelling framework (e.g. EMF). Such approaches have also been applied in other software \cite{DBLP:journals/entcs/RobbesL07}, databases \cite{DBLP:conf/sde/LippeO92}, hierarchical documents \cite{DBLP:conf/caise/IgnatN05}, model repositories and version control \cite{koegel2010emfstore}. The approach is faster for detecting changes \cite{DBLP:conf/edoc/KoegelHLHD10}, more accurate and carries semantic information (e.g. actors, objects, timestamps, and sequences involved in events) \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,mens2002state}, faster and more accurate for comparison and merging \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010emfstore}, and enable additional analytics activities \cite{DBLP:journals/entcs/RobbesL07}.
 
 \vspace{-10pt}
-There are several non-XMI approaches to state-based model persistence, using relational or NoSQL databases. For example, EMF Teneo \cite{eclipse2017teneo} persists EMF models in relational databases, while Morsa \cite{DBLP:conf/models/Espinazo-PaganCM11} and NeoEMF \cite{daniel2016neoemf} persist models in document and graph databases, respectively. None of these approaches provides built-in support for versioning and models are eventually stored in binary files/folders which are known to be a poor fit for text-oriented version control systems like Git and SVN. Connected Data Objects (CDO) \cite{eclipse2017cdo}, which provides support for database-backed model persistence, also provides collaboration facilities, but CDO adoption necessitates the use of a separate version control system (e.g. a Git repository for code and a CDO repository for models), which introduces fragmentation and administration challenges \cite{barmpis2014evaluation}. Similar challenges arise in relation to other model-specific version control systems such as EMFStore \cite{koegel2010emfstore}. %prefer this to the wording in the repository version!
-
-\vspace{-10pt}
-\section{Conclusions and Future Work}
-\label{sec:conlcusions_and_future_work}
+\section{Conclusions}
+\label{sec:conlcusions_5}
 
 \vspace{-10pt}
 In this paper, we have proposed a hybrid model persistence approach and evaluated its impact on time and memory footprint for model loading and saving, and storage space usage.
-%, and detecting changes of versions of the same model. 
 Based on the evaluation results, the hybrid model persistence provides benefits on model loading time 
-%and change detection 
 with an acceptable trade-off on memory footprint and storage space usage. 
-
-Currently, we are still working on the hybrid model comparison (Section \ref{sec:hybrid_model_persistence} -- Comparing hybrid models). So far, the progress is promising. Based on our preliminary investigation, it can detect atomic changes of models faster than state-based model comparison, e.g. detecting elements that have been removed from older versions. In the future, we plan to evaluate hybrid model persistence on even larger models and perform experiments where software modellers are asked to construct change-based models. We also plan to develop a solution for the efficient merging of change-based and hybrid models. 

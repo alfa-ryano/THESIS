@@ -95,24 +95,24 @@ By the end of this research, these following outputs will have been produced:
 \label{sec:research_scope}
 The scope of this research will be restricted to models conforming to 3-level metamodelling architectures. The Eclipse Modelling Framework will be used, as a representative example of such architectures, for the implementation of all algorithms and prototypes.
 
-\chapter{Thesis Structure}
+\section{Thesis Structure}
 \label{sec:Thesis Structure}
 This section provides the description of the planned thesis structure and its progress. Each subsection corresponds to a chapter in the thesis report and describes the purpose, contents, and progress of the chapter. Some of the contents have been discussed in this research's Progress Report \cite{yohannis2017progress}, Thesis Outline \cite{yohannis2018outline}, and written papers \cite{DBLP:conf/models/YohannisKP17,yohannis2018towards,DBLP:conf/models/YohannisRPK18}, and they will be transferred to the thesis report with proper adjustments. The planned time frame for each chapter is presented in Chapter \ref{ch:plan}.
 
-\section{Chapter 1: Introduction}
+\subsection{Chapter 1: Introduction}
 \label{sec:chapter_1_introduction_plan}
 This chapter is intended to present the motivation and purpose of this research. It will comprise the (1) background of the research as well as the (2) research hypothesis, (3) research questions, (4) research objectives, (5) research outputs, and (6) research scope. All of these contents have been defined in the Progress Report \cite{yohannis2017progress} and  this Thesis Audit, and they will be transferred to the Thesis Report with proper adjustments. 
 
-\section{Chapter 2: Literature Review}
+\subsection{Chapter 2: Literature Review}
 \label{sec:chapter_2_literature_review_plan}
 This chapter is dedicated to summarise work related to change-based persistence and comparison, critically assesses the advantages and disadvantages of current approaches, and seek the opportunities to contribute novel knowledge to the field. The chapter will comprise (1) change-based approaches in software engineering, (2) change-based model persistence, (3) state-based model persistence, (4) text-based comparison and merging, (5) state-based model comparison and merging, and (6) change-based model comparison and merging. Most of these topics have been discussed briefly in the Progress Report \cite{yohannis2017progress}. %However, text-based comparison, state-based model comparison, and change-based model comparison and merging need more literature review and deeper analysis to support defining a new approach for change-based model comparison and merging.
 
-\section{Chapter 3: Change-based Model Persistence}
+\subsection{Chapter 3: Change-based Model Persistence}
 \label{sec:chapter_3_Change-based_model_ersistence_plan}
 This chapter is planned to present the concept of change-based model persistence and its core implementation. The chapter will comprise the concept of change-based model persistence, and the design of the core implementation. The implementation is evaluated by comparing the eventual model produced by replaying a change-based representation to the same model but loaded from a state-based persistence (e.g. XMI). These contents have been published in a workshop \cite{DBLP:conf/models/YohannisKP17}.
 
 
-\section{Chapter 4: Optimised Loading of Change-based Models}
+\subsection{Chapter 4: Optimised Loading of Change-based Models}
 \label{sec:chapter_4_optimised_loading_change_based_model_persistence}
 
 Change-based persistence comes with a downside of ever-growing file sizes \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} which causes increased loading time \cite{mens2002state}. Reducing the loading time is essential to facilitate the practical adoption of change-based persistence. One way to reduce the increased loading time is by ignoring -- not replaying -- changes that are cancelled out by subsequent changes. 
@@ -122,7 +122,7 @@ To evaluate the efficiency of the proposed approach, the optimised loading is co
 This chapter is intended to present the optimisation approach along with its implementation and evaluation. The contents of this chapter will be largely based on an accepted conference paper \cite{yohannis2018towards}. 
 
 
-\section{Chapter 5: Hybrid Model Persistence}
+\subsection{Chapter 5: Hybrid Model Persistence}
 \label{sec:chapter_5_hybrid_model_persistence}
 While optimised loading is faster than the naive loading, the benefits are moderate and that the optimised loading is still slower than loading from a state-based representation \cite{yohannis2018towards}. This finding has motivated the design and development of a hybrid persistence approach, that is augmenting a change-based representation with a state-based representation. 
 
@@ -130,7 +130,7 @@ The hybrid model persistence approach is evaluated by comparing it to state-base
 
 This chapter is dedicated to present the hybrid model persistence approach together with its implementation and evaluation. The contents of this chapter will be largely based on a workshop paper \cite{DBLP:conf/models/YohannisRPK18} that is currently under review. 
 
-\section{Chapter 6: Change-based Model Comparison}
+\subsection{Chapter 6: Change-based Model Comparison}
 \label{sec:chapter_6_change_based_model_comparison}
 This chapter will present a change-based model comparison algorithm with its implementation and evaluation. Change-based persistence is expected to speed-up model comparison because the information required to identify changes is already contained in the models' representation. 
 
@@ -139,7 +139,7 @@ The proposed algorithm will be evaluated by comparing it to state-based model co
 The findings of this chapter will be published together with the findings of Chapter 7.
 
 
-\section{Chapter 7: Change-based Model Merging}
+\subsection{Chapter 7: Change-based Model Merging}
 \label{sec:chapter_7_change_based_model_Merging}
 This chapter is planned to present change-based model merging. After identifying the differences between two versions of a change-based model, there is a need to reconcile all the differences into a new version of the model. Thus, conflicts between the two versions have to be identified and resolved -- using predefined rules or based on users' decisions, and by then merging steps can be determined to merge the two versions. 
 

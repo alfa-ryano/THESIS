@@ -1,184 +1,196 @@
-\chapter{Literature Review}
-This work has conducted a literature review and existing tool exploration to 
-identify problem that provide motivation for research. 
+\chapter{Change-based Model Persistence}
+\label{ch:change_based_model_persitence}
+This chapter presents an approach for change-based model 
+persistence, as opposed to state-based model persistence,
+that can facilitate high-performance incremental model processing 
+(e.g., validation, transformation,
+model differencing and conflict detection) by minimising the cost 
+of change identification when models evolve. 
+This chapter illustrates a prototype that implements the proposed
+approach on top of the Eclipse Modelling Framework.
 
-\section{Identifying Changes in Models}
-\label{sec:identifying_changes_in models}
-There are two approaches in the literature for identifying changes in models 
-in order to enable incremental re-execution of model processing operations.
+\section{Introduction}
+\label{Introduction}
+To reap the benefits of Model-Based Software Engineering in the context 
+of large and complex systems, the ability to process large models 
+in an incremental fashion as they evolve is essential. 
+Current incremental model processing techniques 
+(Section \ref{sec:identifying_changes_in models}) only deliver limited 
+performance benefits due to slow and imprecise model change detection 
+capabilities or are limited to a single-developer environment;
+not realistic for real-world software development projects.
+The research introduced in this paper aims at enabling flexible 
+and high-performance incremental model processing through 
+change-based model persistence. That is, instead of persisting snapshots 
+of the state of models, this research proposes persisting models on their change history. 
+The proposed approach has the potential to 
+deliver step-change performance benefits in incremental model processing, 
+faster model differencing and conflict detection, 
+as well as a wide range of other benefits and novel capabilities.
 
-\textbf{Notifications}. In this approach, the incremental execution 
-engine needs to hook into the notification facilities 
-provided by the modelling tool through which the developer edits the model, 
-so that the engine can directly receive notifications as soon as 
-changes happen (e.g. a new employee (\emph{e4}) has been added, 
-the name property of employee \emph{e4} has been changed to ``Richmond"). 
-This is an approach taken by the IncQuery incremental pattern matching 
-framework \cite{DBLP:conf/ecmdafa/RathHV12} and the ReactiveATL incremental model-to-model 
-transformation engine \cite{DBLP:conf/ecmdafa/OgunyomiRK15}. The main advantage of this 
-approach is that precise and fine-grained change notifications are provided 
-for free by the modelling tool (and thus do not need to be computed by the 
-execution engine---which as discussed below can be expensive and inefficient). 
-On the downside, this approach is a poor fit for collaborative development 
-settings where modelling and automated model processing activities are 
-performed by different members of the team.
+The rest of this chapter is structured as follows. 
+Section \ref{sec:running_example_1} 
+present the introduction to the running example used throughout this thesis. 
+Section \ref{sec:the_key_challenge_of_ _incrementality} 
+reviews the key-challenge of incrementality in Model-based Software Engineering (MBSE). 
+Section \ref{sec:proposed_approach} overviews our proposed approach 
+and Section \ref{sec:prototype_implementation} discusses our prototype 
+implementation on top of the Eclipse Modelling Framework. 
+The potential benefits and novel capabilities, as well as the challenges 
+of change-based model persistence, are presented in 
+Sect. \ref{sec:benefits_and_novel_capabilities} and 
+Sect. \ref{sec:challenges_and_future_works} respectively. 
+Section \ref{sec:evaluation_strategy} presents our evaluation strategy 
+and Sect. \ref{sec:conclusions} concludes this paper.
 
-\textbf{Model Differencing}. This approach eliminates the coupling between 
-modelling tools and incremental execution engines. Instead of depending on 
-live notifications, in this approach the developer in charge of automated model 
-processing, needs to have access to a copy of the last version of the model that 
-the model processing program (e.g. the model-to-text transformation) was 
-executed upon, so that it can be compared against the current version of 
-the model (e.g. using a model-differencing framework such as SiDiff or 
-EMFCompare) and the delta can be computed on demand. The main advantage of 
-this approach is that it works well in a collaborative development environment 
-where typically developers have distinct roles and responsibilities. On the 
-downside, model comparison and differencing are computationally expensive and 
-memory-greedy (both versions of the model need to be loaded into memory before 
-they can be compared), thus largely undermining the time and resource saving 
-potentials of incremental re-execution. This approach is adopted by the Xpand 
-model-to-text transformation language. According to the developers of the 
-language, using this approach, a speed-up of only around 50\% is observed 
-compared to non-incremental transformation\footnote{\url{http://wiki.eclipse.org/Xpand/
-        New_And_Noteworthy\#Incremental_Generation}}, 
-which is consistent with our experience from using Xpand.
+\section{Proposed Approach}
+\label{sec:proposed_approach}
+The ambition of this research is to enable high-performance incremental model management in collaborative software development environments by challenging one of the fundamental assumptions of contemporary modelling frameworks and tools: as opposed to persisting snapshots of the state of models (which is what virtually all modelling tools and frameworks currently do), this work proposes turning models inside out and persisting their change history instead.
 
-In summary, incremental model processing currently delivers significant 
-performance benefits only in a single-developer environment where the modeller 
-is also responsible for performing all the (incremental) model processing 
-operations. As a result, in collaborative development environments, 
-developers need to either forgo incremental model processing altogether 
-or to work around this limitation by manually steering model processing 
-programs to process only subsets of their models, which is cumbersome and 
-error prone.
+\begin{lstlisting}[style=xmi,caption={State-based representation of the model of Figure \ref{fig:class_diagram_left} in (simplified) XMI.},label=lst:xmimodel_left]
+<uml:Model>
+  <packagedElement type=Class id="character" name="Hero">
+    <operation id="attack" name="attack">
+      <parameter id="gem" name="gem"/>
+      <parameter id="weapon" name="weapon"/>
+      <parameter id="target" name="target"/>
+   </operation>  
+  </packagedElement>
+  <packagedElement type=Class id="troll" name="Ogre"/>
+  <packagedElement type=Class id="knight" name="Knight">
+    <generalization id="leftGen" general="character"/>
+    <operation id="smash" name="smash"/>
+  </packagedElement>
+  <packagedElement type=Class id="mage" name="Mage"/>
+</uml:Model>
+\end{lstlisting}
 
+\begin{wrapfigure}[34]{r}{0.60\textwidth}
+\vspace{-12pt}
+\begin{lstlisting}[style=eol,caption={Change-based representation of the model in Figure \ref{fig:class_diagram_left}.},label=lst:cbpmodel]
+session "Jane-01"
+create character type Class
+set character.name to "Character" 
+create attack type Operation
+set attack.name to "attack" 
+add attack to character.operations at 0
+create gem type Parameter
+set gem.name to "gem" 
+add gem to attack.parameters at 0
+create target type Parameter
+set target.name to "target" 
+add target to attack.parameters at 1
+create weapon type Parameter
+set weapon.name to "weapon" 
+add weapon to attack.parameters at 2
+create troll type Class
+set troll.name to "Troll" 
+create giant type class
+set giant.name to "Giant"
+create cast type Operation
+set cast.name to "smash"
+add cast to giant.operations at 0
+create knight type Class
+set knight.name to "Knight"
+create smash type Operation
+set smash.name to "smash"
+add smash to knight.operations at 0
+create mage type Class
+set mage.name to "Mage" 
+session "Bob-01"
+create leftGen type Generalization
+set leftGen.general to character
+set troll.generalization to leftGen
+set character.name from "Character" to "Hero"
+remove leftGen from troll.generalization composite r1
+set knight.generalization to leftGen composite r1
+move target in attack.parameters from 1 to 2
+unset cast.name from "cast" to null composite r2
+remove cast from giant.operations at 0 composite r2
+delete cast composite r2
+unset giant.name from "Giant" to null composite r2
+delete giant comp r2
+set troll.name from "Troll" to "Ogre"
+\end{lstlisting}
+\end{wrapfigure}
 
-\section{State-based Persistence vs. Change-based Persistence}
-\label{sec:state-based_model_vs_change-based_model}
+To illustrate the proposed approach, List. \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and List. \ref{lst:cbpmodel} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of List. \ref{lst:cbpmodel} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions (2 editing sessions in the case of this model). Replaying these changes produces the same state as the one captured in List. \ref{lst:xmimodel_left}, so the proposed representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in List. \ref{lst:cbpmodel} is the simplified version of the actual format used in a  change-based file in List. \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
 
-The concept of change-based persistence is not new and has been used in persisting changes to software, 
-object-oriented databases, and hierarchical documents 
-\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05}. 
-The change-based approach can improve detecting differences more precisely at the semantic 
-level -- that is by providing finer-granularity information (e.g. types of changes, the order of the changes, 
-elements that were changed, previous values, etc.) -- and therefore provide support to resolve them \cite{mens2002state}. 
-The ordered nature of change-based persistence means that changes made to a model can be identified sequentially without 
-having to explore and compare all elements of the model and its previous version. Based on these arguments, 
-this work explores the advantages and shortcomings of change-based persistence as an alternative approach to 
-state-based persistence for models conforming to 3-layer metamodelling architectures such as EMF and MOF. 
-Persisting models in a change-based format can bring a number of envisioned benefits over state-based persistence, 
-such as the ability to detect changes much faster and more precisely, which can then have positive 
-knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments, 
-and (2) incremental model management ( e.g. incremental query \cite{DBLP:conf/ecmdafa/RathHV12} and 
-model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}). 
+Such a representation is particularly suitable for incremental model processing. For example, if the model-to-text transformation discussed above ``remembers" that in its previous invocation it had processed up to editing session \textsf{Jane-01} (lines 1-29) of the model, it can readily identify the changes that have been made to the model since then (i.e. in session \textsf{Bob-01} -- lines 30-43) instead of having to rediscover them through (expensive) state-based model differencing.
 
-Nevertheless, change-based persistence also comes with downsides, such as ever-growing model files 
-\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and increased model loading time \cite{mens2002state}
-which increase storage and computation costs. A model that is frequently modified will increase considerably in file size 
-since every change is added to the file. The increased file size (proportional to the number of persisted changes) will, 
-in turn, increase the loading time of the model since all changes have to be replayed to reconstruct the model's 
-eventual state. These downsides have to be mitigated to enable the practical adoption of change-based persistence. 
-One approach to reducing the file size of change-based models is by removing changes that do not affect the eventual 
-state of the model. For the increased loading time, it can be mitigated by ignoring -- i.e. not replaying -- changes 
-that are cancelled out by later changes or employing change-based and state-based persistence side-by-side so that the
-benefits of state-based persistence on loading time can be obtained. Other downsides are change-based persistence requires 
-integration with existing tools -- since it is still a non-standard approach -- for its adoption \cite{koegel2010emfstore}, 
-and still has limited support for standard, text-based version controls for collaborative development \cite{koegel2010emfstore}. 
-These downsides can be addressed by developing a change-based persistence plugin for a specific development environment 
-(e.g. Eclipse) and persisting changes in text-based format to support text-based version controls (e.g. Git, SVN).
+\section{Prototype Implementation}
+\label{sec:prototype_implementation}
+This work has implemented a prototype\footnote{The prototype is available under \url{https://github.com/epsilonlabs/emf-cbp}.} of the change-based model persistence format using the notification facilities provided by the Eclipse Modelling Framework. In the implementation, the prototype uses a subclass of EMF's \textsf{EContentAdapter} (\textsf{ChangeEventAdapter}) to receive and record \textsf{Notification} events produced by the framework for every model-element level change.
 
-The summary of 
-the literature review and existing tool exploration is presented in
-Table \ref{table:summary_literature_review}.
-
-\begin{table}[t!]
+\begin{figure}[th]
     \centering
-    \caption{Summary of this work's literature review on change-based approach.}
-    \label{table:summary_literature_review}
-    \begin{tabular}
-        {|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{1.6cm}|>{\centering\arraybackslash}p{4.7cm}|>{\centering\arraybackslash}p{4.7cm}|}
-        \hline 
-        \multicolumn{2}{|c|}{\textbf{Dimensions}}&\textbf{Change-based Approach}&\textbf{State-based Approach}\\
-        \hline 
-        \multirow{2}{2cm}{\centering Model change-detection} & methods & use notification to capture changes & compute differences between two models \\
-        \hhline{~---}
-        & products & used in many incremental projects (e.g IncQuery \cite{rath2012derived}, ReactiveATL \cite{ogunyomi2015property}) & SiDiff \cite{kelter2005generic}, EMF Compare \cite{eclipse2017compare}  \\ 
-        \hline
-        \multirow{2}{2cm}{\centering Model persistence} & methods & persist changes of models & persist states of models \\
-        \hhline{~---}
-        & products & EMFStore \cite{koegel2010emfstore} & XMI, NeoEMF \cite{daniel2016neoemf}, Morsa \cite{pagan2011morsa}, CDO \cite{eclipse2017cdo}, Teneo \cite{eclipse2017teneo}\\
-        \hline
-        \multirow{2}{2cm}{\centering Other persistence} & entities & software \cite{DBLP:journals/entcs/RobbesL07}, database \cite{DBLP:conf/sde/LippeO92}, hierarchical documents \cite{DBLP:conf/caise/IgnatN05}, model repository and version control \cite{koegel2010emfstore} & default for most persistence entities \\
-        \hline
-        \multicolumn{2}{|p{3.6cm}|}{\centering Advantages} &
-        \begin{minipage}[t]{4.7cm}
-            \raggedright
-            \begin{itemize}[leftmargin=9pt]
-                \setlength\itemsep{-5pt}
-                \item[-] Faster for detecting changes \cite{DBLP:conf/edoc/KoegelHLHD10}
-                \item[-] More accurate, carry semantic information \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,mens2002state}  
-                \item[-] Faster and more accurate for comparison and merging \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010emfstore}
-                \item[-] Information carried is useful for analytics \cite{DBLP:journals/entcs/RobbesL07}
-            \end{itemize}
-        \end{minipage}
-        & 
-        \begin{minipage}[t]{4.7cm}
-            \raggedright
-            \begin{itemize}[leftmargin=9pt]
-                \setlength\itemsep{-5pt}
-                \item[-] Faster for loading large models \cite{pagan2011morsa,daniel2016neoemf}
-                \item[-] Supported by standard version controls (e.g. GitHub) \cite{koegel2010emfstore} 
-                \item[-] A default standard, no need integration with existing tools \cite{koegel2010emfstore}  
-            \end{itemize}
-        \end{minipage}
-        \\
-        \hline
-        \multicolumn{2}{|p{3.6cm}|}{\centering Disadvantages} & \begin{minipage}[t]{4.7cm}
-            \raggedright
-            \begin{itemize}[leftmargin=9pt]
-                \setlength\itemsep{-5pt}
-                \item[-] Increased record size \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10}
-                \item[-] Is not efficient for replaying (loading) for long records \cite{mens2002state}
-                \item[-] Limited supports for standard, text-based version controls (e.g. GitHub) \cite{koegel2010emfstore} 
-                \item[-] Not a standard, need integration with existing tools \cite{koegel2010emfstore} 
-            \end{itemize}
-        \end{minipage}
-        & 
-        \begin{minipage}[t]{4.7cm}
-            \raggedright
-            \begin{itemize}[leftmargin=9pt]
-                \setlength\itemsep{-5pt}
-                \item[-] Slower for saving changes  (currently NoSQL is used to solve this) \cite{mens2002state,daniel2016neoemf,pagan2011morsa}
-                \item[-] Slower for comparison \cite{DBLP:conf/edoc/KoegelHLHD10}
-                \item[-] Less accurate, does not carry semantic information \cite{mens2002state,DBLP:conf/edoc/KoegelHLHD10}  
-            \end{itemize}
-        \end{minipage}
-        \\
-        \hline
-    \end{tabular} 
-\end{table}
+    \includegraphics[width=\linewidth]{events}
+    \caption{Event classes to represent changes of models.}
+    \label{fig:events}
+\end{figure}
 
-\section{Model Persistence}
-\label{model_persistence}
-There are several non-XMI approaches to state-based model persistence, using relational or NoSQL databases. For example, EMF Teneo \cite{eclipse2017teneo} persists EMF models in relational databases, while Morsa \cite{DBLP:conf/models/Espinazo-PaganCM11} and NeoEMF \cite{daniel2016neoemf} persist models in document and graph databases, respectively. None of these approaches provides built-in support for versioning and models are eventually stored in binary files/folders which are known to be a poor fit for text-oriented version control systems like Git and SVN. Connected Data Objects (CDO) \cite{eclipse2017cdo}, which provides support for database-backed model persistence, also provides collaboration facilities, but CDO adoption necessitates the use of a separate version control system (e.g. a Git repository for code and a CDO repository for models), which introduces fragmentation and administration challenges \cite{barmpis2014evaluation}. Similar challenges arise in relation to other model-specific version control systems such as EMFStore \cite{koegel2010emfstore}.
+Since not all change events are relevant to change-based persistence (e.g. EMF also produces change notifications when listeners/adapted are added/removed from the model), this work has defined a set of event classes to represent events of interest. The event classes are depicted in Fig. \ref{fig:events} as subclasses of the \textsf{ChangeEvent} abstract class.
 
-We are not aware of any other work that targets comparison and diffing of change-based models persisted as files. However, there are several existing tools for state-based model comparison. Beyond EMFCompare, which we used for our comparative evaluation due to its maturity and ongoing development activity, tools such as SiDiff \cite{Treude2007SiDiff} and DSMDiff \cite{lin2009dsmdiff} also provide language-agnostic graph-based model comparison, with some room for configuration (e.g., assigning different weights to features of types in the language). Additional expressive power -- at the cost of increased complexity and configuration effort -- is offered by dedicated comparison languages such as the Epsilon Comparison Language, which can be used to compare both homogeneous and heterogeneous models \cite{kolovos2009ecl}. We refrain from a more detailed discussion on state-based comparison tools as they all require upfront loading of both versions of the model into memory, which is the main cost that we aspire to reduce with the presented change-based approach.
+The \textsf{ChangeEvent} class has a multi-valued \textsf{values} attribute which can accommodate both single-valued (e.g. set/add) or multi-valued events (e.g. addAll/removeAll). \textsf{ChangeEvent} can also accommodate different types of values, such as \textsf{EObject}s for \textsf{EReferenceEvents}, and primitive values (e.g. Integer, String) for \textsf{EAttributeEvents}. The \textsf{ChangeEvent} class also has a position attribute to hold the  index of an \textsf{EObject} or a literal when they are added to a \textsf{Resource}, \textsf{EReference}, or \textsf{EAttribute} with multiple values. 
 
-Database-backed model persistence and version control solutions such as CDO \cite{eclipse2019cdo} and EMFStore \cite{koegel2010emfstore} also provide diffing capabilities between different versions of the same model without requiring models to be fully loaded into memory, however they present integration challenges with mainstream software engineering tools (e.g., continuous integration systems, backup and restore facilities) which are typically file-based, and their performance can degrade as more models/users are added to a repository, since all models are effectively stored in a single database \cite{KolovosRMPGCLRV13}.
+Every time an \textsf{EObject} is added to the model, a \textsf{CreateEObjectEvent} and an \textsf{AddToResourceEvent} are recorded. When an EObject is deleted, or moved to a containment \textsf{EReference} deeper in the model, a \textsf{RemoveFromResourceEvent}
+ is recorded.
 
+The \textsf{ChangeEventAdapter} receives EMF change notifications in its \textsf{notifyChanged()} method and filters and transforms them into appropriate change events. As an example of how notifications are filtered and transformed, Listing \ref{lst:javacode} shows how the prototype handles \textsf{Notification.UNSET} events based on the type of the changed feature i.e. an \textsf{UnsetEAttributeEvent} is instantiated if the feature of the notifier is an \textsf{EAttribute}, or an \textsf{UnsetEReferenceEvent}  is created if the notifier is an \textsf{EReference}. The transformed instances are then stored into a list of events in \textsf{ChangeEventAdapter} (\textsf{changeEvents}) for persistence. 
 
-\section{State-based Model Differencing}
-\label{sec:state-based_model_differencing}
+\begin{lstlisting}[style=java,caption={Simplified Java code to handle notification events.},label=lst:javacode]
+public class ChangeEventAdapter extends EContentAdapter {
+...
+@override
+public void notifyChanged(Notification n) {
+    ...
+    switch (n.getEventType()) {
+    ... // other events
+    case Notification.UNSET: {
+        if (n.getNotifier() instanceof EObject) {
+            EStructuralFeature feature = (EStructuralFeature) n.getFeature();
+            if (feature instanceof EAttribute) {
+                event = new UnsetEAttributeEvent();
+            } else if (feature instanceof EReference) {
+                event = new UnsetEReferenceEvent();
+            }
+        } break;
+    } 
+    ... // other events
+\end{lstlisting}	
 
+To integrate seamlessly with the EMF framework and to eventually support multiple concrete change-based serialisation formats (e.g. XML-formatted representation for readability and binary for performance/size), the prototype implemented \textsf{CBPResource} abstract class, that extends EMF's built-in \textsf{ResourceImpl} class. The role of the abstract class is to encapsulate all change recording functionality while the role of its concrete subclasses is to implement serialisation and de-serialisation. For example, \textsf{CBPXMLResourceImpl} persists changes in a line-based format where every change is serialised as a single-line XML document. In this way, when a model changes, the prototype can append the new changes to the end of the model file without needing to serialise the entire model again. The prototype has also implemented a \textsf{CBPXMLResourceFactory} class that extends EMF's \textsf{ResourceFactoryImpl}, as the factory class for change-based models. Figure \ref{fig:resources} shows the relationships between these classes.
 
-\section{Model Conflict Detection}
-\label{sec:model_conflict_detection}
+\begin{figure}[th]
+    \centering
+    \includegraphics[width=0.75\linewidth]{resources}
+    \caption{Factory, resources, and ChangeEventAdapter classes.}
+    \label{fig:resources}
+\end{figure}
 
-\subsection{State-based Conflict Detection: EMF Compare}
-\label{sec:emfcompare_conflict_detection}
+\section{Benefits and Novel Capabilities}
+\label{sec:benefits_and_novel_capabilities}
+Beyond facilitating incremental processing, the proposed representation 
+also has the potential to deliver a wide range of benefits and 
+novel capabilities, compared to the currently prevalent 
+state-based representations, some of which are discussed below.
 
-\subsection{Change-based Conflict Detection: EMF Store}
-\label{sec:emfstore_l_conflict_detection}
+\begin{itemize}
+    \item With appropriate tool support, modellers will be able to ``replay" (part of) the change history of a model (e.g. to understand design decisions made by other developers, for training purposes). In state-based approaches, this can be partly achieved if models are stored in a version-control repository (e.g. Git). However, the granularity would only be at the commit level.
+    \item By analysing models serialised in the proposed representation, modelling language and tool vendors will be able to develop deeper insights into how modellers actually use these languages/tools in practice and utilise this information to guide the evolution of the language/tool.
+    \item By attaching additional information to each session (e.g. the id of the developer, references to external documents/URLs), sequences of changes can be traced back to the developer that made them, or to requirements/bug reports that triggered them.
+    \item Persisting changes to large models after an editing session will be significantly faster compared to serialising the entire state of the model, as only changes made during the session will need to be appended to the model file.
+    \item The performance and precision of model comparison and merging can be substantially improved, particularly for large models with shared editing histories.
+\end{itemize}
 
+\section{Challenges}
+\label{sec:challenges}
+The proposed approach also comes with a number of challenges that this research will need to overcome, such as loading overhead and fast-growing model files. However, due to limitation of time, this work only addresses the loading overhead while the fast-growing model files can be set as another topic for future work.  
 
+While, as discussed above, persisting changes to large models is expected to be much faster and resource-efficient compared to state-based approaches, loading models into memory by naively replaying the entire change history is expected to have a significant overhead. To address this challenge, this work has developed two solutions that reduces the cost of change-based model loading, firstly, by recording and ignoring events -- events that are later overridden or cancelled out by other events -- and, secondly, by proposing a hybrid model persistence format which models are loaded from stated-based persistence but changes are persisted into both change-based and state-based representation. 
 
+For the fast-growing model files challenge, persisting models in a change-based format means that model files will keep growing in size during their evolution significantly faster than their state-based counterparts. To address this challenge, one can proposes sound change-compression operations (e.g. remove older/unused information) that can be used to reduce the size of a model in a controlled way or develops a compact textual format that will minimise the amount of space required to record a change (a textual line-separated format is desirable to maintain compatibility with file-based version control systems).  
+
+\section{Conclusions}
+\label{sec:conclusions_2}
+Through persisting models' change history, this research aims at enabling high-performance incremental model processing in collaborative development settings. The proposed approach also has the potential to enable model analytics, more fine-grained tracing, and to improve the precision and performance of model comparison and merging. A prototype implementation of a change-based persistence format has been presented and the main envisioned challenges have been listed. 

@@ -1,4 +1,6 @@
 \chapter{Efficient Conflict Detection of Change-based Models}
+\label{ch:conflict_detection}
+  
 Comparison -- difference identification and conflict detection -- of large models can be time-consuming since every element has to be visited, matched, and compared with its respective element in other models. This can result in bottlenecks in collaborative modelling environments, where identifying differences between two versions of a model is desirable. Reducing the comparison process to only the elements that have been modified since a previous known state (e.g. previous version) could significantly reduce the time required for large model comparison. This paper presents how change-based persistence can be used to localise the comparison of models so that only elements affected by recent changes are compared and to substantially reduce comparison and differencing time (up to 90\% in some experiments) compared to state-based model comparison. 
 
 \section{Another Running Example}

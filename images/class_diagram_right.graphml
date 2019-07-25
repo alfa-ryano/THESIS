@@ -30,7 +30,7 @@
           </y:NodeLabel>
           <y:UML clipContent="false" constraint="" omitDetails="false" stereotype="" use3DEffect="false">
             <y:AttributeLabel/>
-            <y:MethodLabel>attack(target, gem, weapon)
+            <y:MethodLabel>attack(gem, weapon, target)
 </y:MethodLabel>
           </y:UML>
         </y:UMLClassNode>

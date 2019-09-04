@@ -22,99 +22,24 @@ not realistic for real-world software development projects.
 The research introduced in this paper aims at enabling flexible 
 and high-performance incremental model processing through 
 change-based model persistence. That is, instead of persisting snapshots 
-of the state of models, this research proposes persisting models on their change history. 
-The proposed approach has the potential to 
+of the state of models, this research proposes persisting models on their change history. The proposed approach has the potential to 
 deliver step-change performance benefits in incremental model processing, 
 faster model differencing and conflict detection, 
 as well as a wide range of other benefits and novel capabilities.
 
 The rest of this chapter is structured as follows. 
-Section \ref{sec:running_example_1} 
-present the introduction to the running example used throughout this thesis. 
-Section \ref{sec:the_key_challenge_of_ _incrementality} 
-reviews the key-challenge of incrementality in Model-based Software Engineering (MBSE). 
 Section \ref{sec:proposed_approach} overviews our proposed approach 
 and Section \ref{sec:prototype_implementation} discusses our prototype 
 implementation on top of the Eclipse Modelling Framework. 
 The potential benefits and novel capabilities, as well as the challenges 
 of change-based model persistence, are presented in 
-Sect. \ref{sec:benefits_and_novel_capabilities} and 
-Sect. \ref{sec:challenges_and_future_works} respectively. 
-Section \ref{sec:evaluation_strategy} presents our evaluation strategy 
-and Sect. \ref{sec:conclusions} concludes this paper.
+Section \ref{sec:benefits_and_novel_capabilities}. Section \ref{sec:conclusions} concludes this chapter.
 
 \section{Proposed Approach}
 \label{sec:proposed_approach}
 The ambition of this research is to enable high-performance incremental model management in collaborative software development environments by challenging one of the fundamental assumptions of contemporary modelling frameworks and tools: as opposed to persisting snapshots of the state of models (which is what virtually all modelling tools and frameworks currently do), this work proposes turning models inside out and persisting their change history instead.
 
-\begin{lstlisting}[style=xmi,caption={State-based representation of the model of Figure \ref{fig:class_diagram_left} in (simplified) XMI.},label=lst:xmimodel_left]
-<uml:Model>
-  <packagedElement type=Class id="character" name="Hero">
-    <operation id="attack" name="attack">
-      <parameter id="gem" name="gem"/>
-      <parameter id="weapon" name="weapon"/>
-      <parameter id="target" name="target"/>
-   </operation>  
-  </packagedElement>
-  <packagedElement type=Class id="troll" name="Ogre"/>
-  <packagedElement type=Class id="knight" name="Knight">
-    <generalization id="leftGen" general="character"/>
-    <operation id="smash" name="smash"/>
-  </packagedElement>
-  <packagedElement type=Class id="mage" name="Mage"/>
-</uml:Model>
-\end{lstlisting}
-
-\begin{wrapfigure}[34]{r}{0.60\textwidth}
-\vspace{-12pt}
-\begin{lstlisting}[style=eol,caption={Change-based representation of the model in Figure \ref{fig:class_diagram_left}.},label=lst:cbpmodel]
-session "Jane-01"
-create character type Class
-set character.name to "Character" 
-create attack type Operation
-set attack.name to "attack" 
-add attack to character.operations at 0
-create gem type Parameter
-set gem.name to "gem" 
-add gem to attack.parameters at 0
-create target type Parameter
-set target.name to "target" 
-add target to attack.parameters at 1
-create weapon type Parameter
-set weapon.name to "weapon" 
-add weapon to attack.parameters at 2
-create troll type Class
-set troll.name to "Troll" 
-create giant type class
-set giant.name to "Giant"
-create cast type Operation
-set cast.name to "smash"
-add cast to giant.operations at 0
-create knight type Class
-set knight.name to "Knight"
-create smash type Operation
-set smash.name to "smash"
-add smash to knight.operations at 0
-create mage type Class
-set mage.name to "Mage" 
-session "Bob-01"
-create leftGen type Generalization
-set leftGen.general to character
-set troll.generalization to leftGen
-set character.name from "Character" to "Hero"
-remove leftGen from troll.generalization composite r1
-set knight.generalization to leftGen composite r1
-move target in attack.parameters from 1 to 2
-unset cast.name from "cast" to null composite r2
-remove cast from giant.operations at 0 composite r2
-delete cast composite r2
-unset giant.name from "Giant" to null composite r2
-delete giant comp r2
-set troll.name from "Troll" to "Ogre"
-\end{lstlisting}
-\end{wrapfigure}
-
-To illustrate the proposed approach, List. \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and List. \ref{lst:cbpmodel} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of List. \ref{lst:cbpmodel} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions (2 editing sessions in the case of this model). Replaying these changes produces the same state as the one captured in List. \ref{lst:xmimodel_left}, so the proposed representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in List. \ref{lst:cbpmodel} is the simplified version of the actual format used in a  change-based file in List. \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
+To illustrate the proposed approach, Listing \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and Listing \ref{lst:cbp_left} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of Listing \ref{lst:cbp_left} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions. There are two editing sessions in the case of this model: one in Listing \ref{lst:cbp_left} and another in Listing \ref{lst:cbp_origin}. In the actual implementation, change events in Listing \ref{lst:cbp_left} are appended to a file that is a copy of Listing \ref{lst:cbp_origin}. Listing \ref{lst:cbp_left} only shows the appended change events. Replaying these changes, the change events in Listing \ref{lst:cbp_origin} first and then followed by the change events in Listing \ref{lst:cbp_left}, produces the same state as the one captured in Listing \ref{lst:xmimodel_left}, so the proposed representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in Listing \ref{lst:cbpmodel} is the simplified version of the actual format used in a  change-based file in Listing \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
 
 Such a representation is particularly suitable for incremental model processing. For example, if the model-to-text transformation discussed above ``remembers" that in its previous invocation it had processed up to editing session \textsf{Jane-01} (lines 1-29) of the model, it can readily identify the changes that have been made to the model since then (i.e. in session \textsf{Bob-01} -- lines 30-43) instead of having to rediscover them through (expensive) state-based model differencing.
 
@@ -136,8 +61,7 @@ The \textsf{ChangeEvent} class has a multi-valued \textsf{values} attribute whic
 Every time an \textsf{EObject} is added to the model, a \textsf{CreateEObjectEvent} and an \textsf{AddToResourceEvent} are recorded. When an EObject is deleted, or moved to a containment \textsf{EReference} deeper in the model, a \textsf{RemoveFromResourceEvent}
  is recorded.
 
-The \textsf{ChangeEventAdapter} receives EMF change notifications in its \textsf{notifyChanged()} method and filters and transforms them into appropriate change events. As an example of how notifications are filtered and transformed, Listing \ref{lst:javacode} shows how the prototype handles \textsf{Notification.UNSET} events based on the type of the changed feature i.e. an \textsf{UnsetEAttributeEvent} is instantiated if the feature of the notifier is an \textsf{EAttribute}, or an \textsf{UnsetEReferenceEvent}  is created if the notifier is an \textsf{EReference}. The transformed instances are then stored into a list of events in \textsf{ChangeEventAdapter} (\textsf{changeEvents}) for persistence. 
-
+\vspace{-20pt}
 \begin{lstlisting}[style=java,caption={Simplified Java code to handle notification events.},label=lst:javacode]
 public class ChangeEventAdapter extends EContentAdapter {
 ...
@@ -158,6 +82,8 @@ public void notifyChanged(Notification n) {
     } 
     ... // other events
 \end{lstlisting}	
+
+The \textsf{ChangeEventAdapter} receives EMF change notifications in its \textsf{notifyChanged()} method and filters and transforms them into appropriate change events. As an example of how notifications are filtered and transformed, Listing \ref{lst:javacode} shows how the prototype handles \textsf{Notification.UNSET} events based on the type of the changed feature i.e. an \textsf{UnsetEAttributeEvent} is instantiated if the feature of the notifier is an \textsf{EAttribute}, or an \textsf{UnsetEReferenceEvent}  is created if the notifier is an \textsf{EReference}. The transformed instances are then stored into a list of events in \textsf{ChangeEventAdapter} (\textsf{changeEvents}) for persistence. 
 
 To integrate seamlessly with the EMF framework and to eventually support multiple concrete change-based serialisation formats (e.g. XML-formatted representation for readability and binary for performance/size), the prototype implemented \textsf{CBPResource} abstract class, that extends EMF's built-in \textsf{ResourceImpl} class. The role of the abstract class is to encapsulate all change recording functionality while the role of its concrete subclasses is to implement serialisation and de-serialisation. For example, \textsf{CBPXMLResourceImpl} persists changes in a line-based format where every change is serialised as a single-line XML document. In this way, when a model changes, the prototype can append the new changes to the end of the model file without needing to serialise the entire model again. The prototype has also implemented a \textsf{CBPXMLResourceFactory} class that extends EMF's \textsf{ResourceFactoryImpl}, as the factory class for change-based models. Figure \ref{fig:resources} shows the relationships between these classes.
 

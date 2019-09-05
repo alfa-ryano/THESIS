@@ -25,6 +25,8 @@ Persisting models in a change-based format means that model files will keep grow
 \item By attaching additional information to each session (e.g. the id of the developer, references to external documents/URLs), sequences of changes can be traced back to the developer that made them, or to requirements/bug reports that triggered them.
 \item Meanwhile, the CBP approach can be further optimised to consume less memory and speed up parsing, such as using binary format instead of text.
 
+In future, this work intends to evaluate CBP against state-based persistence on real complex models. We also plan to investigate the impact of change-based model persistence on the performance of change detection, model merging, and conflict resolution in the context of collaborative modelling. Meanwhile, the CBP approach can be further optimised to consume less memory and speed up parsing, such as using binary format instead of text. We are also exploring a hybrid persistence representation that offers a combination of state-based and change-based persistence. 
+
 \end{enumerate}
 
 \subsection{Limitations and Validity}

@@ -1,37 +1,34 @@
 \chapter{Conclusions and Future Work}
 
-\section{Conclusions}
-
-\begin{enumerate}
-\item Through persisting models' change history, this research aims at enabling high-performance incremental model processing in collaborative development settings. The proposed approach also has the potential to enable model analytics, more fine-grained tracing, and to improve the precision and performance of model comparison and merging. A prototype implementation of a change-based persistence format has been presented and the main envisioned challenges have been listed. 
-\item This paper proposes an efficient algorithm and supporting data structures for loading change-based models.  Performance is evaluated on synthesised models, with comparison against the existing change-based implementation, and state-based XMI. Our results show considerable savings in terms of loading time with a negligible impact on saving time, but at the cost of a higher memory footprint.  In future, we intend to evaluate CBP against state-based persistence on real complex models.  We also plan to investigate the impact of change-based model persistence on the performance of change detection, model merging, and conflict resolution in the context of collaborative modelling. 
-\item In this paper, we have proposed a hybrid model persistence approach and evaluated its impact on time and memory footprint for model loading and saving, and storage space usage.
-Based on the evaluation results, the hybrid model persistence provides benefits on model loading time 
-with an acceptable trade-off on memory footprint and storage space usage. 
-\item In this paper, we have presented a novel approach to model comparison by exploiting the nature of change-based persistence which allows us to find differences between versions of a model by only comparing the last set of changes between the source and reference model.
-Our evaluation results suggest that using this approach, we can produce model comparison that is faster than traditional, state-based model comparison.
-However, the change-based comparison approach needs to load change events from a change-based persistence into main memory and thus may requires more memory than for state-based comparison. In our evaluation, this occurs when the number of change events exceeds 400,000.
-Arguably, diff and merge operations are usually performed on smaller deltas than our evaluation.
-\end{enumerate}
-
-
-\section{Future Work}
-
-\begin{enumerate}
-\item The proposed approach also comes with a number of challenges that this research needs to overcome, such as loading overhead and fast-growing model files. However, the fast-growing model files challenge has not been addressed. 
-Persisting models in a change-based format means that model files will keep growing in size during their evolution significantly faster than their state-based counterparts. To address this challenge, (1) we will propose sound change-compression operations (e.g. remove older/unused information) that can be used to reduce the size of a model in a controlled way. (2) We will develop a compact textual format that will minimise the amount of space required to record a change (a textual line-separated format is desirable to maintain compatibility with file-based version control systems). 
-\item With appropriate tool support, modellers will be able to ``replay" (part of) the change history of a model (e.g. to understand design decisions made by other developers, for training purposes). In state-based approaches, this can be partly achieved if models are stored in a version-control repository (e.g. Git). However, the granularity would only be at the commit level.
-\item By analysing models serialised in the proposed representation, modelling language and tool vendors will be able to develop deeper insights into how modellers actually use these languages/tools in practice and utilise this information to guide the evolution of the language/tool.
-\item By attaching additional information to each session (e.g. the id of the developer, references to external documents/URLs), sequences of changes can be traced back to the developer that made them, or to requirements/bug reports that triggered them.
-\item Meanwhile, the CBP approach can be further optimised to consume less memory and speed up parsing, such as using binary format instead of text.
-
-In future, this work intends to evaluate CBP against state-based persistence on real complex models. We also plan to investigate the impact of change-based model persistence on the performance of change detection, model merging, and conflict resolution in the context of collaborative modelling. Meanwhile, the CBP approach can be further optimised to consume less memory and speed up parsing, such as using binary format instead of text. We are also exploring a hybrid persistence representation that offers a combination of state-based and change-based persistence. 
-
-\end{enumerate}
-
-\subsection{Limitations and Validity}
+\section{Limitations and Validity}
 \label{sec:limitation_and_Threat_to_validity}
-
 In this work, we have only tested the algorithms on synthesised  models which may not be representative of the complexity and interconnectedness of models in other domains. Diverse characteristics of models in different domains can affect the effectiveness of the algorithm and therefore yield different outcomes. So far, CBP optimisation only supports ordered and unique features. Support for duplicate values means that removal of an item does not necessarily result in the item not being present in the feature value. Additional information must be captured to persist the number of copies and positions of the feature members to properly generate the ignore list. 
 
 The evaluation of the proposed change-based comparison is limited to the Java metamodel only. Thus, there is no guarantee it will perform in a consistent manner on models conforming to different metamodels. Although, we have tried to cover as much as common changes made in EMF models (e.g. performing \textsf{add}/\textsf{remove}/\textsf{set}/\textsf{move} operations on \textsf{single}/\textsf{multi}-\textsf{valued} features, \textsf{attribute}/\textsf{reference} features, or \textsf{containment}/\textsf{non}-\textsf{containment} references), the random modification made in the evaluation does not largely reflect the evolution of models in the real world. This is challenging as different domains can have their own patterns of model evolution -- different problems, metamodels, modellers, etc.
+
+
+\section{Conclusions}
+\label{conclusions_overall}
+Through persisting models' change history, this research aims at enabling high-performance incremental model processing in collaborative development settings. The proposed approach also has the potential to enable model analytics, more fine-grained tracing, and to improve the precision and performance of model comparison and merging. A prototype implementation of a change-based persistence format has been presented and the main envisioned challenges have been listed. 
+
+This paper proposes an efficient algorithm and supporting data structures for loading change-based models.  Performance is evaluated on synthesised models, with comparison against the existing change-based implementation, and state-based XMI. Our results show considerable savings in terms of loading time with a negligible impact on saving time, but at the cost of a higher memory footprint.  In future, we intend to evaluate CBP against state-based persistence on real complex models.  We also plan to investigate the impact of change-based model persistence on the performance of change detection, model merging, and conflict resolution in the context of collaborative modelling. 
+
+In this paper, we have proposed a hybrid model persistence approach and evaluated its impact on time and memory footprint for model loading and saving, and storage space usage.
+Based on the evaluation results, the hybrid model persistence provides benefits on model loading time 
+with an acceptable trade-off on memory footprint and storage space usage. 
+
+In this paper, we have presented a novel approach to model comparison by exploiting the nature of change-based persistence which allows us to find differences between versions of a model by only comparing the last set of changes between the source and reference model.
+Our evaluation results suggest that using this approach, we can produce model comparison that is faster than traditional, state-based model comparison.
+However, the change-based comparison approach needs to load change events from a change-based persistence into main memory and thus may requires more memory than for state-based comparison. In our evaluation, this occurs when the number of change events exceeds 400,000.
+Arguably, diff and merge operations are usually performed on smaller deltas than our evaluation.
+
+\section{Future Work}
+\label{future_work}
+The proposed change-based model persistence also comes with a number of challenges that this research needs to overcome, such as loading overhead and fast-growing model files. The loading overhead has been addressed in this work by introducing hybrid model persistence -- using state and change-based persistence side-by-side -- in which models are loaded from its state-based persistence. Nevertheless, the proposed approach still needs to load change events in order to construct an \textsf{elementTree} -- Section \ref{sec:tree_construction} -- to perform model differencing and conflict detection, as discussed in Chapters \ref{ch:model_differencing} and \ref{ch:conflict_detection}. The loading can be further optimised to consume less memory and speed up parsing, such as using binary or optimised-text format.
+
+The fast-growing model files challenge has not been addressed in this work. Persisting models in a change-based format means that model files will keep growing in size during their evolution significantly faster than their state-based counterparts. This work proposes two solutions to address the issue: (1) sound change-compression operations (e.g. remove older/unused information) that can be used to reduce the size of a model in a controlled way, (2) a compact textual format that will minimise the amount of space required to record a change (a textual line-separated format is desirable to maintain compatibility with file-based version control systems). 
+
+The information contained in change-based model persistence is also useful for Model Analytics. With appropriate tool support, modellers will be able to ``replay" (part of) the change history of a model (e.g. to understand design decisions made by other developers, for training purposes). In state-based approaches, this can be partly achieved if models are stored in a version-control repository (e.g. Git). However, the granularity would only be at the commit level. By analysing models serialised in the proposed representation, modelling language and tool vendors will be able to develop deeper insights into how modellers actually use these languages/tools in practice and utilise this information to guide the evolution of the language/tool. By attaching additional information to each session (e.g. the id of the developer, references to external documents/URLs), sequences of changes can be traced back to the developer that made them, or to requirements/bug reports that triggered them.
+
+In future, this work intends to evaluate CBP against state-based persistence on real complex models.
+

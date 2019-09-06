@@ -247,7 +247,7 @@ Similar to Rule 3, the fourth rule (Rule 4) in Algorithm \ref{alg:diff_rules_2} 
       createNewDiff(getLeftContainer($rightValue$), getRightContainer($rightValue$), getLeftFeature($rightValue$), getRightFeature($rightValue$), null, getRightIndex(rightValue), null, $rightValue$, DifferenceType.DELETE)\;
       addDiffToDiffList($diff$, $diffs$)\;
     }
-    \tcp{Rule : one of rules to determine addition of an element}
+    \tcp{Rule 5: one of rules to determine addition of an element}
     \If{getType($feature$) \Is Containment \AndA leftIsCreated($leftValue$)  \AndA \Not leftIsDeleted($leftValue$) \AndA \Not rightIsCreated($leftValue$) \AndA \Not rightIsDeleted($leftValue$)}{
       $diff$ $\leftarrow$ createNewDiff(getLeftContainer($leftValue$), getRightContainer($leftValue$), getLeftFeature($leftValue$), getRightFeature($leftValue$), getLeftIndex($leftValue$), null, $rightValue$, null, DifferenceType.ADD)\;
       addDiffToDiffList($diff$, $diffs$)\;

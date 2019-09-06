@@ -53,21 +53,21 @@ The hypothesis of this work is that \textbf{``Change-based persistence reduces t
 
 To assess the validity of the hypothesis, this work aims to answer the following research questions: 
 \begin{enumerate} 
-\item \textbf{How to persist models in a change-based format? How does it perform compared to state-based persistence on saving changes?} 
+\item \textbf{How to persist models in a change-based format? How does it perform compared to state-based persistence on loading and saving models? (RQ1)} 
 
-The concept of change-based persistence has to be translated into an implementation in a modelling framework context so that it can be applied for model persistence, and therefore its impact on model change-detection, model comparison, and model merging can be assessed.
+The concept of change-based persistence has to be translated into an implementation in a modelling framework context so that it can be applied for model persistence, and therefore its impact on model loading and saving, model differencing, and model conflict detection can be assessed.
 
-\item \textbf{How to detect changes in change-based models -- comparing them to their ancestors/previous versions? To what extent does change-detection in change-based models perform compared to change-detection in state-based models?} 
+\item \textbf{How to identify differences between two versions of a change-based model? To what extent does change-based model differencing perform, in terms of speed and memory footprint, compared to state-based model differencing? (RQ2)} 
 
-The purpose of using change-based persistence in this work is to improve change-detection. The change-based persistence will have change-detection time that is smaller than the change-detection time of state-based persistence.        
+The purpose of using change-based persistence in this work is to speed up model differencing. Due to the nature of change-based persistence, the mechanism to perform change-based model differencing will differ substantially from the current state-based model differencing. It is expected that model differencing in change-based persistence perform faster than model differencing in state-based persistence.        
 
-\item \textbf{How to compare change-based models that come from the same ancestor? How does the comparison of change-based models perform compared to the state-based model comparison?} 
+\item \textbf{How to detect conflicts between two versions of a change-based model? To what extent does change-based model conflict detection perform, in terms of speed and memory, compared to state-based model conflict detection? (RQ3)} 
 
-The knock-on effect of faster change-detection on model comparison will also be investigated. Due to the nature of change-based models, the mechanism to perform change-based model comparison will differ substantially from the current state-based model comparison. It is expected that comparison of change-based models will be significantly faster than the comparison of state-based models.
+The knock-on effect of change-based persistence on model conflict detection will also be investigated. It is expected that comparison of change-based models will be significantly faster than the comparison of state-based models.
 
-\item \textbf{How to merge different change-based models that come from the same ancestor? How does the merging perform compared to model merging in state-based persistence?}
-
-Another knock-on effect of faster change-detection of change-based persistence is faster model merging. Similar to the change-based model comparison, the mechanism to merge change-based models will differ substantially from merging state-based models. It is expected that the change-based model merging will be much faster than state-based model merging.   
+%\item \textbf{How to merge different change-based models that come from the same ancestor? How does the merging perform compared to model merging in state-based persistence?}
+%
+%Another knock-on effect of faster change-detection of change-based persistence is faster model merging. Similar to the change-based model comparison, the mechanism to merge change-based models will differ substantially from merging state-based models. It is expected that the change-based model merging will be much faster than state-based model merging.   
 
 \end{enumerate}
 
@@ -76,9 +76,8 @@ Another knock-on effect of faster change-detection of change-based persistence i
 This research aims to meet the following research objectives to answer the research questions.
 \begin{enumerate}
 \item Develop an implementation of change-based persistence so it can be applied to persist models in change-based format, and evaluate the correctness of change-based models that it produces and its performance on saving changes against state-based persistence. 
-\item Develop a solution to detect changes in change-based models, and compare its execution time and memory footprint against change-detection in state-based models.
-\item Develop a solution to compare change-based models, and compare its execution time and memory footprint against model comparison in state-based models.
-\item Develop a solution to merge different change-based models, and compare its execution time and memory footprint against model-merging in state-based models. 
+\item Develop a solution to perform change-based model differencing, and compare its execution time and memory footprint against state-based model differencing.
+\item Develop a solution to perform change-based model conflict detection, and compare its execution time and memory footprint against state-based model conflict detection.
 \end{enumerate}
 
 \section{Research Outputs}
@@ -86,10 +85,9 @@ This research aims to meet the following research objectives to answer the resea
 By the end of this research, these following outputs will have been produced:
 \begin{enumerate}
 \item Prototypes for change-based persistence. 
-\item Solutions -- including their implementation and evaluation -- for file size and loading time reduction, change-detection (finding parts that already changed of a model compared to its previous version/ancestor), model comparison (finding differences between models that come from the same ancestor), and model merging of change-based persistence.
+\item Solutions -- including their implementation and evaluation -- for loading time reduction and saving, model differencing, and model conflict detection of change-based persistence.
 \item Publications and a thesis documenting the outcomes of this research.
 \end{enumerate}
-
 
 \section{Research Scope}
 \label{sec:research_scope}
@@ -121,7 +119,6 @@ To evaluate the efficiency of the proposed approach, the optimised loading is co
 
 This chapter is intended to present the optimisation approach along with its implementation and evaluation. The contents of this chapter will be largely based on an accepted conference paper \cite{yohannis2018towards}. 
 
-
 \subsection{Chapter 5: Hybrid Model Persistence}
 \label{sec:chapter_5_hybrid_model_persistence}
 While optimised loading is faster than the naive loading, the benefits are moderate and that the optimised loading is still slower than loading from a state-based representation \cite{yohannis2018towards}. This finding has motivated the design and development of a hybrid persistence approach, that is augmenting a change-based representation with a state-based representation. 
@@ -146,3 +143,21 @@ This chapter is planned to present change-based model merging. After identifying
 Similar to change-based model comparison in Section \ref{sec:chapter_6_change_based_model_comparison}, the proposed merging approach will also be evaluated by comparing it to the merging of state-based persistence (e.g. EMF Compare) on the affected time and memory footprint. The evaluation will also use the same datasets in Section \ref{sec:chapter_6_change_based_model_comparison}.
 
 The findings of this chapter will be published together with the findings of Chapter 6.
+
+\subsection{Chapter 8: Conclusions and Future Work}
+\label{sec:chapter_8_conclusions_and_future_work}
+
+
+\section{Publications}
+\label{sec:publications}
+This research has published several workshop, conference, and journal papers. They are as follow:
+\begin{enumerate}
+  \item
+  \item
+  \item
+  \item 
+\end{enumerate}
+
+
+
+

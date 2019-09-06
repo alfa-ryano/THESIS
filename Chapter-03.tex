@@ -33,7 +33,7 @@ and Section \ref{sec:prototype_implementation} discusses our prototype
 implementation on top of the Eclipse Modelling Framework. 
 The potential benefits and novel capabilities, as well as the challenges 
 of change-based model persistence, are presented in 
-Section \ref{sec:benefits_and_novel_capabilities}. Section \ref{sec:conclusions} concludes this chapter.
+Section \ref{sec:benefits_and_novel_capabilities}. Section \ref{sec:conclusions_2} concludes this chapter.
 
 \section{Proposed Approach}
 \label{sec:proposed_approach}
@@ -45,7 +45,7 @@ Such a representation is particularly suitable for incremental model processing.
 
 \section{Prototype Implementation}
 \label{sec:prototype_implementation}
-This work has implemented a prototype\footnote{The prototype is available under \url{https://github.com/epsilonlabs/emf-cbp}.} of the change-based model persistence format using the notification facilities provided by the Eclipse Modelling Framework. In the implementation, the prototype uses a subclass of EMF's \textsf{EContentAdapter} (\textsf{ChangeEventAdapter}) to receive and record \textsf{Notification} events produced by the framework for every model-element level change.
+This work has implemented a prototype \cite{epsilonlabs2019emfcbp} of the change-based model persistence format -- the prototype is named Epsilon CBP -- using the notification facilities provided by the Eclipse Modelling Framework. In the implementation, the prototype uses a subclass of EMF's \textsf{EContentAdapter} (\textsf{ChangeEventAdapter}) to receive and record \textsf{Notification} events produced by the framework for every model-element level change.
 
 \begin{figure}[th]
     \centering
@@ -111,7 +111,7 @@ state-based representations, some of which are discussed below.
 
 \section{Challenges}
 \label{sec:challenges}
-The proposed approach also comes with a number of challenges that this research will need to overcome, such as loading overhead and fast-growing model files. However, due to limitation of time, this work only addresses the loading overhead while the fast-growing model files can be set as another topic for future work.  
+The proposed approach also comes with a number of challenges that this research will need to overcome, such as loading overhead and fast-growing model files. However, due to limitation of time, this work only addresses the loading overhead while the fast-growing model files is set as another topic for future work.  
 
 While, as discussed above, persisting changes to large models is expected to be much faster and resource-efficient compared to state-based approaches, loading models into memory by naively replaying the entire change history is expected to have a significant overhead. To address this challenge, this work has developed two solutions that reduces the cost of change-based model loading, firstly, by recording and ignoring events -- events that are later overridden or cancelled out by other events -- and, secondly, by proposing a hybrid model persistence format which models are loaded from stated-based persistence but changes are persisted into both change-based and state-based representation. 
 

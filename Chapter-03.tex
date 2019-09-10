@@ -35,11 +35,59 @@ The potential benefits and novel capabilities, as well as the challenges
 of change-based model persistence, are presented in 
 Section \ref{sec:benefits_and_novel_capabilities}. Section \ref{sec:conclusions_2} concludes this chapter.
 
+\begin{lstlisting}[style=eol,escapechar=|,caption={The complete version of Bob's change events in Listing \ref{lst:cbp_left}.},label=lst:cbp_left_full]
+session "Jane-01"
+create character type Class
+set character.name from null to "Character" 
+create attack type Operation
+set attack.name from null to "attack" 
+add attack to character.operations at 0
+create gem type Parameter
+set gem.name from null to "gem" 
+add gem to attack.parameters at 0
+create target type Parameter
+set target.name from null to "target" 
+add target to attack.parameters at 1
+create weapon type Parameter
+set weapon.name from null to "weapon" 
+add weapon to attack.parameters at 2
+create troll type Class
+set troll.name from null to "Troll" 
+create giant type class
+set giant.name from null to "Giant"
+create cast type Operation
+set cast.name from null to "smash"
+add cast to giant.operations at 0
+create knight type Class
+set knight.name from null to "Knight"
+create smash type Operation
+set smash.name from null to "smash"
+add smash to knight.operations at 0
+create mage type Class
+set mage.name from null to "Mage" 
+session "Bob-01"|\label{line:cbp_left_30}|
+create leftGen type Generalization|\label{line:cbp_left_31}|
+set leftGen.general from null to character|\label{line:cbp_left_32}|
+set troll.generalization to leftGen|\label{line:cbp_left_33}|
+set character.name from "Character" to "Hero"|\label{line:cbp_left_34}|
+unset troll.generalization from leftGen to null composite l1|\label{line:cbp_left_35}|
+set knight.generalization to leftGen composite l1|\label{line:cbp_left_36}|
+move target in attack.parameters from 1 to 2|\label{line:cbp_left_37}|
+unset cast.name from "cast" to null composite l2|\label{line:cbp_left_38}|
+remove cast from giant.operations at 0 composite l2|\label{line:cbp_left_39}|
+delete cast composite l2|\label{line:cbp_left_40}|
+unset giant.name from "Giant" to null composite l2|\label{line:cbp_left_41}|
+delete giant composite l2|\label{line:cbp_left_42}|
+set troll.name from "Troll" to "Ogre"|\label{line:cbp_left_43}|
+\end{lstlisting}
+
+
 \section{Proposed Approach}
 \label{sec:proposed_approach}
+
 The ambition of this research is to enable high-performance incremental model management in collaborative software development environments by challenging one of the fundamental assumptions of contemporary modelling frameworks and tools: as opposed to persisting snapshots of the state of models (which is what virtually all modelling tools and frameworks currently do), this work proposes turning models inside out and persisting their change history instead.
 
-To illustrate the proposed approach, Listing \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and Listing \ref{lst:cbp_left} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of Listing \ref{lst:cbp_left} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions. There are two editing sessions in the case of this model: one in Listing \ref{lst:cbp_left} and another in Listing \ref{lst:cbp_origin}. In the actual implementation, change events in Listing \ref{lst:cbp_left} are appended to a file that is a copy of Listing \ref{lst:cbp_origin}. Listing \ref{lst:cbp_left} only shows the appended change events. Replaying these changes, the change events in Listing \ref{lst:cbp_origin} first and then followed by the change events in Listing \ref{lst:cbp_left}, produces the same state as the one captured in Listing \ref{lst:xmimodel_left}, so the proposed representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in Listing \ref{lst:cbpmodel} is the simplified version of the actual format used in a  change-based file in Listing \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
+To illustrate the proposed approach, Listing \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and Listing \ref{lst:cbp_left} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of Listing \ref{lst:cbp_left} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions. There are two editing sessions in the case of this model: one in Listing \ref{lst:cbp_left} and another in Listing \ref{lst:cbp_origin}. In the actual implementation, change events in Listing \ref{lst:cbp_left} are appended to a file that is a copy of Listing \ref{lst:cbp_origin}. Listing \ref{lst:cbp_left} only shows the appended change events, while Listing \ref{lst:cbp_left_full} shows the complete change events. Replaying these changes, the change events in Listing \ref{lst:cbp_origin} first and then followed by the change events in Listing \ref{lst:cbp_left}, produces the same state as the one captured in Listing \ref{lst:xmimodel_left}. Thus, we can conclude that the proposed change-based representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in Listing \ref{lst:cbp_left_full} is the simplified version of the actual format used in a  change-based file in Listing \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
 
 Such a representation is particularly suitable for incremental model processing. For example, if the model-to-text transformation discussed above ``remembers" that in its previous invocation it had processed up to editing session \textsf{Jane-01} (lines 1-29) of the model, it can readily identify the changes that have been made to the model since then (i.e. in session \textsf{Bob-01} -- lines 30-43) instead of having to rediscover them through (expensive) state-based model differencing.
 

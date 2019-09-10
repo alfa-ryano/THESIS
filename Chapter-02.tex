@@ -95,45 +95,44 @@ Let's say that there is a project to develop a simplified class diagram model of
 </uml:Model>
 \end{lstlisting}
 
-\begin{wrapfigure}[21]{r}{0.53\textwidth}
-  \vspace{-27pt}
+The company where Jane, Bob, and Alice work applies incremental model management in their development process. Applying incrementality allows them to manage their models automatically based on every change made to their models. For example, validating names of classes against a naming convention or to updating a class' documentation when the class is modified. Implementing such incrementality also comes with challenges (e.g., performance and cost for identifying changes; discussed in Section \ref{sec:the_key_challenge_of_incrementality}), and one solution that the company comes up with is, instead of only persisting the snapshots of models, they also persist the complete history of changes made to models in the form of change-based model persistence. 
+
 \begin{lstlisting}[style=eol,caption={Change-based representation of the original version in Figure \ref{fig:class_diagram_origin}.},label=lst:cbp_origin]
 session "Jane-01"
 create character type Class
-set character.name to "Character" 
+set character.name from null to "Character" 
 create attack type Operation
-set attack.name to "attack" 
+set attack.name from null to "attack" 
 add attack to character.operations at 0
 create gem type Parameter
-set gem.name to "gem" 
+set gem.name from null to "gem" 
 add gem to attack.parameters at 0
 create target type Parameter
-set target.name to "target" 
+set target.name from null to "target" 
 add target to attack.parameters at 1
 create weapon type Parameter
-set weapon.name to "weapon" 
+set weapon.name from null to "weapon" 
 add weapon to attack.parameters at 2
 create troll type Class
-set troll.name to "Troll" 
+set troll.name from null to "Troll" 
 create giant type class
-set giant.name to "Giant"
+set giant.name from null to "Giant"
 create cast type Operation
-set cast.name to "smash"
+set cast.name from null to "smash"
 add cast to giant.operations at 0
 create knight type Class
-set knight.name to "Knight"
+set knight.name from null to "Knight"
 create smash type Operation
-set smash.name to "smash"
+set smash.name from null to "smash"
 add smash to knight.operations at 0
 create mage type Class
-set mage.name to "Mage" 
+set mage.name from null to "Mage" 
 \end{lstlisting}
-\end{wrapfigure}
 
-The company where Jane, Bob, and Alice work applies incremental model management in their development process. Applying incrementality allows them to manage their models automatically based on every change made to their models. For example, validating names of classes against a naming convention or to updating a class' documentation when the class is modified. Implementing such incrementality also comes with challenges (e.g., performance and cost for identifying changes; discussed in Section \ref{sec:the_key_challenge_of_incrementality}), and one solution that the company comes up with is, instead of only persisting the snapshots of models, they also persist the complete history of changes made to models in the form of change-based model persistence. 
 
-\begin{wrapfigure}[13]{r}{0.71\textwidth}
-\vspace{-27pt}
+For example, the complete history of changes made by Jane to construct the original version in Figure \ref{fig:class_diagram_origin} is also persisted in a change-based model representation as in Listing \ref{lst:cbp_origin}. The change events (Listing \ref{lst:cbp_left}) made by Bob is appended to Jane's original change events. Thus, the change events that represent Bob's version (Figure \ref{fig:class_diagram_left}) consists of the original change events and the change events (Listing \ref{lst:cbp_left}) made by him; only the appended changes are presented on the list. The change events that represents Alice's version (Figure \ref{fig:class_diagram_right}) is presented in Listing \ref{lst:cbp_right}. One clear advantage of change-based model persistence is that, from Listing \ref{lst:cbp_left}, we can immediately know all the changes made my Bob and Alice (starting from line 30) and identify all the elements that have been modified since Jane's version.  
+
+
 \begin{lstlisting}[firstnumber=30,style=eol,escapechar=|,caption={The appended events made by Bob to produce the left version in Fig. \ref{fig:class_diagram_left} (left version).},label=lst:cbp_left]
 session "Bob-01"|\label{line:cbp_left_30}|
 create leftGen type Generalization|\label{line:cbp_left_31}|
@@ -150,12 +149,7 @@ unset giant.name from "Giant" to null composite l2|\label{line:cbp_left_41}|
 delete giant composite l2|\label{line:cbp_left_42}|
 set troll.name from "Troll" to "Ogre"|\label{line:cbp_left_43}|
 \end{lstlisting}
-\end{wrapfigure}
 
-For example, the complete history of changes made by Jane to construct the original version in Figure \ref{fig:class_diagram_origin} is also persisted in a change-based model representation as in Listing \ref{lst:cbp_origin}. The change events (Listing \ref{lst:cbp_left}) made by Bob is appended to Jane's original change events. Thus, the change events that represent Bob's version (Figure \ref{fig:class_diagram_left}) consists of the original change events and the change events (Listing \ref{lst:cbp_left}) made by him; only the appended changes are presented on the list. The change events that represents Alice's version (Figure \ref{fig:class_diagram_right}) is presented in Listing \ref{lst:cbp_right}. One clear advantage of change-based model persistence is that, from Listing \ref{lst:cbp_left}, we can immediately know all the changes made my Bob and Alice (starting from line 30) and identify all the elements that have been modified since Jane's version.  
-
-\begin{wrapfigure}[12]{r}{0.71\textwidth}
-\vspace{-26pt}
 \begin{lstlisting}[firstnumber=30,style=eol,escapechar=|,caption={The appended events made by Alice to produce the right version in Fig. \ref{fig:class_diagram_right} (right version).},label=lst:cbp_right]
 session "Alice-01"|\label{line:cbp_right_30}|
 move target in attack.parameters from 1 to 0|\label{line:cbp_right_31}|
@@ -171,9 +165,8 @@ unset troll.generalization from rightGen to null composite r3|\label{line:cbp_ri
 set mage.generalization to rightGen composite r3|\label{line:cbp_right_41}|
 set troll.name from "Troll" to "Orc"|\label{line:cbp_right_42}|
 \end{lstlisting}
-\end{wrapfigure}
 
-Let's say the complete scenario that produces the models in Figures \ref{fig:class_diagram_origin}, \ref{fig:class_diagram_left}, and \ref{fig:class_diagram_right} as wells Listings \ref{lst:cbp_origin}, \ref{lst:cbp_left}, and \ref{lst:cbp_right} occured according to the following story. 
+ Let's say the complete scenario that produces the models in Figures \ref{fig:class_diagram_origin}, \ref{fig:class_diagram_left}, and \ref{fig:class_diagram_right} as wells Listings \ref{lst:cbp_origin}, \ref{lst:cbp_left}, and \ref{lst:cbp_right} occured according to the following story.
 
 Jane, as the technical leader, set up the initial model. The records of events during setting up the initial is recorded in the CBMP in List. \ref{lst:cbp_origin}. She created a class \textsf{Character} that contains an operation \textsf{attack} with three parameters: \textsf{gem}, \textsf{target}, and \textsf{weapon} (lines 2-15). She also created four other classes; \textsf{Troll} (lines 16-17), \textsf{Giant} (lines 18-22), \textsf{Knight} (lines 23-27), and \textsf{Mage} (lines 28-29). She then pushed her work to a change-based version control system. If her work is visualised in state-based format, the model looks like in Fig. \ref{fig:class_diagram_origin}.
 

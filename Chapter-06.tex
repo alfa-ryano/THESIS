@@ -22,7 +22,7 @@ Section \ref{sec:evaluation_6} reports on the results of evaluation experiments 
 
 \section{Change-based Model Differencing}
 \label{sec:change_based_approach_for_comparing_models}
-Compared to the state-based model differencing of EMF Compare, the change-based model differencing approach proposed in this work consists of three phases: event loading, element tree construction, and diff computation.
+Compared to the state-based model differencing of EMF Compare, the change-based model proposed in this work consists of three phases: event loading, element tree construction, and diff computation.
 The comparison is not performed over all the elements of the model as opposed to state-based model differencing; instead, the approach only needs to compare the last set of changes from the source and reference model.
 The last set of changes can be identified easily by finding their last common change. A simplified class diagram of the approach's implementation \cite{epsilonlabs2019emfcbp} is depicted in Figure \ref{fig:approach_class_diagram}. The three phases are described in detail in the following Sections.
 

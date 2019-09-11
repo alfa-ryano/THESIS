@@ -1,83 +1,85 @@
-\chapter{Examples of Change-based Persistence}
+\chapter{Change-based Model Persistence in XML-like Format}
 \label{sec:examples_of_cbp}
 
-\begin{lstlisting}[style=cbpfile,caption={Change-based representation of the model in Figure \ref{fig:class_diagram_left}.},label=lst:class_diagram_left_cbpfile]
-<session id="ORIGIN" time="20190709204331782GMT"/>
-<register epackage="org.eclipse.epsilon.cbp.comparison.model.node"/>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-0"/>
-<add-to-resource eclass="Node" position="0"><value eclass="Node" eobject="O-0"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-0"><value literal="ROOT"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-1"/>
-<add-to-resource eclass="Node" position="1"><value eclass="Node" eobject="O-1"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-1"><value literal="Character"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-2"/>
-<add-to-resource eclass="Node" position="2"><value eclass="Node" eobject="O-2"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-2"><value literal="attack"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-3"/>
-<add-to-resource eclass="Node" position="3"><value eclass="Node" eobject="O-3"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-3"><value literal="gem"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-4"/>
-<add-to-resource eclass="Node" position="4"><value eclass="Node" eobject="O-4"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-4"><value literal="target"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-5"/>
-<add-to-resource eclass="Node" position="5"><value eclass="Node" eobject="O-5"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-5"><value literal="weapon"/></set-eattribute>
-<remove-from-resource composite="_1UnfYKKBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-2"/></remove-from-resource>
-<add-to-ereference composite="_1UnfYKKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-1"><value eclass="Node" eobject="O-2"/></add-to-ereference>
-<remove-from-resource composite="_1UnfYaKBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-3"/></remove-from-resource>
-<add-to-ereference composite="_1UnfYaKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-2"><value eclass="Node" eobject="O-3"/></add-to-ereference>
-<remove-from-resource composite="_1UnfYqKBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-4"/></remove-from-resource>
-<add-to-ereference composite="_1UnfYqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="1" target="O-2"><value eclass="Node" eobject="O-4"/></add-to-ereference>
-<remove-from-resource composite="_1UnfY6KBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-5"/></remove-from-resource>
-<add-to-ereference composite="_1UnfY6KBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="2" target="O-2"><value eclass="Node" eobject="O-5"/></add-to-ereference>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-6"/>
-<add-to-resource eclass="Node" position="2"><value eclass="Node" eobject="O-6"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-6"><value literal="Troll"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-7"/>
-<add-to-resource eclass="Node" position="3"><value eclass="Node" eobject="O-7"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-7"><value literal="Giant"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-8"/>
-<add-to-resource eclass="Node" position="4"><value eclass="Node" eobject="O-8"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-8"><value literal="cast"/></set-eattribute>
-<remove-from-resource composite="_1UnfZKKBEemITuTZTlK_UA" eclass="Node" position="4"><value eclass="Node" eobject="O-8"/></remove-from-resource>
-<add-to-ereference composite="_1UnfZKKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-7"><value eclass="Node" eobject="O-8"/></add-to-ereference>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-9"/>
-<add-to-resource eclass="Node" position="4"><value eclass="Node" eobject="O-9"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-9"><value literal="Knight"/></set-eattribute>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-10"/>
-<add-to-resource eclass="Node" position="5"><value eclass="Node" eobject="O-10"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-10"><value literal="smash"/></set-eattribute>
-<remove-from-resource composite="_1UnfZaKBEemITuTZTlK_UA" eclass="Node" position="5"><value eclass="Node" eobject="O-10"/></remove-from-resource>
-<add-to-ereference composite="_1UnfZaKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-9"><value eclass="Node" eobject="O-10"/></add-to-ereference>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-11"/>
-<add-to-resource eclass="Node" position="5"><value eclass="Node" eobject="O-11"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="O-11"><value literal="Mage"/></set-eattribute>
-<remove-from-resource composite="_1UnfZqKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-1"/></remove-from-resource>
-<add-to-ereference composite="_1UnfZqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-0"><value eclass="Node" eobject="O-1"/></add-to-ereference>
-<remove-from-resource composite="_1UnfZ6KBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-6"/></remove-from-resource>
-<add-to-ereference composite="_1UnfZ6KBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="1" target="O-0"><value eclass="Node" eobject="O-6"/></add-to-ereference>
-<remove-from-resource composite="_1UnfaKKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-7"/></remove-from-resource>
-<add-to-ereference composite="_1UnfaKKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="2" target="O-0"><value eclass="Node" eobject="O-7"/></add-to-ereference>
-<remove-from-resource composite="_1UnfaaKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-9"/></remove-from-resource>
-<add-to-ereference composite="_1UnfaaKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="3" target="O-0"><value eclass="Node" eobject="O-9"/></add-to-ereference>
-<remove-from-resource composite="_1UnfaqKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-11"/></remove-from-resource>
-<add-to-ereference composite="_1UnfaqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="4" target="O-0"><value eclass="Node" eobject="O-11"/></add-to-ereference>
-<session id="LEFT" time="20190709204333079GMT"/>
-<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="L-0"/>
-<add-to-resource eclass="Node" position="1"><value eclass="Node" eobject="L-0"/></add-to-resource>
-<set-eattribute eclass="Node" name="name" target="L-0"><value literal="Left Generalisation"/></set-eattribute>
-<remove-from-resource composite="_1beVUKKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="L-0"/></remove-from-resource>
-<set-ereference composite="_1beVUKKBEemITuTZTlK_UA" eclass="Node" name="valNode" target="O-6"><value eclass="Node" eobject="L-0"/></set-ereference>
-<set-ereference eclass="Node" name="refNode" target="L-0"><value eclass="Node" eobject="O-1"/></set-ereference>
-<set-eattribute eclass="Node" name="name" target="O-1"><old-value literal="Character"/><value literal="Hero"/></set-eattribute>
-<unset-ereference composite="_1beVUaKBEemITuTZTlK_UA" eclass="Node" name="valNode" target="O-6"><old-value eclass="Node" eobject="L-0"/></unset-ereference>
-<set-ereference composite="_1beVUaKBEemITuTZTlK_UA" eclass="Node" name="valNode" target="O-9"><value eclass="Node" eobject="L-0"/></set-ereference>
-<move-in-ereference eclass="Node" from="1" name="valNodes" target="O-2" to="2"><value eclass="Node" eobject="O-4"/></move-in-ereference>
-<unset-eattribute composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="name" target="O-8"><old-value literal="cast"/></unset-eattribute>
-<remove-from-ereference composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-7"><value eclass="Node" eobject="O-8"/></remove-from-ereference>
-<delete composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-8"/>
-<unset-eattribute composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="name" target="O-7"><old-value literal="Giant"/></unset-eattribute>
-<remove-from-ereference composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="2" target="O-0"><value eclass="Node" eobject="O-7"/></remove-from-ereference>
-<delete composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-7"/>
-<set-eattribute eclass="Node" name="name" target="O-6"><old-value literal="Troll"/><value literal="Ogre"/></set-eattribute>
-\end{lstlisting}
+\textsf{[TO DO]}
+
+%\begin{lstlisting}[style=cbpfile,caption={Change-based representation of the model in Figure \ref{fig:class_diagram_left}.},label=lst:class_diagram_left_cbpfile]
+%<session id="ORIGIN" time="20190709204331782GMT"/>
+%<register epackage="org.eclipse.epsilon.cbp.comparison.model.node"/>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-0"/>
+%<add-to-resource eclass="Node" position="0"><value eclass="Node" eobject="O-0"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-0"><value literal="ROOT"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-1"/>
+%<add-to-resource eclass="Node" position="1"><value eclass="Node" eobject="O-1"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-1"><value literal="Character"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-2"/>
+%<add-to-resource eclass="Node" position="2"><value eclass="Node" eobject="O-2"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-2"><value literal="attack"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-3"/>
+%<add-to-resource eclass="Node" position="3"><value eclass="Node" eobject="O-3"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-3"><value literal="gem"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-4"/>
+%<add-to-resource eclass="Node" position="4"><value eclass="Node" eobject="O-4"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-4"><value literal="target"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-5"/>
+%<add-to-resource eclass="Node" position="5"><value eclass="Node" eobject="O-5"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-5"><value literal="weapon"/></set-eattribute>
+%<remove-from-resource composite="_1UnfYKKBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-2"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfYKKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-1"><value eclass="Node" eobject="O-2"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfYaKBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-3"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfYaKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-2"><value eclass="Node" eobject="O-3"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfYqKBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-4"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfYqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="1" target="O-2"><value eclass="Node" eobject="O-4"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfY6KBEemITuTZTlK_UA" eclass="Node" position="2"><value eclass="Node" eobject="O-5"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfY6KBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="2" target="O-2"><value eclass="Node" eobject="O-5"/></add-to-ereference>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-6"/>
+%<add-to-resource eclass="Node" position="2"><value eclass="Node" eobject="O-6"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-6"><value literal="Troll"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-7"/>
+%<add-to-resource eclass="Node" position="3"><value eclass="Node" eobject="O-7"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-7"><value literal="Giant"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-8"/>
+%<add-to-resource eclass="Node" position="4"><value eclass="Node" eobject="O-8"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-8"><value literal="cast"/></set-eattribute>
+%<remove-from-resource composite="_1UnfZKKBEemITuTZTlK_UA" eclass="Node" position="4"><value eclass="Node" eobject="O-8"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfZKKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-7"><value eclass="Node" eobject="O-8"/></add-to-ereference>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-9"/>
+%<add-to-resource eclass="Node" position="4"><value eclass="Node" eobject="O-9"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-9"><value literal="Knight"/></set-eattribute>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-10"/>
+%<add-to-resource eclass="Node" position="5"><value eclass="Node" eobject="O-10"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-10"><value literal="smash"/></set-eattribute>
+%<remove-from-resource composite="_1UnfZaKBEemITuTZTlK_UA" eclass="Node" position="5"><value eclass="Node" eobject="O-10"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfZaKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-9"><value eclass="Node" eobject="O-10"/></add-to-ereference>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-11"/>
+%<add-to-resource eclass="Node" position="5"><value eclass="Node" eobject="O-11"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="O-11"><value literal="Mage"/></set-eattribute>
+%<remove-from-resource composite="_1UnfZqKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-1"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfZqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-0"><value eclass="Node" eobject="O-1"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfZ6KBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-6"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfZ6KBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="1" target="O-0"><value eclass="Node" eobject="O-6"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfaKKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-7"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfaKKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="2" target="O-0"><value eclass="Node" eobject="O-7"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfaaKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-9"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfaaKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="3" target="O-0"><value eclass="Node" eobject="O-9"/></add-to-ereference>
+%<remove-from-resource composite="_1UnfaqKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="O-11"/></remove-from-resource>
+%<add-to-ereference composite="_1UnfaqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="4" target="O-0"><value eclass="Node" eobject="O-11"/></add-to-ereference>
+%<session id="LEFT" time="20190709204333079GMT"/>
+%<create eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="L-0"/>
+%<add-to-resource eclass="Node" position="1"><value eclass="Node" eobject="L-0"/></add-to-resource>
+%<set-eattribute eclass="Node" name="name" target="L-0"><value literal="Left Generalisation"/></set-eattribute>
+%<remove-from-resource composite="_1beVUKKBEemITuTZTlK_UA" eclass="Node" position="1"><value eclass="Node" eobject="L-0"/></remove-from-resource>
+%<set-ereference composite="_1beVUKKBEemITuTZTlK_UA" eclass="Node" name="valNode" target="O-6"><value eclass="Node" eobject="L-0"/></set-ereference>
+%<set-ereference eclass="Node" name="refNode" target="L-0"><value eclass="Node" eobject="O-1"/></set-ereference>
+%<set-eattribute eclass="Node" name="name" target="O-1"><old-value literal="Character"/><value literal="Hero"/></set-eattribute>
+%<unset-ereference composite="_1beVUaKBEemITuTZTlK_UA" eclass="Node" name="valNode" target="O-6"><old-value eclass="Node" eobject="L-0"/></unset-ereference>
+%<set-ereference composite="_1beVUaKBEemITuTZTlK_UA" eclass="Node" name="valNode" target="O-9"><value eclass="Node" eobject="L-0"/></set-ereference>
+%<move-in-ereference eclass="Node" from="1" name="valNodes" target="O-2" to="2"><value eclass="Node" eobject="O-4"/></move-in-ereference>
+%<unset-eattribute composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="name" target="O-8"><old-value literal="cast"/></unset-eattribute>
+%<remove-from-ereference composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="0" target="O-7"><value eclass="Node" eobject="O-8"/></remove-from-ereference>
+%<delete composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-8"/>
+%<unset-eattribute composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="name" target="O-7"><old-value literal="Giant"/></unset-eattribute>
+%<remove-from-ereference composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" name="valNodes" position="2" target="O-0"><value eclass="Node" eobject="O-7"/></remove-from-ereference>
+%<delete composite="_1beVUqKBEemITuTZTlK_UA" eclass="Node" epackage="org.eclipse.epsilon.cbp.comparison.model.node" id="O-7"/>
+%<set-eattribute eclass="Node" name="name" target="O-6"><old-value literal="Troll"/><value literal="Ogre"/></set-eattribute>
+%\end{lstlisting}

@@ -128,7 +128,7 @@
 \begin{titlepage}
 \begin{center}
 
-\textbf{\large Change-Based Model Persistence}
+\textbf{\Large Change-Based Model Differencing\\and Conflict Detection}
 
 \vfill
 \begin{figure}[ht]
@@ -167,7 +167,13 @@ for the Degree of Doctor of Philosophy in Computer Science
 \begin{abstract}
 \label{abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-Most of the models in Model-Driven Engineering are persisted in state-based formats. While state-based persistence has certain advantages, it is problematic when it comes to detecting changes in large-scale models. As an alternative, this work proposes a change-based approach that involves persisting the full sequence of changes made to models. Persisting a model in a change-based format has the potential to deliver benefits over state-based persistence, such as the ability to detect changes, compare and merge models much faster and more precisely, which can then yield positive knock-on effects on helping developers compare and merge models in collaborative modelling environments. Nevertheless, change-based persistence also comes with downsides, such as ever-growing model file sizes and increased model loading time. So far, the initial implementation has been presented at the FlexMDE 2017 workshop, the proposed algorithm to optimise the loading time of change-based persistence has been presented at the ECMFA 2018 conference, and a paper discussing hybrid model persistence also has been presented at the Models and Evolution 2018 workshop. Currently, this research is still working on the change-based model comparison and merging. The thesis writing up is planned to start next year. An adjustment of the previous research plan is also presented in this report.
+Most of the models in Model-Driven Engineering are persisted in state-based formats. While state-based persistence has certain advantages, it is problematic when it comes to detecting changes in large-scale models. As an alternative, this work proposes a change-based approach that involves persisting the full sequence of changes made to models. Persisting a model in a change-based format has the potential to deliver benefits over state-based persistence, such as the ability to perform model differencing and conflict detection much faster and more precisely, which can then yield positive knock-on effects on helping developers compare and merge models in collaborative modelling environments. Nevertheless, change-based persistence also comes with downsides, and one of them is the increased model loading time. 
+
+To reduce the loading time, this work has investigated two approaches. First, by cancelling superseded changes, and second, through the use of hybrid model persistence. While the first approach is still by far outperformed by state-based persistence, the hybrid model persistence only experience insignificant slight slowdown in most cases compared to loading models from state-based persistence. 
+
+This work has proposed an approach for a faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence which allows us to find differences and conflicts between two versions of a model by only comparing the last set of changes applied to them, without having to compare every element and feature in both versions as traditionally performed in state-based model comparison. This work's evaluation shows that the proposed changed-based model differencing and conflicts detection outperforms existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reduction on model size could impair the performance of the proposed model differencing and conflict detection as a great number of change records have to be read and loaded into memory.
+
+
 \end{abstract}
 
 \tableofcontents
@@ -187,6 +193,7 @@ Most of the models in Model-Driven Engineering are persisted in state-based form
 
 \cleardoublepage
 \chapter*{Preface}
+\textsf{[TO DO]}
 
 \cleardoublepage
 \chapter*{Acknowledgements}

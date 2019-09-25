@@ -5,9 +5,8 @@ In this chapter, this work proposes and evaluates an efficient approach for load
 
 \section{Introduction}
 \label{sec:introduction_4}
-Conventional approaches for file-based model persistence in metamodelling architectures such as MOF \cite{omg2018mof} and EMF \cite{steinberg2008emf} are state-based -- saving the current state or snapshot of a model.  In these approaches, version control and change detection are delegated to external systems. State-based persistence is computationally expensive, as a whole model must be saved and loaded; this can particularly affect large models and collaborative developments.
-
-In \cite{DBLP:conf/models/YohannisKP17}, proposed change-based persistence (CBP), an approach that persists the full sequence of \emph{changes} made to a model instead of persisting the state. Compared to state-based approaches, CBP supports fast detection of changes, which can speed up model comparison and merging, as well as fast incremental model validation and transformation \cite{DBLP:conf/ecmdafa/RathHV12,DBLP:conf/ecmdafa/OgunyomiRK15}. However, saving the change history of a model results in large, and ever-growing, CBP files.  Loading times are also significant, as the loading process has to reconstruct a model's current state from its history \cite{DBLP:conf/models/YohannisKP17}. This work proposes and evaluates an approach that reduces CBP model loading time by avoiding the replaying of historical changes that have no impact on the final state of the model.
+One of the drawbacks of saving models in change-based persistence (CBP) is that the model results in a large, ever-growing file.  
+Its loading time is also increasing, as the loading process has to reconstruct the model's current state from its history \cite{DBLP:conf/models/YohannisKP17}. This work proposes and evaluates an approach that reduces CBP model loading time by avoiding the replaying of historical changes that have no impact on the final state of the model.
 
 The rest of this chapter is structured as follows. Section \ref{sec:case_study} introduces a running example and provides a brief introduction to CBP.
 Section \ref{sec:loading_time_optimisation} presents the approach to speed up model loading and its supporting data structures. Section \ref{sec:performance_evaluation} presents experimental results and evaluation.  Section \ref{sec:conclusions_4} concludes this chapter.
@@ -203,7 +202,7 @@ Using the Listing \ref{lst:cbpmodel}, we can construct the structure of historie
 \section{Performance Evaluation}
 \label{sec:performance_evaluation}
 
-This work has developed the proposed efficient loading approach on top of the original CBP implementation, Epsilon CBP \cite{DBLP:conf/models/YohannisKP17,epsilonlabs2019emfcbp}, and evaluated our approach's model loading performance, as well as its memory footprint and its impact on the time required to save changes made to CBP models. The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU@2.50GHz 2.59GHz, 12GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0\textunderscore162-b12).
+This work has developed the proposed efficient loading approach on top of the original CBP implementation, EMF CBP \cite{DBLP:conf/models/YohannisKP17,epsilonlabs2019emfcbp}, and evaluated our approach's model loading performance, as well as its memory footprint and its impact on the time required to save changes made to CBP models. The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU@2.50GHz 2.59GHz, 12GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0\textunderscore162-b12).
 
 Given that CBP is a very recent contribution and this work is not aware of any existing datasets containing real-world models expressed in a change-based format, this work has used synthetic change-based models for the experiments. The synthetic models were derived from real-world cases: the BPMN2 \cite{eclipse2017bpmn2,eclipse2018bpmn2git} and Epsilon \cite{eclipse2017epsilon,eclipse2018epsilongit} software projects, and the United States article \cite{wikipedia2018us} on Wikipedia (the article is further referred as Wikipedia). For the first two projects, for each version of the cases, MoDisco \cite{DBLP:journals/infsof/BruneliereCDM14} was used to generate a UML2 \cite{eclipse2017uml2} model that reflects its source code. For the Wikipedia article, a model that conforms to the Modisco XML metamodel \cite{eclipse2018modiscoxml} was generated. Since these cases have many versions -- represented by commits/revisions, different models of the versions can be generated, and to some degree, they reflect the time-ordered changes of the cases. The synthetic change-based model for each case was derived by comparing an initially-empty running model to different versions of the case's models sequentially. All identified differences were then reconciled by performing a unidirectional merging to the running model. All changes made to the running model during the merging process were captured and persisted into a CBP file. EMF Compare was used \cite{eclipse2017compare} to perform the comparison and merging.
 
@@ -236,7 +235,7 @@ Table \ref{table:data_description} summarises events, elements and saved version
 
 \subsection{Model Loading Time}
 \label{subsec:loading_time_test}
-This subsection presents the results of the loading time measurement of change-based models for each pair of the persistence types and cases, and the t-test results of their comparisons (Table \ref{table:ttest_results_loadtime} and Figure \ref{fig:loadtime}). 
+This section presents the results of the loading time measurement of change-based models for each pair of the persistence types and cases, and the t-test results of their comparisons (Table \ref{table:ttest_results_loadtime} and Figure \ref{fig:loadtime}). 
 
 \begin{table}[ht]
 \footnotesize

@@ -1,7 +1,7 @@
 \chapter{Literature Review}
 \label{ch:literature_review}
 This work has conducted a literature review and existing tool exploration to 
-identify problem that provide motivation for research. This chapter also presents a running example. The running example is used throughout this thesis to help introducing and explaining concepts, such as presenting related work (e.g. incrementality, state/change-based model persistence and comparison), explaining this work's proposed approaches to address the slow loading of change-based models, and discussing how change-based model persistence can be exploited to optimise model differencing and conflict detection.
+identify problem that provide motivation for research. This chapter also presents a running example. The running example is used throughout this thesis to help introducing and explaining concepts, such as presenting related work (e.g. state/change-based model persistence and comparison), explaining this work's proposed approaches to address the slow loading of change-based models, and discussing how change-based model persistence can be exploited to optimise model differencing and conflict detection.
 
 \section{Running Example}
 \label{sec:running_example_1}
@@ -31,7 +31,7 @@ identify problem that provide motivation for research. This chapter also present
 
 This chapter starts by introducing a running example. The example is used throughout this thesis to explain the solutions proposed in this research, such as loading optimisation of change-based models, hybrid model persistence, and change-based model differencing and conflict detection. The example is also used to explain how model differencing and conflict detection are performed in the related work, such as in EMF Compare \cite{emfcompare2018developer} and EMF Store \cite{emfstore2019what}. 
 
-Let's say that there is a project to develop a simplified class diagram model of a Role Playing Game (RPG). Jane, as the technical leader, set up the initial model (Fig. \ref{fig:class_diagram_origin}). She then assigned this work to Bob and Alice. Both of them continued to work on the model and made some modification producing the models in Figures \ref{fig:class_diagram_left} and \ref{fig:class_diagram_right} respectively. Persisting these models in the standard XMI \cite{omg2018xmi} format produces three files as shown in Listings \ref{lst:xmimodel_origin}, \ref{lst:xmimodel_left}, and \ref{lst:xmimodel_right}.
+Let's say that there is a project to develop a simplified class diagram model of a Role Playing Game (RPG). Jane, as the technical leader, set up the initial model (Figure \ref{fig:class_diagram_origin}). She then assigned this work to Bob and Alice. Both of them continued to work on the model and made some modification producing the models in Figures \ref{fig:class_diagram_left} and \ref{fig:class_diagram_right} respectively. Persisting these models in the standard XMI \cite{omg2018xmi} format produces three files as shown in Listings \ref{lst:xmimodel_origin}, \ref{lst:xmimodel_left}, and \ref{lst:xmimodel_right}.
 
 \vspace{-20pt}
 \begin{lstlisting}[style=xmi,caption={Simplified XMI file of the original version in Figure \ref{fig:class_diagram_origin}.},label=lst:xmimodel_origin]
@@ -66,7 +66,7 @@ Let's say that there is a project to develop a simplified class diagram model of
   </packagedElement>
   <packagedElement type=Class id="troll" name="Ogre"/>
   <packagedElement type=Class id="knight" name="Knight">
-  <generalization id="leftGen" general="character"/>
+    <generalization id="leftGen" general="character"/>
     <operation id="smash" name="smash"/>
   </packagedElement>
   <packagedElement type=Class id="mage" name="Mage"/>
@@ -133,7 +133,7 @@ set mage.name from null to "Mage"
 For example, the complete history of changes made by Jane to construct the original version in Figure \ref{fig:class_diagram_origin} is also persisted in a change-based model representation as in Listing \ref{lst:cbp_origin}. The change events (Listing \ref{lst:cbp_left}) made by Bob is appended to Jane's original change events. Thus, the change events that represent Bob's version (Figure \ref{fig:class_diagram_left}) consists of the original change events and the change events (Listing \ref{lst:cbp_left}) made by him; only the appended changes are presented on the list. The change events that represents Alice's version (Figure \ref{fig:class_diagram_right}) is presented in Listing \ref{lst:cbp_right}. One clear advantage of change-based model persistence is that, from Listing \ref{lst:cbp_left}, we can immediately know all the changes made my Bob and Alice (starting from line 30) and identify all the elements that have been modified since Jane's version.  
 
 
-\begin{lstlisting}[firstnumber=30,style=eol,escapechar=|,caption={The appended events made by Bob to produce the left version in Fig. \ref{fig:class_diagram_left} (left version).},label=lst:cbp_left]
+\begin{lstlisting}[firstnumber=30,style=eol,escapechar=|,caption={The appended events made by Bob to produce the left version in Figure \ref{fig:class_diagram_left} (left version).},label=lst:cbp_left]
 session "Bob-01"|\label{line:cbp_left_30}|
 create leftGen type Generalization|\label{line:cbp_left_31}|
 set leftGen.general to character|\label{line:cbp_left_32}|
@@ -150,7 +150,7 @@ delete giant composite l2|\label{line:cbp_left_42}|
 set troll.name from "Troll" to "Ogre"|\label{line:cbp_left_43}|
 \end{lstlisting}
 
-\begin{lstlisting}[firstnumber=30,style=eol,escapechar=|,caption={The appended events made by Alice to produce the right version in Fig. \ref{fig:class_diagram_right} (right version).},label=lst:cbp_right]
+\begin{lstlisting}[firstnumber=30,style=eol,escapechar=|,caption={The appended events made by Alice to produce the right version in Figure \ref{fig:class_diagram_right} (right version).},label=lst:cbp_right]
 session "Alice-01"|\label{line:cbp_right_30}|
 move target in attack.parameters from 1 to 0|\label{line:cbp_right_31}|
 remove smash from knight.operations at 0 composite r1|\label{line:cbp_right_32}|
@@ -168,7 +168,7 @@ set troll.name from "Troll" to "Orc"|\label{line:cbp_right_42}|
 
  Let's say the complete scenario that produces the models in Figures \ref{fig:class_diagram_origin}, \ref{fig:class_diagram_left}, and \ref{fig:class_diagram_right} as wells Listings \ref{lst:cbp_origin}, \ref{lst:cbp_left}, and \ref{lst:cbp_right} occured according to the following story.
 
-Jane, as the technical leader, set up the initial model. The records of events during setting up the initial is recorded in the CBMP in List. \ref{lst:cbp_origin}. She created a class \textsf{Character} that contains an operation \textsf{attack} with three parameters: \textsf{gem}, \textsf{target}, and \textsf{weapon} (lines 2-15). She also created four other classes; \textsf{Troll} (lines 16-17), \textsf{Giant} (lines 18-22), \textsf{Knight} (lines 23-27), and \textsf{Mage} (lines 28-29). She then pushed her work to a change-based version control system. If her work is visualised in state-based format, the model looks like in Fig. \ref{fig:class_diagram_origin}.
+Jane, as the technical leader, set up the initial model. The records of events during setting up the initial is recorded in the CBMP in List. \ref{lst:cbp_origin}. She created a class \textsf{Character} that contains an operation \textsf{attack} with three parameters: \textsf{gem}, \textsf{target}, and \textsf{weapon} (lines 2-15). She also created four other classes; \textsf{Troll} (lines 16-17), \textsf{Giant} (lines 18-22), \textsf{Knight} (lines 23-27), and \textsf{Mage} (lines 28-29). She then pushed her work to a change-based version control system. If her work is visualised in state-based format, the model looks like in Figure \ref{fig:class_diagram_origin}.
 
 She then assigned this work to Bob and Alice. Both of them checked out this project to their own machine. Alice then started to continue the model. She then moved parameter \textsf{target} to the first place in operation \textsf{attack}'s parameters, because she thought it was more intuitive for programmers to think about the \textsf{target} first than the rest parameters (List. \ref{lst:cbp_right}, line 31). She also moved operation \textsf{smash} from class \textsf{Knight} to class \textsf{Giant} and operation \textsf{cast} from class \textsf{Giant} to class \textsf{Mage} as they are more reasonable to belong to their new classes (lines 32-35). Alice also created a generalisation relationship with id \textsf{rightGen} from class \textsf{Troll} to class \textsf{Character} (36-39). Bob also did the same thing except that his generalisation came with id \textsf{leftGen} (List. \ref{lst:cbp_left}, line 31-33). 
 
@@ -179,87 +179,82 @@ Composite change events are events that should be treated as one composition -- 
 For example, moving an element from a container to another container is composite event since it consists of two change events: 
 removing/unsetting the element from its source container and adding/setting it to its target container (lines 40-41 Listing \ref{lst:cbp_right}). 
 
-\section{The Challenge of Incrementality}
+\section{The Challenges of Model Comparison}
 \label{sec:the_key_challenge_of_incrementality}
-To illustrate the key-challenge of incrementality, I use the example in Fig. \ref{fig:class_diagram_rpg}. Let's say that after every modification to the model in Fig. \ref{fig:class_diagram_origin}, the model needs to be:
+As the sizes and complexity of models grown, it is common to manages a model in multiple versions. Thus, a capability to perform efficient change detection, model differencing, and conflict identification between versions is a necessary \cite{KolovosRMPGCLRV13}. It would scale up model management and collaborative modelling, which has been held back by the traditional, state-based model differencing and conflict detection.
 
-\begin{itemize}
-  \item Validated against a naming convention that the name of a class should start with an uppercase.
-  \item Transformed into a number of documentation files through a model-to-text transformation. Each class should have a documentation file.
-\end{itemize}
+\subsection{Model Change Detection}
+\label{sec:model_change_detection}
+Let's say that after modifying the model in Figure \ref{fig:class_diagram_rpg}, each class needs to be transformed into a documentation file through a model-to-text transformation. Models in Figures \ref{fig:class_diagram_origin} and \ref{fig:class_diagram_left} are two consecutive versions. When handling the original version, Figure \ref{fig:class_diagram_origin}), the model-to-text transformation produces four documentation files that correspond to the classes in the model. In the sequel, Figure \ref{fig:class_diagram_left}, modified by Bob, he applies several changes, such as renaming class \textsf{Character} to \textsf{Hero} and class \textsf{Troll} to \textsf{Ogre} and deleting class \textsf{Giant}.
 
-Models in Figures \ref{fig:class_diagram_origin} and \ref{fig:class_diagram_left} are two consecutive versions. When the validation constraint is evaluated against the first version of the model (Fig. \ref{fig:class_diagram_origin}), it verifies that all the classes' names starts with a uppercase, and the model-to-text transformation then produces four documentation files that correspond to the classes in the model. In the sequel, in Fig. \ref{fig:class_diagram_left}, the model is updated by Bob. He applies several changes, such as renaming class \textsf{Character} to \textsf{Hero} and class \textsf{Troll} to \textsf{Ogre} and deleting class \textsf{Giant}.
+A model-to-text transformation engine that does not implement model change detection would treat the model of Figure \ref{fig:class_diagram_left} as another different model. It would generate 
+and overwrite all the documentation files and leave the documentation of class \textsf{Giant} undeleted. On the contrary, an model-to-text transformation that implements model change detection, would identify that it only needs to delete the documentation file of class \textsf{Giant} and generate documentation files for classes \textsf{Character} and \textsf{Troll} -- but not the documentation files of classes \textsf{Knight} and \textsf{Mage}, as these cannot have been affected by the changes made to the model.
 
-A non-incremental model validation engine would treat the model of 
-Fig. \ref{fig:class_diagram_left} as if it was a new model and would evaluate 
-the constraint above against every class in the model. 
-An incremental model validation engine, on the other hand, would identify 
-that the previously established satisfaction of the constraint for classes 
-\textsf{Knight} and \textsf{Mage} cannot have been possibly compromised by the changes made, and would only re-evaluate the constraint for classes \textsf{Character} and \textsf{Troll} (class \textsf{Giant} is deleted so it is not evaluated). 
+While the overhead of executing transformations on small models like the models in Figure \ref{fig:class_diagram_rpg} is negligible, model change detection can become a significant bottleneck for large evolving models. As stressed in Selic's seminal work \cite{selic2003pragmatics}, with reference to model-to-text transformation, ``... \textsf{this is particularly true in the latter phases of the development cycle when programmers make many small changes as they fine-tune the system. To keep this overhead low, it is crucial for the code generators to have sophisticated change impact analysis capabilities that minimize the amount of code regeneration}''.
 
-Similarly, a non-incremental model-to-text transformation would generate 
-and overwrite all documentation files. On the contrary, an 
-incremental model-to-text transformation, would identify that it only needs to delete the documentation file of class \textsf{Giant} and generate documentation files for classes \textsf{Character} and \textsf{Troll} -- but not the documentation files of classes \textsf{Knight} and \textsf{Mage}, as these cannot have been affected by the changes made to the model.
+Model change detection has been addressed in incremental model management that changes of models are recorded and used as the basis to perform effective incremental model processing operations. In his work, Egyed \cite{egyed2011automatically} has shown that the property-access recording approach is applicable to queries of arbitrary complexity, as long as they are deterministic. More recent work has shown that variants of this approach can be used to achieve incrementality in a wide range of model processing operations, including model-to-model transformation \cite{jouault2010towards}, model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}, model validation, and pattern matching \cite{DBLP:conf/ecmdafa/RathHV12}---as long as changes to models can be precisely identified.
 
-While the overhead of executing transformations and validation constraints 
-on small models like the one in Fig. \ref{fig:class_diagram_origin} is negligible, non-incremental execution can become a significant bottleneck for large evolving models. As stressed in Selic's seminal work \cite{selic2003pragmatics}, with reference to model-to-text transformation, ``... \textsf{this is particularly true in the latter phases of the development cycle when programmers make many small changes as they fine-tune the system. To keep this overhead low, it is crucial for the code generators to have sophisticated change impact analysis capabilities that minimize the amount of code regeneration}''.
+\subsection{Model Differencing and Conflict Detection}
+\label{sec:between_two_parallel_versions}
+Nevertheless, the solutions in incremental model management are coupled to their execution engines, which limits itself to work best only in single-developer environment (discussed more in Section \ref{sec:identifying_changes_in models}). In a collaborative setting, a model can have different versions, and they can be developed in parallel. In Figure \ref{fig:class_diagram_rpg}, Bob and Alice extend the original model in parallel and thus the model-to-text transformation would produce different sets of documentation as well. It would be sophisticated, once their models are merged, the merging also produces relevant documentation to the merged model; unnecessary documentation should be omitted.   
 
-As demonstrated by the pioneering work of Egyed \cite{egyed2011automatically}, 
-to achieve incremental re-execution of (deterministic) queries on 
-structured models, an execution engine needs to:
+Before merging both models, model comparison needs to be executed first in order to identify differences and conflicts between them so that the merging can be accurate. However, performing the model comparison in traditional, state-based way can cause a bottleneck since it is computationally expensive and memory greedy (discussed more in Section \ref{sec:identifying_changes_in models}). Traditional, state-based model comparison requires every element of the versions being compared to be loaded into memory, matched, and then differenced \cite{emfcompare2018developer}, which is inefficient for large models that only experience a small number of changes. A novel approach is required that can compare only elements that has been modified -- not all elements -- thus can speed up model comparison.
 
-\begin{enumerate}
-  \item Record model element property accesses during the initial execution of the queries;
-  \item Identify new and deleted elements and modified model element properties in the new version of the model;
-  \item Combine the information collected in the steps above to identify the subset of (potentially) affected rules/queries/templates that need to be re-executed.
-\end{enumerate}
-
-To illustrate this, this example uses an OCL implementation of the domain-specific constraint in List. \ref{lst:constraint}.
-
-\begin{lstlisting}[style=ocl,caption={OCL constraint requiring that a class should start with an uppercase.},label=lst:constraint]
-context Class
-inv UpperCase: self.name->subtring(1,1) == self.name->subtring(1,1)->toUpper()
-\end{lstlisting}
-
-\begin{table}[ht]
-  \centering
-  \caption{Property-access trace of the evaluation of the constraint in List. \ref{lst:constraint} on the model of Fig. \ref{fig:class_diagram_origin}.}
-  \begin{small}
-  \begin{tabular}{p{4cm} p{2.1cm} p{2cm} p{2.1cm}}
-    \hline 
-    \textbf{Constraint} & \textbf{Context} & \textbf{Accessed Element} & \textbf{Accessed Property} \\ 
-    \hline 
-    \textsf{Class.UpperCase}  & \textsf{character} & \textsf{character} & \textsf{name} \\ 
-    \textsf{Class.UpperCase}  & \textsf{troll} & \textsf{troll} & \textsf{name} \\ 
-    \textsf{Class.UpperCase}  & \textsf{giant} & \textsf{giant} & \textsf{name} \\ 
-    \textsf{Class.UpperCase}  & \textsf{knight} & \textsf{knight} & \textsf{name} \\
-    \textsf{Class.UpperCase}  & \textsf{mage} & \textsf{mage} & \textsf{name} \\
-    \hline 
-  \end{tabular} 
-  \end{small}
-  \label{tab:property_access_trace}
-\end{table}
-
-During the initial evaluation of the constraint on the model of Fig. \ref{fig:class_diagram_origin}, an incremental OCL engine would compute the property access trace displayed in Table \ref{tab:property_access_trace} as a side-product. Now, when the model is updated (Fig. \ref{fig:class_diagram_left}), the execution engine can identify that:
-
-\begin{itemize}
-  \item There is an element deleted in the model (class \textsf{Giant}) for which the constraint is not necessary to be evaluated;
-  \item The value of property \textsf{name} of classes \textsf{Character} and \textsf{Troll} have changed, and as such, the constrain needs to be re-evaluated on this elements.
-\end{itemize}
-
-Egyed has shown that the property-access recording approach is applicable to queries of arbitrary complexity, 
-as long as they are deterministic. More recent work has shown that variants of this approach can be used to 
-achieve incrementality in a wide range of model processing operations, including model-to-model 
-transformation \cite{jouault2010towards}, model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}, 
-model validation, and pattern matching \cite{DBLP:conf/ecmdafa/RathHV12}---as long as changes to models can be 
-precisely identified (step 2 in the list above).
+%As demonstrated by the pioneering work of Egyed \cite{egyed2011automatically}, 
+%to achieve incremental re-execution of (deterministic) queries on 
+%structured models, an execution engine needs to:
+%
+%\begin{enumerate}
+%  \item Record model element property accesses during the initial execution of the queries;
+%  \item Identify new and deleted elements and modified model element properties in the new version of the model;
+%  \item Combine the information collected in the steps above to identify the subset of (potentially) affected rules/queries/templates that need to be re-executed.
+%\end{enumerate}
+%
+%To illustrate this, this example uses an OCL implementation of the domain-specific constraint in List. \ref{lst:constraint}.
+%
+%\begin{lstlisting}[style=ocl,caption={OCL constraint requiring that a class should start with an uppercase.},label=lst:constraint]
+%context Class
+%inv \subsubsection*{U}pperCase: self.name->subtring(1,1) == self.name->subtring(1,1)->toUpper()
+%\end{lstlisting}
+%
+%\begin{table}[ht]
+%  \centering
+%  \caption{Property-access trace of the evaluation of the constraint in List. \ref{lst:constraint} on the model of Figure \ref{fig:class_diagram_origin}.}
+%  \begin{small}
+%  \begin{tabular}{p{4cm} p{2.1cm} p{2cm} p{2.1cm}}
+%    \hline 
+%    \textbf{Constraint} & \textbf{Context} & \textbf{Accessed Element} & \textbf{Accessed Property} \\ 
+%    \hline 
+%    \textsf{Class.UpperCase}  & \textsf{character} & \textsf{character} & \textsf{name} \\ 
+%    \textsf{Class.UpperCase}  & \textsf{troll} & \textsf{troll} & \textsf{name} \\ 
+%    \textsf{Class.UpperCase}  & \textsf{giant} & \textsf{giant} & \textsf{name} \\ 
+%    \textsf{Class.UpperCase}  & \textsf{knight} & \textsf{knight} & \textsf{name} \\
+%    \textsf{Class.UpperCase}  & \textsf{mage} & \textsf{mage} & \textsf{name} \\
+%    \hline 
+%  \end{tabular} 
+%  \end{small}
+%  \label{tab:property_access_trace}
+%\end{table}
+%
+%During the initial evaluation of the constraint on the model of Figure \ref{fig:class_diagram_origin}, an incremental OCL engine would compute the property access trace displayed in Table \ref{tab:property_access_trace} as a side-product. Now, when the model is updated (Figure \ref{fig:class_diagram_left}), the execution engine can identify that:
+%
+%\begin{itemize}
+%  \item There is an element deleted in the model (class \textsf{Giant}) for which the constraint is not necessary to be evaluated;
+%  \item The value of property \textsf{name} of classes \textsf{Character} and \textsf{Troll} have changed, and as such, the constrain needs to be re-evaluated on this elements.
+%\end{itemize}
+%
+%Egyed has shown that the property-access recording approach is applicable to queries of arbitrary complexity, 
+%as long as they are deterministic. More recent work has shown that variants of this approach can be used to 
+%achieve incrementality in a wide range of model processing operations, including model-to-model 
+%transformation \cite{jouault2010towards}, model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}, 
+%model validation, and pattern matching \cite{DBLP:conf/ecmdafa/RathHV12}---as long as changes to models can be 
+%precisely identified (step 2 in the list above).
 
 \section{Identifying Changes in Models}
 \label{sec:identifying_changes_in models}
-There are two approaches in the literature for identifying changes in models 
-in order to enable incremental re-execution of model processing operations.
+There are two approaches in the literature for identifying changes in models, using notification facilities and model differencing.
 
-\textbf{Notifications}. In this approach, the incremental execution 
+\textbf{Notifications}. In this approach, a model change tracking 
 engine needs to hook into the notification facilities 
 provided by the modelling tool through which the developer edits the model, 
 so that the engine can directly receive notifications as soon as 
@@ -275,7 +270,7 @@ settings where modelling and automated model processing activities are
 performed by different members of the team.
 
 \textbf{Model Differencing}. This approach eliminates the coupling between 
-modelling tools and incremental execution engines. Instead of depending on 
+modelling tools and model change tracking engines. Instead of depending on 
 live notifications, in this approach the developer in charge of automated model 
 processing, needs to have access to a copy of the last version of the model that the model processing program (e.g. the model-to-text transformation) was 
 executed upon, so that it can be compared against the current version of 
@@ -285,21 +280,21 @@ this approach is that it works well in a collaborative development environment
 where typically developers have distinct roles and responsibilities. On the 
 downside, model comparison and differencing are computationally expensive and 
 memory-greedy (both versions of the model need to be loaded into memory before 
-they can be compared), thus largely undermining the time and resource saving 
-potentials of incremental re-execution. 
+they can be compared).
+%, thus largely undermining the time and resource saving 
+%potentials of incremental re-execution. 
 
-In summary, incremental model processing currently delivers significant 
-performance benefits only in a single-developer environment where the modeller 
-is also responsible for performing all the (incremental) model processing 
-operations. As a result, in collaborative development environments, 
-developers need to either forgo incremental model processing altogether 
-or to work around this limitation by manually steering model processing 
-programs to process only subsets of their models, which is cumbersome and 
-error prone.
+In summary, tracking changes of models using notification facilities currently delivers significant performance benefits only in a single-developer environment as the approach is coupled to modelling tools. 
+%where the modeller is also responsible for performing all the (incremental) model processing operations. 
+As a result, in collaborative development environments, 
+developers need to either forgo the notification approach altogether 
+or to work with model differencing, which is computationally expensive and 
+memory-greedy.
+%around this limitation by manually steering model processing programs to process only subsets of their models, which is cumbersome and error prone.
 
-\section{A Novel Solution to Incrementality}
-\label{sec:a_novel_solution_to_incrementality}
-A novel solution to incrementality should be able to deliver the advantages of both notification and model differencing approaches while eliminate their drawbacks. To realize such solution, this work comes with an idea that models can be persisted in their complete history of changes, a.k.a. change-based model persistence, as opposed to state-based model persistence that persists models in their snapshots at a time. In change-based model persistence, information about changes that have been applied to models can be preserved, and the persistence can be shared across the members of a team, for example through Version Control Systems (e.g., SVN, Git).The proposed change-based model persistence is discussed later in Chapter \ref{ch:change_based_model_persitence}. 
+\section{A Novel Solution to Model Change Detection}
+\label{sec:a_novel_solution_to_model_change_detection}
+A novel solution to model change detection should be able to deliver the advantages of both notification and model differencing approaches while eliminate their drawbacks. To realize such solution, this work comes with an idea that models can be persisted in their complete history of changes, a.k.a. change-based model persistence, as opposed to state-based model persistence that persists models in their snapshots at a time. The change-based model persistence should be text-based. Thus, information about changes of models can be preserved and can be shared across the members of a team through Version Control Systems (e.g., SVN, Git).The proposed change-based model persistence is discussed later in Chapter \ref{ch:change_based_model_persistence}. 
 
 Moreover, change-based model persistence also can be exploited to optimise model comparison to only compares versions of a model on parts that have only been changed since their last shared common version. In other words, not every element of the versions is compared which can lead to a faster model comparison. This solution is discussed later in Chapters \ref{ch:model_differencing} and \ref{ch:conflict_detection}. 
 
@@ -435,7 +430,7 @@ $ds_{5}$ = [\textsf{mage}, \textsf{mage}, \textsf{generalization}, \textsf{gener
 $ds_{6}$ = [\textsf{mage}, \textsf{mage}, \textsf{operations}, \textsf{operations}, \textsf{null}, 0, \textsf{null}, \textsf{cast}, \textsf{DELETE}]\\
 $ds_{7}$ = [\textsf{knight}, \textsf{knight}, \textsf{generalization}, \textsf{generalization}, 0, \textsf{null}, \textsf{leftGen}, \textsf{null}, \textsf{ADD}]
 
-This work then can use this information to represent the diffs visually as depicted in Fig. \ref{fig:xmi_comparison}. We can also transform these diffs into change events that if the diffs are executed as changes to the right model, they transform it into the left model and generate relevant change events. The change events are presented in Listing \ref{lst:readable_diffs}. Diff $ds_{1}$ produces the change event at line 1 in Listing \ref{lst:readable_diffs}, $ds_{2}$ produces line 2, $ds_{3}$ produces lines 3-4, $ds_{4}$ produces lines 5-7, $ds_{5}$ produces lines 8-10, $ds_{6}$ produces lines 11-13, and $ds_{7}$ produces lines 14-16.
+This work then can use this information to represent the diffs visually as depicted in Figure \ref{fig:xmi_comparison}. We can also transform these diffs into change events that if the diffs are executed as changes to the right model, they transform it into the left model and generate relevant change events. The change events are presented in Listing \ref{lst:readable_diffs}. Diff $ds_{1}$ produces the change event at line 1 in Listing \ref{lst:readable_diffs}, $ds_{2}$ produces line 2, $ds_{3}$ produces lines 3-4, $ds_{4}$ produces lines 5-7, $ds_{5}$ produces lines 8-10, $ds_{6}$ produces lines 11-13, and $ds_{7}$ produces lines 14-16.
 
 \begin{figure}[ht]
   \includegraphics[width=\linewidth]{XmiComparison}
@@ -469,8 +464,8 @@ In state-based model comparison, a conflict occurs when the states of an element
 
 Let's say that we have three versions of a model, the original shared version $m_{o}$ and two other modified versions: the left version $m_{l}$ and the right version $m_{r}$. There are also two sets of derived operations, $C_{L}$ and $C_{R}$. These sets are obtained by differencing $m_{l}$ to $m_{o}$ and $m_{r}$ to $M_{O}$ using an LCS algorithm as explained in Section \ref{sec:state-based_model_differencing}, where $C_{L}$ = $\{c_{l1}$, $c_{l2}$, ..., $c_{olg}\}$, $C_{R}$ = $\{c_{r1}$, $c_{r2}$, ..., $c_{rh}\}$, $g = |C_{L}|$, and $h = |C_{R}|$. Applying $C_{L}$ to model $m_{o}$ transforms it into model $m_{l}$, and applying $C_{R}$ to model $m_{o}$ transforms it into model $m_{r}$. These derived change events are be used to detect conflicts using (\ref{eq:state_real_conflict}), (\ref{eq:state_pseudo_conflict}), and (\ref{eq:state_nonapplicability_conflict}).  
 
-If the method in Section \ref{sec:state-based_model_differencing} is used -- as executed in EMF Compare -- to derive $C_{L}$ from the left and original versions -- Bob's and Jane's versions -- in Fig. \ref{fig:class_diagram_rpg} and present it in the format of change events, the following list are obtained. 
-\begin{lstlisting}[firstnumber=1,style=eol,caption={The derived change events made by Bob to produce the right model in Fig. \ref{fig:class_diagram_left} (right version).},label=lst:cbp_left_state]
+If the method in Section \ref{sec:state-based_model_differencing} is used -- as executed in EMF Compare -- to derive $C_{L}$ from the left and original versions -- Bob's and Jane's versions -- in Figure \ref{fig:class_diagram_rpg} and present it in the format of change events, the following list are obtained. 
+\begin{lstlisting}[firstnumber=1,style=eol,caption={The derived change events made by Bob to produce the right model in Figure \ref{fig:class_diagram_left} (right version).},label=lst:cbp_left_state]
 move target in attack.parameters from 1 to 2
 set character.name from "Character" to "Hero"
 set troll.name from "Troll" to "Ogre"
@@ -485,8 +480,8 @@ remove giant from resource at 2 composite l3
 delete giant composite l3
 \end{lstlisting}
 
-And following list is the derived change events for $C_{R}$ that are obtained from the right and original versions -- Alice's and Jane's versions -- in Fig. \ref{fig:class_diagram_rpg}. 
-\begin{lstlisting}[firstnumber=1,style=eol,caption={The derived change events (operations) made by Alice to produce the right model in Fig. \ref{fig:class_diagram_right} (right version).},label=lst:cbp_right_state]
+And following list is the derived change events for $C_{R}$ that are obtained from the right and original versions -- Alice's and Jane's versions -- in Figure \ref{fig:class_diagram_rpg}. 
+\begin{lstlisting}[firstnumber=1,style=eol,caption={The derived change events (operations) made by Alice to produce the right model in Figure \ref{fig:class_diagram_right} (right version).},label=lst:cbp_right_state]
 move gem in attack.parameters from 0 to 1
 set character.name from "Character" to "Hero"
 set troll.name from "Troll" to "Orc"
@@ -515,7 +510,7 @@ e_{o} + c_{l} \equiv e_{o} + c_{r} \Rightarrow c_{l}\;!_{p}\;c_{r}
 
 \begin{table}[h]
   \centering
-  \caption{Conflicting change events identified using EMF Compare based on the case in Fig. \ref{fig:class_diagram_rpg}.}
+  \caption{Conflicting change events identified using EMF Compare based on the case in Figure \ref{fig:class_diagram_rpg}.}
   \label{table:emfc_conflicts}
   % Please add the following required packages to your document preamble:
   % \usepackage[table,xcdraw]{xcolor}
@@ -610,7 +605,7 @@ Conflict ES4 is a non-applicability, composite conflict. Moving element \textsf{
 
 The summary of the advantages and drawbacks between EMF Compare and EMF Store in detecting conflicts are presented in Table \ref{tab:accuracy_emfcompare_emfstore}.
 
-\begin{table}[ht]
+\begin{table}[]
   \centering
   \caption{The advantages and drawbacks of EMF Compare and EMF Store in detecting conflicts.}
   \label{tab:accuracy_emfcompare_emfstore}

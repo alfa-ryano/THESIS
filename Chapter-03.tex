@@ -87,13 +87,16 @@ set troll.name from "Troll" to "Ogre"|\label{line:cbp_left_43}|
 
 The ambition of this research is to enable high-performance incremental model management in collaborative software development environments by challenging one of the fundamental assumptions of contemporary modelling frameworks and tools: as opposed to persisting snapshots of the state of models (which is what virtually all modelling tools and frameworks currently do), this work proposes turning models inside out and persisting their change history instead.
 
-To illustrate the proposed approach, Listing \ref{lst:xmimodel_left} shows a state-based representation of the model of Fig. \ref{fig:class_diagram_left} in (simplified) XMI, and Listing \ref{lst:cbp_left} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of Listing \ref{lst:cbp_left} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions. There are two editing sessions in the case of this model: one in Listing \ref{lst:cbp_left} and another in Listing \ref{lst:cbp_origin}. In the actual implementation, change events in Listing \ref{lst:cbp_left} are appended to a file that is a copy of Listing \ref{lst:cbp_origin}. Listing \ref{lst:cbp_left} only shows the appended change events, while Listing \ref{lst:cbp_left_full} shows the complete change events. Replaying these changes, the change events in Listing \ref{lst:cbp_origin} first and then followed by the change events in Listing \ref{lst:cbp_left}, produces the same state as the one captured in Listing \ref{lst:xmimodel_left}. Thus, we can conclude that the proposed change-based representation carries at least as much information as the state-based representation. For the sake of readability, the change-based representation presented in Listing \ref{lst:cbp_left_full} is the simplified version of the actual format used in a  change-based file in Listing \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. 
+To illustrate the proposed approach, Listing \ref{lst:xmimodel_left} shows a state-based representation of the model of Figure \ref{fig:class_diagram_left} in (simplified) XMI, and Listing \ref{lst:cbp_left} shows the proposed equivalent change-based representation of the same model. Instead of a snapshot of the state of the model, the representation of Listing \ref{lst:cbp_left} captures the complete sequence of change events (create/set/add/move/remove/delete) that were performed on the model since its creation, organised in editing sessions. There are two editing sessions in the case of this model: one in Listing \ref{lst:cbp_left} and another in Listing \ref{lst:cbp_origin}. In the actual implementation, change events in Listing \ref{lst:cbp_left} are appended to a file that is a copy of Listing \ref{lst:cbp_origin}. Listing \ref{lst:cbp_left} only shows the appended change events, while Listing \ref{lst:cbp_left_full} shows the complete change events. Replaying these changes, the change events in Listing \ref{lst:cbp_origin} first and then followed by the change events in Listing \ref{lst:cbp_left}, produces the same state as the one captured in Listing \ref{lst:xmimodel_left}. Thus, we can conclude that the proposed change-based representation carries at least as much information as the state-based representation. 
 
 Such a representation is particularly suitable for incremental model processing. For example, if the model-to-text transformation discussed above ``remembers" that in its previous invocation it had processed up to editing session \textsf{Jane-01} (lines 1-29) of the model, it can readily identify the changes that have been made to the model since then (i.e. in session \textsf{Bob-01} -- lines 30-43) instead of having to rediscover them through (expensive) state-based model differencing.
 
+For the sake of readability, the format of change-based persistence presented in Listing \ref{lst:cbp_left_full} is a simplified version. The real format would be something similar to the change-based file in Listing \ref{lst:class_diagram_left_cbpfile} in Appendix \ref{sec:examples_of_cbp}. For example, change event [\textsf{session "Jane-01"}] is persisted as 
+\textsf{<session id="Jane-01" time="20190923181841687GMT"/>} in a real CBP file, and [\textsf{set character.name from null to "Character"}] is persisted as \textsf{<set-eattribute eclass="Class" name="name" target="character"><old-value literal=null/><value literal="Character"/></set-eattribute>}.
+
 \section{Prototype Implementation}
 \label{sec:prototype_implementation}
-This work has implemented a prototype \cite{epsilonlabs2019emfcbp} of the change-based model persistence format -- the prototype is named Epsilon CBP -- using the notification facilities provided by the Eclipse Modelling Framework. In the implementation, the prototype uses a subclass of EMF's \textsf{EContentAdapter} (\textsf{ChangeEventAdapter}) to receive and record \textsf{Notification} events produced by the framework for every model-element level change.
+This work has implemented a prototype \cite{epsilonlabs2019emfcbp} of the change-based model persistence format -- the prototype is named EMF CBP -- using the notification facilities provided by the Eclipse Modelling Framework. In the implementation, the prototype uses a subclass of EMF's \textsf{EContentAdapter} (\textsf{ChangeEventAdapter}) to receive and record \textsf{Notification} events produced by the framework for every model-element level change.
 
 \begin{figure}[th]
     \centering
@@ -102,7 +105,7 @@ This work has implemented a prototype \cite{epsilonlabs2019emfcbp} of the change
     \label{fig:events}
 \end{figure}
 
-Since not all change events are relevant to change-based persistence (e.g. EMF also produces change notifications when listeners/adapted are added/removed from the model), this work has defined a set of event classes to represent events of interest. The event classes are depicted in Fig. \ref{fig:events} as subclasses of the \textsf{ChangeEvent} abstract class.
+Since not all change events are relevant to change-based persistence (e.g. EMF also produces change notifications when listeners/adapted are added/removed from the model), this work has defined a set of event classes to represent events of interest. The event classes are depicted in Figure \ref{fig:events} as subclasses of the \textsf{ChangeEvent} abstract class.
 
 The \textsf{ChangeEvent} class has a multi-valued \textsf{values} attribute which can accommodate both single-valued (e.g. set/add) or multi-valued events (e.g. addAll/removeAll). \textsf{ChangeEvent} can also accommodate different types of values, such as \textsf{EObject}s for \textsf{EReferenceEvents}, and primitive values (e.g. Integer, String) for \textsf{EAttributeEvents}. The \textsf{ChangeEvent} class also has a position attribute to hold the  index of an \textsf{EObject} or a literal when they are added to a \textsf{Resource}, \textsf{EReference}, or \textsf{EAttribute} with multiple values. 
 
@@ -141,6 +144,26 @@ To integrate seamlessly with the EMF framework and to eventually support multipl
     \caption{Factory, resources, and ChangeEventAdapter classes.}
     \label{fig:resources}
 \end{figure}
+
+Listing \ref{lst:javacode_resource} shows an example how to use the prototype in a Java code. Lines 1-8 demonstrate how to initialise and save a model using the prototype. First, the code creates an instance of \textsf{CBPResource}, \textsf{cbpResource}, using \textsf{CBPXMLResourceFactory} and specify its file as \textsf{helloworld.cbpxml} using \textsf{URI}. The code than executes method \textsf{startNewSession} of \textsf{cbpResource}. This methods adds a change event to indicate the start of editing session as depicted at line 1 in Listings \ref{lst:cbp_origin} and \ref{lst:class_diagram_left_cbpfile}.
+The code then uses \textsf{UMLFactory} to create an element, \textsf{model}, of UML2's \textsf{Model}. The code adds element \textsf{model} into \textsf{cbpResource} and set the name to ``Hello World''. The code then saves the model in change-based format using method \textsf{save} and then unload \textsf{cbpResource}. Lines 9-12 demonstrate how to replay (load) the model that previously has been saved and then print the name of the first element in \textsf{cbpResource} which is expected to print ``Hello World'' text.
+
+\vspace{-20pt}
+\begin{lstlisting}[style=java,caption={An example how to use \textsf{CBPResource} in Java code.},label=lst:javacode_resource]
+/* initialise, save, and unload */
+CBPResource cbpResource = (CBPResource) (new CBPXMLResourceFactory()).createResource(URI.createFileURI("helloworld.cbpxml"));
+cbpResource.startNewSession("Initial");
+Model model = UMLFactory.eINSTANCE.createModel();
+cbpResource.getContents().add(model);
+model.setName("Hello World");
+cbpResource.save(null);
+cbpResource.unload();
+
+/* load and print */
+cbpResource.load(null);
+model = (Model) cbpResource.getContents().get(0);
+System.out.println(model.getName()); // expected output: "Hello World"
+\end{lstlisting}
 
 \section{Benefits and Novel Capabilities}
 \label{sec:benefits_and_novel_capabilities}

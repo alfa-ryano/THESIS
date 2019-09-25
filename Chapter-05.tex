@@ -1,11 +1,13 @@
 \chapter{Hybrid Model Persistence}
 \label{ch:hybrid_model_persistence}
 
-Change-based persistence has the potential to support faster and more accurate model comparison, merging, as well as a range of analytics activities. Nevertheless, reconstructing the state of a model by replaying its editing history every time the model needs to be queried or modified can get increasingly expensive as the model grows in size. In Chapter \ref{ch:optimised_loading}, this work has proposed a method to speed up the reconstruction by not replaying change events that do not have any effect to the eventual states of a model. However, the method is by far still outperformed by loading a model directly from its state-based persistence. Thus, as another solution, this work integrates change-based and state-based model persistence mechanisms in a hybrid model persistence approach that delivers the best of both worlds. This Chapter presents the design of the hybrid model persistence approach and report on its impact on time and memory footprint for model loading, saving, and storage space usage.
+Reconstructing the state of a change-based model by replaying its editing history every time the model needs to be queried or modified can get increasingly expensive as the model grows in size. In Chapter \ref{ch:optimised_loading}, this work has proposed a method to speed up the reconstruction by not replaying change events that do not have any effect to the eventual states of a model. However, the method is by far still outperformed by loading a model directly from its state-based persistence. Thus, as another solution, this work integrates change-based and state-based model persistence mechanisms in a hybrid model persistence approach that delivers the best of both worlds. This Chapter presents the design of the hybrid model persistence approach and report on its impact on time and memory footprint for model loading, saving, and storage space usage.
 
 \section{Introduction}
 \label{sec:introduction_5}
-Change-based persistence (CBP) of models \cite{DBLP:conf/models/YohannisKP17} conforming to metamodelling architectures such as MOF/EMF \cite{omg2018mof,steinberg2008emf} comes with notable advantages over state-based persistence: it provides support for fast comparison and differencing of versions of the same model \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,DBLP:conf/edoc/KoegelHLHD10,koegel2010emfstore} -- which can also substantially speed up incremental model management activities, and enables novel model analytics activities (e.g. pattern detection in the editing history to understand how modellers use modelling languages and tools) \cite{DBLP:journals/entcs/RobbesL07}. However, change-based model persistence comes at the cost of ever-growing model files \cite{DBLP:conf/edoc/KoegelHLHD10,DBLP:journals/entcs/RobbesL07} since all changes (even deleting model elements) are recorded in an editing log, which naturally leads to longer loading times \cite{mens2002state}. This Chapter addresses the latter challenge by introducing the concept of hybrid persistence of models. In hybrid model persistence the change-based representation is augmented with a state-based representation (which may be derived from the change-based representation) of the latest state of the model which is used to speed up model loading and querying.
+Saving models in change-based persistence (CBP) comes at the cost of ever-growing model files \cite{DBLP:conf/edoc/KoegelHLHD10,DBLP:journals/entcs/RobbesL07} since all changes (even deleting model elements) are recorded in an editing log, which naturally leads to longer loading times \cite{mens2002state}. 
+In Chapter \ref{ch:optimised_loading}, this work has proposed a method to speed up the reconstruction by not replaying change events that do not have any effect to the eventual states of a model. However, the method is by far still outperformed by loading a model directly from its state-based persistence.
+Thus, this chapter proposes another solution to address the issue by introducing the concept of hybrid persistence of models. In hybrid model persistence the change-based representation is augmented with a state-based representation (which may be derived from the change-based representation) of the latest state of the model which is used to speed up model loading and querying.
 
 This Chapter is structured as follows. Section \ref{sec:change_and_state_based_model_persistence} introduces the concept of change-based model persistence and recent work on state-based model persistence. Sections \ref{sec:hybrid_model_persistence} and \ref{sec:implementation} present the proposed approach to hybrid model persistence and its implementation. Sections \ref{sec:evaluation_5} and \ref{sec:discussion_5} present and discuss experimental results and evaluation. Section \ref{sec:conclusions_5} concludes this Chapter.
 
@@ -24,8 +26,8 @@ Table \ref{table:persistence_comparsion} summarises the benefits (+) and drawbac
       \hline 
       Load Time & $-$ & $+$ \\
       Save Time & $+$ & $-$ \\
-      Comparison Time & $+$ & $-$ \\
-      Storage Space & $-$ & $+$ \\
+%      Comparison Time & $+$ & $-$ \\
+      Storage & $-$ & $+$ \\
       \hline 
     \end{tabular}
   \end{small}
@@ -33,11 +35,12 @@ Table \ref{table:persistence_comparsion} summarises the benefits (+) and drawbac
 
 To store an state-based model, all the elements that exist in the final state must be persisted. To save a change-based model, only the change events in the last session need to be persisted. Storing times of state-based models are proportional to the size of the model. Storing times of change-based models are proportional to the number of events in a session. As a result, storing times of change-based models can be considerably shorter than for state-based models \cite{yohannis2018towards}. Comparing and finding the differences between two versions of a state-based model is expensive \cite{Kolovos:2009:DMM:1564596.1564641} ($O(N^2)$ in the general case) which affects the efficiency of change visualisation and comprehension, and has a substantial impact on downstream activities such as incremental model transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15} and validation.
 
-By contrast, in change-based model persistence, changes are first-class entities in the persisted model file and as such, model comparison and differencing is relatively inexpensive. The main downsides of change-based model persistence are it's model file sizes \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and ever-increasing loading times \cite{mens2002state}. Loading times can be reduced by around 50\% by processing the changelog, detecting, memorising and subsequently ignoring change events that have no impact to the final state of the model. The loading times are still substantially longer -- more than 6.4 times slower and even longer as the persisted changes increase -- than loading times for state-based approaches \cite{yohannis2018towards}. 
+%By contrast, in change-based model persistence, changes are first-class entities in the persisted model file and as such, model comparison and differencing is relatively inexpensive. 
+The main downsides of change-based model persistence are it's model file sizes \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and ever-increasing loading times \cite{mens2002state}. Loading times can be reduced by around 50\% by processing the changelog, detecting, memorising and subsequently ignoring change events that have no impact to the final state of the model. The loading times are still substantially longer -- more than 6.4 times slower and even longer as the persisted changes increase -- than loading times for state-based approaches \cite{yohannis2018towards}. 
 
 \section{Hybrid Model Persistence}
 \label{sec:hybrid_model_persistence}
-To achieve the best of both worlds, this work introduces a hybrid model persistence approach which combines change-based and state-based model persistence, to work together side-by-side. An overview of the proposed approach is illustrated in Fig. \ref{fig:hybrid_persistence}. In the proposed approach a \textit{hybrid} model is stored in two representations at the same time: a change-based (e.g. using Epsilon CBP \cite{epsilonlabs2019emfcbp} and a state-based representation (e.g. using XMI \cite{omg2018xmi} or a database-backed approach such as NeoEMF \cite{daniel2016neoemf}). The change-based representation is perceived as the main representation of a model, while the state-based representation can be fully derived from the change-based representation.
+To achieve the best of both worlds, this work introduces a hybrid model persistence approach which combines change-based and state-based model persistence, to work together side-by-side. An overview of the proposed approach is illustrated in Fig. \ref{fig:hybrid_persistence}. In the proposed approach a \textit{hybrid} model is stored in two representations at the same time: a change-based (e.g. using EMF CBP \cite{epsilonlabs2019emfcbp} and a state-based representation (e.g. using XMI \cite{omg2018xmi} or a database-backed approach such as NeoEMF \cite{daniel2016neoemf}). The change-based representation is perceived as the main representation of a model, while the state-based representation can be fully derived from the change-based representation.
 
 \begin{figure}[t]
   \includegraphics[width=\linewidth]{images/hybrid_persistence}
@@ -57,17 +60,19 @@ To achieve the best of both worlds, this work introduces a hybrid model persiste
 
 \section{Implementation}
 \label{sec:implementation}
-This work has implemented the proposed hybrid model persistence approach in a prototype \cite{epsilonlabs2019emfcbp} on top of the Eclipse Modeling Framework (EMF) \cite{steinberg2008emf}. The prototype makes use of an existing implementation of change-based model persistence, the Epsilon CBP \cite{DBLP:conf/models/YohannisKP17}, augmented with two state-based model persistence implementations: NeoEMF \cite{daniel2016neoemf} and XMI \cite{omg2018xmi}.
+This work has implemented the proposed hybrid model persistence approach in a prototype \cite{epsilonlabs2019emfcbp} on top of the Eclipse Modeling Framework (EMF) \cite{steinberg2008emf}. The prototype makes use of an existing implementation of change-based model persistence, the EMF CBP \cite{DBLP:conf/models/YohannisKP17}, augmented with two state-based model persistence implementations: NeoEMF \cite{daniel2016neoemf} and XMI \cite{omg2018xmi}.
+
+\begin{landscape}
+\begin{figure}[]
+  \includegraphics[width=\linewidth]{images/class_diagram}
+  \captionof{figure}{Class diagram showing the core components of the hybrid model persistence implementation.}
+  \label{fig:class_diagram}
+\end{figure}
+\end{landscape}
 
 XMI has been selected as a standard state-based model persistence format (natively supported by EMF), and NeoEMF as a best-of-breed representative of database-backed state-based model persistence frameworks. The core components of the prototype are presented in Fig. \ref{fig:class_diagram}. 
 
-\begin{figure}[ht]
-    \includegraphics[width=\linewidth]{images/class_diagram}
-    \captionof{figure}{Class diagram showing the core components of the hybrid model persistence implementation.}
-    \label{fig:class_diagram}
-\end{figure}
-
-The Epsilon CBP provides a \textsf{ChangeEventAdapter} class \cite{DBLP:conf/models/YohannisKP17} that extends from Ecore's \textsf{EContentAdapter} adapter class \cite{eclipse2018eContentAdapter}
+The EMF CBP provides a \textsf{ChangeEventAdapter} class \cite{DBLP:conf/models/YohannisKP17} that extends from Ecore's \textsf{EContentAdapter} adapter class \cite{eclipse2018eContentAdapter}
 . This class collects changes made to the in-memory object graph of an EMF model in the form of a list of events \textsf{changeEvents}. Based on this class, this work derived an adapter class, \textsf{HybridChangeEventAdapter}, for the hybrid model persistence implementation. It is an abstract class so that it can be further derived to create different implementations of adapter classes for different types of state-based model persistence. The \textsf{HybridNeoEMFChangeEventAdapater} is the adapter class for NeoEMF, and the \textsf{HybridXMIChangeEventAdapater} for XMI. These classes override \textsf{notifyChanged}(\textsf{Notification}) in the \textsf{ChangeEventAdapter} class, to handle events that are specific to NeoEMF and XMI, respectively.
 
 This work also created a resource class for hybrid persistence, \textsf{HybridResource} (a resource class is a class dedicated to interacting with a persistence, e.g. save, load, get contents), derived from the Ecore's \textsf{ResourceImpl} \cite{eclipse2018resourceImpl}
@@ -78,7 +83,7 @@ so that specific NeoEMF's methods can be used (e.g. \textsf{close}(), to close a
 
 \section{Evaluation}
 \label{sec:evaluation_5}
-In this section, this work compares hybrid model persistence (Epsilon CBP with each of NeoEMF and XMI) vs state-based model persistence (NeoEMF or XMI only) on storage space usage, loading and saving time and memory footprint, and demonstrate that hybrid model persistence can still perform fast model loading and saving. 
+In this section, this work compares hybrid model persistence (EMF CBP with each of NeoEMF and XMI) vs state-based model persistence (NeoEMF or XMI only) on storage space usage, loading and saving time and memory footprint, and demonstrate that hybrid model persistence can still perform fast model loading and saving. 
 
 The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU @ 2.50GHz 2.59GHz, 12GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0 \textunderscore162-b12). For the evaluation, this work used models reverse-engineered from the Java source code of the Epsilon \cite{eclipse2017epsilon,eclipse2018epsilongit} and BPMN2 \cite{eclipse2017bpmn2} projects. For state-based representation of the models, this work used the MoDisco tool \cite{DBLP:journals/infsof/BruneliereCDM14} to generate XMI-based UML2 \cite{eclipse2017uml2} models that reflect the classes, fields, and operation signatures of the source code of the project and then imported the generated models into NeoEMF. This work also derived MoDiscoXML models \cite{eclipse2018modiscoxml} from the Wikipedia article on the United States \cite{wikipedia2018us}. This work then used reverse-engineering to generate a change-based model persistence for each project based on the differences between consecutive versions of the models.
 
@@ -128,13 +133,11 @@ and the Wikipedia's United States article (m = million events, MB = Megabytes, K
 
 \subsection{Storage Space Usage}
 \label{sec:storage_space_usage}
-For the Epsilon project, this work has successfully generated a change-based model persistence from version 1 up to version 940 and also change-based model persistence for the BPMN2 project and Wikipedia article up to version number 192 and 10,187 respectively. The details (element count, event count, space size, and average space size per element or event) of their models, when persisted in XMI, NeoEMF, and Epsilon CBP are shown in Table \ref{table:space_usage}. The last column of the table derives an average space usage per element (for the state-based model persistence) or event (for the change-based model persistence). Thus, we can estimate the storage space usage for a hybrid model persistence to be the combination of change-based model persistence and the appropriate state-based model persistence space usage.
+For the Epsilon project, this work has successfully generated a change-based model persistence from version 1 up to version 940 and also change-based model persistence for the BPMN2 project and Wikipedia article up to version number 192 and 10,187 respectively. The details (element count, event count, space size, and average space size per element or event) of their models, when persisted in XMI, NeoEMF, and EMF CBP are shown in Table \ref{table:space_usage}. The last column of the table derives an average space usage per element (for the state-based model persistence) or event (for the change-based model persistence). Thus, we can estimate the storage space usage for a hybrid model persistence to be the combination of change-based model persistence and the appropriate state-based model persistence space usage.
 
 \subsection{Time and Memory Footprint of Loading and Saving Models}
 \label{sec:model_loading_time}
 This work evaluated the performance of our hybrid persistence prototype against XMI and NeoEMF regarding time and memory footprint for loading and saving. In the evaluation, experiments were repeated 22 times for each dimension measured. Since the data were not normally distributed, this work used the nonparametric Mann-Whitney U test \cite{doi:10.1002/9780470479216.corpsy0524} with 5\% significance level.
-
-As it can be noticed in Table \ref{table:time_memory_footprint}, all cases experience a slight slowdown on loading and saving time (hybrid approach's $mean$ $>$ state-based approach's $mean$). However, almost for all NeoEMF cases, the slowdown is not significant, which means that side-effect of the hybrid approach on loading and saving time is still acceptable. The hybrid approach also produces more memory footprint compared to the state-based-only approach. Nevertheless, considering the cost of main memory, this condition is acceptable in almost all real-world scenarios.
 
   \begin{table}
     \centering
@@ -211,14 +214,32 @@ As it can be noticed in Table \ref{table:time_memory_footprint}, all cases exper
     \end{footnotesize}
   \end{table}
 
+As it can be noticed in Table \ref{table:time_memory_footprint}, all cases experience a slight slowdown on loading and saving time (hybrid approach's $mean$ $>$ state-based approach's $mean$). However, almost for all NeoEMF cases, the slowdown is not significant, which means that side-effect of the hybrid approach on loading and saving time is still acceptable. The hybrid approach also produces more memory footprint compared to the state-based-only approach. Nevertheless, considering the cost of main memory, this condition is acceptable in almost all real-world scenarios.
+
 \section{Discussion}
 \label{sec:discussion_5}
 The use of state-based model persistence in hybrid model persistence enables faster model loading, as shown by the result of loading time evaluation in Section \ref{sec:model_loading_time}, without having to replay all the changes persisted in its change-based model persistence -- the main challenge for the change-based approach \cite{yohannis2018towards,mens2002state}. 
 Hybrid model persistence performs slightly slower -- statistically significant for Hybrid XMI but insignificant for Hybrid NeoEMF -- compared to loading a state-based model. A slight slowdown also appears on model saving -- statistically significant for Hybrid XMI but insignificant for Hybrid NeoEMF (Section \ref{sec:model_loading_time}). The slowdown is caused by persisting changes into two representations. 
 
+The main drawback of hybrid model persistence is that it consumes more memory when loading and saving and storage space for persisting models compared to state-based representation only (Sections \ref{sec:model_loading_time} and \ref{sec:storage_space_usage}). However, considering the cost of main memory and storage, the trade-off can be acceptable in most real-world scenarios. The summary of the findings can be seen in Table \ref{table:persistence_comparison_conclusion}.
 
-
-The main drawback of hybrid model persistence is that it consumes more memory when loading and saving and storage space for persisting models compared to state-based representation only (Sections \ref{sec:model_loading_time} and \ref{sec:storage_space_usage}). However, considering the cost of main memory and storage, the trade-off can be acceptable in most real-world scenarios.
+\begin{table}[ht]
+  \caption{Hybrid model persistence compared to other persistence approaches.}
+  \label{table:persistence_comparison_conclusion}
+  \centering
+  \begin{small}
+    \begin{tabular}{ c c c c }
+      \hline 
+      \textbf{Dimensions} & \textbf{Change-based} & \textbf{State-based} & \textbf{Hybrid}  \\
+      \hline 
+      Load Time & $-$ & $+$ & $+$ \\
+      Save Time & $+$ & $-$ & $+$ \\
+      %      Comparison Time & $+$ & $-$ & $+$ \\
+      Storage/Memory & $-$ & $+$ & $-$ \\
+      \hline 
+    \end{tabular}
+  \end{small}
+\end{table}
 
 \section{Conclusions}
 \label{sec:conclusions_5}

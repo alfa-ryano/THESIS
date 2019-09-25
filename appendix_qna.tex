@@ -1,0 +1,25 @@
+\chapter{Q \& A}
+\label{sec:qna}
+
+\begin{enumerate}
+  \item \textbf{Can the proposed change based persistence, model differencing, and conflict detection be applied to other artefacts besides models (e.g., XML documents, spreadsheets)?}
+  
+  \textbf{Answer}:
+  
+  Yes, they can. As long as we can capture all the necessary changes to reconstruct an artefact then it is possible. Some editors/tools already provide dedicated SDK tools to add custom functionalities.  Commonly, they provide access to some kind of event listener which captures every event executed in the editors/tools. This functionality can be used to capture changes. If the event listener is not provided, copy-and-paste facility could also be exploited to capture changes. Also, the format of the persisted changes also needs to be adapted so that the persisted changes contain adequate information to reconstruct the partial states of the artefact; in this research, it is called the element tree. Once the partial states constructed, we can perform comparison between the elements of the partial states of the artefact.
+  
+  \item \textbf{Can the model differencing and conflict detection also be applied to any modelling languages?}
+  
+  \textbf{Answer}:
+  
+  Yes, it is possible. Nevertheless, constraints and composite changes that are specific to a modelling language has not been supported yet. For example, in the context of BPMN2, two versions can have different outgoing connection flows that leave a same start event. This should be a conflict since only one connection flow are allowed to leave a start event. However, no conflict is detected since the connection flows are treated as different elements -- they have different ids, and a start event is derived from a node-like class which allows multiple incoming and outgoing connection flows. Thus, for future work, a feature that supports custom conflict detection should be added to support conflict detection specific to certain modelling language.
+  
+  For composite changes, such as refactoring, the proposed approach also supports composite change event. This feature allows multiple changes that are part of a single refactoring activity can be put into one composite change event. Thus, a conflict with one member of a composite change event also means a conflict with the other members of the composite change event.
+  
+  \item \textbf{How does the model differencing and conflict detection handle changes at the metamodel level?}
+  
+  \textbf{Answer}:
+  
+  No, so far the proposed approach cannot handle changes at the metamodel level. One solution to address this challenge is by introducing a new change event that indicates an upgrade/downgrade of metamodel version. Thus, when replaying the change event, some adjustment should be performed so that following change events are handled accordingly to the active metamodel.
+ 
+\end{enumerate}

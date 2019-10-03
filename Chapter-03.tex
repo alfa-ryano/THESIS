@@ -65,20 +65,20 @@ set smash.name from null to "smash"
 add smash to knight.operations at 0
 create mage type Class
 set mage.name from null to "Mage" 
-session "Bob-01"|\label{line:cbp_left_30}|
-create leftGen type Generalization|\label{line:cbp_left_31}|
-set leftGen.general from null to character|\label{line:cbp_left_32}|
-set troll.generalization to leftGen|\label{line:cbp_left_33}|
-set character.name from "Character" to "Hero"|\label{line:cbp_left_34}|
-unset troll.generalization from leftGen to null composite l1|\label{line:cbp_left_35}|
-set knight.generalization to leftGen composite l1|\label{line:cbp_left_36}|
-move target in attack.parameters from 1 to 2|\label{line:cbp_left_37}|
-unset cast.name from "cast" to null composite l2|\label{line:cbp_left_38}|
-remove cast from giant.operations at 0 composite l2|\label{line:cbp_left_39}|
-delete cast composite l2|\label{line:cbp_left_40}|
-unset giant.name from "Giant" to null composite l2|\label{line:cbp_left_41}|
-delete giant composite l2|\label{line:cbp_left_42}|
-set troll.name from "Troll" to "Ogre"|\label{line:cbp_left_43}|
+session "Bob-01"
+create leftGen type Generalization
+set leftGen.general from null to character
+set troll.generalization to leftGen
+set character.name from "Character" to "Hero"
+unset troll.generalization from leftGen to null composite l1
+set knight.generalization to leftGen composite l1
+move target in attack.parameters from 1 to 2
+unset cast.name from "cast" to null composite l2
+remove cast from giant.operations at 0 composite l2
+delete cast composite l2
+unset giant.name from "Giant" to null composite l2
+delete giant composite l2
+set troll.name from "Troll" to "Ogre"
 \end{lstlisting}
 
 

@@ -14,7 +14,7 @@
   
   Yes, it is possible. Nevertheless, constraints and composite changes that are specific to a modelling language has not been supported yet. For example, in the context of BPMN2, two versions can have different outgoing connection flows that leave a same start event. This should be a conflict since only one connection flow are allowed to leave a start event. However, no conflict is detected since the connection flows are treated as different elements -- they have different ids. Moreover, a start event allows multiple incoming and outgoing connection flows. Thus, for future work, the solution should support custom conflict detection that is specific to certain modelling language. One way to do this is by the use of adapters.
   
-  For composite changes, such as refactoring, the proposed approach also supports composite change event. This feature allows multiple changes that are part of a single refactoring activity can be put into one composite change event. Thus, a conflict with one member of a composite change event also means a conflict with the other members of the composite change event.
+  For composite changes, such as refactoring, the proposed approach also supports composite change event. This feature allows multiple changes that are part of a single refactoring activity can be put into one composite change event. Thus, a change event that conflicts with a member of a composite change event also conflicts with the other members of the composite change events.
   
   \item \textbf{How does the model differencing and conflict detection handle changes at the metamodel level?}
   

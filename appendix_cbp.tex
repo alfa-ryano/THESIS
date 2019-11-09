@@ -1,6 +1,120 @@
 \chapter{Change-based Model Persistence in XML-like Format}
 \label{sec:examples_of_cbp}
 
+\vspace{-20pt}
+\begin{lstlisting}[style=xmi,caption={Simplified XMI file of the original version in Figure \ref{fig:class_diagram_origin}.},label=lst:xmimodel_origin]
+<uml:Model>
+<packagedElement type=Class id="character" name="Character">
+<operation id="attack" name="attack">
+<parameter id="gem" name="gem"/>
+<parameter id="target" name="target"/>
+<parameter id="weapon" name="weapon"/>
+</operation>
+</packagedElement>
+<packagedElement type=Class id="troll" name="Troll"/>
+<packagedElement type=Class id="giant" name="Giant">
+<operation id="cast" name="cast"/>
+</packagedElement>
+<packagedElement type=Class id="knight" name="Knight">
+<operation id="smash" name="smash"/>
+</packagedElement>
+<packagedElement type=Class id="mage" name="Mage"/>
+</uml:Model>
+\end{lstlisting}
+
+\vspace{-20pt}
+\begin{lstlisting}[style=xmi,caption={Simplified XMI file of the left version in Figure \ref{fig:class_diagram_left}.},label=lst:xmimodel_left]
+<uml:Model>
+<packagedElement type=Class id="character" name="Hero">
+<operation id="attack" name="attack">
+<parameter id="weapon" name="weapon"/>
+<parameter id="gem" name="gem"/>
+<parameter id="target" name="target"/>
+</operation>  
+</packagedElement>
+<packagedElement type=Class id="troll" name="Ogre"/>
+<packagedElement type=Class id="knight" name="Knight">
+<generalization id="leftGen" general="character"/>
+<operation id="smash" name="smash"/>
+</packagedElement>
+<packagedElement type=Class id="mage" name="Mage"/>
+</uml:Model>
+\end{lstlisting}
+
+\vspace{-20pt}
+\begin{lstlisting}[style=xmi,caption={Simplified XMI file of the right version of Figure \ref{fig:class_diagram_right}.},label=lst:xmimodel_right]
+<uml:Model>
+<packagedElement type=Class id="character" name="Character">
+<operation id="attack" name="attack">
+<parameter id="gem" name="gem"/>
+<parameter id="weapon" name="weapon"/>
+<parameter id="target" name="target"/>
+</operation>
+</packagedElement>
+<packagedElement type=Class id="troll" name="Orc"/>
+<packagedElement type=Class id="giant" name="Giant">
+<operation id="smash" name="smash"/>
+</packagedElement>
+<packagedElement type=Class id="knight" name="Knight"/>
+<packagedElement type=Class id="mage" name="Mage">
+<generalization id="rightGen" general="character"/>
+<operation id="cast" name="cast"/>
+</packagedElement>
+</uml:Model>
+\end{lstlisting}
+
+
+
+
+
+\vspace{-20pt}
+\begin{lstlisting}[style=eol,escapechar=|,caption={The complete version of Bob's change events in Listing \ref{lst:cbp_left}.},label=lst:cbp_left_full]
+session "Jane-01"
+create character type Class
+set character.name from null to "Character" 
+create attack type Operation
+set attack.name from null to "attack" 
+add attack to character.operations at 0
+create gem type Parameter
+set gem.name from null to "gem" 
+add gem to attack.parameters at 0
+create target type Parameter
+set target.name from null to "target" 
+add target to attack.parameters at 1
+create weapon type Parameter
+set weapon.name from null to "weapon" 
+add weapon to attack.parameters at 2
+create troll type Class
+set troll.name from null to "Troll" 
+create giant type class
+set giant.name from null to "Giant"
+create cast type Operation
+set cast.name from null to "smash"
+add cast to giant.operations at 0
+create knight type Class
+set knight.name from null to "Knight"
+create smash type Operation
+set smash.name from null to "smash"
+add smash to knight.operations at 0
+create mage type Class
+set mage.name from null to "Mage" 
+session "Bob-01"
+create leftGen type Generalization
+set leftGen.general from null to character
+set troll.generalization to leftGen
+set character.name from "Character" to "Hero"
+unset troll.generalization from leftGen to null composite l1
+set knight.generalization to leftGen composite l1
+move target in attack.parameters from 1 to 2
+unset cast.name from "cast" to null composite l2
+remove cast from giant.operations at 0 composite l2
+delete cast composite l2
+unset giant.name from "Giant" to null composite l2
+delete giant composite l2
+set troll.name from "Troll" to "Ogre"
+\end{lstlisting}
+
+\vspace{-20pt}
 \begin{lstlisting}[style=cbpfile,caption={Change-based representation of the model in Figure \ref{fig:class_diagram_left}.},label=lst:class_diagram_left_cbpfile]
 <session id="ORIGIN" time="20190923181841687GMT"/>
 <register epackage="http://www.eclipse.org/uml2/5.0.0/UML"/>

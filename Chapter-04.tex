@@ -5,49 +5,80 @@ In this chapter, this work proposes and evaluates an efficient approach for load
 
 \section{Introduction}
 \label{sec:introduction_4}
-One of the drawbacks of saving models in change-based persistence (CBP) is that the model results in a large, ever-growing file.  
-Its loading time is also increasing, as the loading process has to reconstruct the model's current state from its history \cite{DBLP:conf/models/YohannisKP17}. This work proposes and evaluates an approach that reduces CBP model loading time by avoiding the replaying of historical changes that have no impact on the final state of the model.
+saving a model in change-based persistence causes the model results in a large, ever-growing file (see Table \ref{table:advantages_drawbacks}) since every change made to the model is appended to the file. This is also applies to the implementation of change-based model persistence (CBP) in this work that
+uses a text file to simplify saving changes by appending them and reading them into memory. The increasing records of changes also causes its loading time to increase, as the loading process has to reconstruct the model's current state from its history \cite{DBLP:conf/models/YohannisKP17}. This work proposes and evaluates an approach that reduces CBP model loading time by avoiding the replaying of historical changes that have no impact on the final state of the model.
 
-The rest of this chapter is structured as follows. Section \ref{sec:case_study} introduces a running example and provides a brief introduction to CBP.
+The rest of this chapter is structured as follows. Section \ref{sec:case_study} introduces a running example.
 Section \ref{sec:loading_time_optimisation} presents the approach to speed up model loading and its supporting data structures. Section \ref{sec:performance_evaluation} presents experimental results and evaluation.  Section \ref{sec:conclusions_4} concludes this chapter.
 
 \section{Running Example}
 \label{sec:case_study}
-To explain the the change-based optimised loading proposed in this chapter, instead of using the running example in Section \ref{sec:running_example_1}, a a minimal tree metamodel and an example tree model in Figure \ref{fig:tree_metamodel} and \ref{fig:initial_model} are used to simplify explaining the approach. 
-The metamodel is expressed in the Eclipse Modelling Framework (EMF) Ecore metamodelling language, the de-facto standard for object-oriented metamodelling.  The example is contrived to avoid unnecessary repetition, whilst providing adequate coverage of the core features of Ecore (classes, single/multi-valued features, references).
-In this example, a tree model consists of named nodes which can -- optionally -- contain other nodes (\textsf{child} reference).
+To explain the the change-based optimised loading proposed in this chapter, instead of using the running example introduced in Section \ref{sec:running_example_1}, a minimal tree metamodel and example tree models in Figure \ref{fig:tree_example} are used to simplify explaining the approach.
+ 
+The metamodel for the minimal tree model is expressed in the Eclipse Modelling Framework (EMF) Ecore metamodelling language, the de-facto standard for object-oriented metamodelling.  The example is contrived to avoid unnecessary repetition, whilst providing adequate coverage of the core features of Ecore (classes, single/multi-valued features, references).
+In this example, a tree model consists of named nodes which can -- optionally -- contain other nodes (\textsf{child} reference). 
 
 \begin{figure}[ht]
-\begin{subfigure}[t]{0.29\linewidth}
+\begin{subfigure}[t]{0.32\linewidth}
 \centering
-\includegraphics[width=0.8\linewidth]{node_metamodel}
-\caption{The tree metamodel (EMF/Ecore).}
+\includegraphics[width=\linewidth]{node_metamodel}
+\caption{the tree metamodel (EMF/Ecore)}
 \label{fig:tree_metamodel}
 \end{subfigure}
 \hfill
-\begin{subfigure}[h]{0.69\linewidth}
+\begin{subfigure}[t]{0.32\linewidth}
 \centering
-\includegraphics[width=\linewidth]{initial_chart}
-\caption{A tree model that conforms to the  metamodel.  Node n3 is created and then deleted.}
+\includegraphics[width=\linewidth]{initial_chart_1}
+\caption{the initial state of a tree model}
 \label{fig:initial_model}
 \end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{initial_chart_2}
+  \caption{the eventual state after \textsf{n3} is deleted}
+  \label{fig:modified_model}
+\end{subfigure}
 \caption{Running example of a metamodel and a conformant model.}
-\label{fig:append_speed}
+\label{fig:tree_example}
 \end{figure}
 
-The current state of the model in Figure \ref{fig:initial_model} has two nodes, \textsf{n1}, \textsf{n2}.  The model was constructed by firstly creating the three nodes (\textsf{n1}, \textsf{n2}, and \textsf{n3}) and then nodes \textsf{n2} and \textsf{n3} were then added as children of \textsf{n1}. Finally, node \textsf{n3} was deleted.
+The initial state of the model in Figure \ref{fig:initial_model} has three nodes, \textsf{n1}, \textsf{n2}, and \textsf{n3}. It was initially constructed by firstly creating the three nodes (\textsf{n1}, \textsf{n2}, and \textsf{n3}) and nodes \textsf{n2} and \textsf{n3} were added as children of \textsf{n1}. The model then was modified by deleting node \textsf{n3} producing the eventual state in Figure \ref{fig:modified_model}.
 
 \vspace{-20pt}
-\begin{minipage}[t]{0.5\linewidth}
-\begin{lstlisting}[style=xmi,caption={State-based tree model.},label=lst:xmimodel]
+\begin{minipage}[t]{0.49\linewidth}
+\begin{lstlisting}[style=xmi,caption={State-based representation in simplified XMI of the tree model in Figure \ref{fig:initial_model}.},label=lst:xmimodel_0]
+<Node id="n1" name="A">
+  <children id="n2" name="B"/>
+  <children id="n3" name="C"/>
+</Node>
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.49\linewidth}
+\begin{lstlisting}[style=xmi,caption={State-based representation in simplified XMI of the tree model in Figure \ref{fig:modified_model}.},label=lst:xmimodel]
 <Node id="n1" name="A">
   <children id="n2" name="B"/>
 </Node>
 \end{lstlisting}
 \end{minipage}
+
+\vspace{-20pt}
+\begin{minipage}[t]{0.49\linewidth}
+\begin{lstlisting}[style=eol,caption={Change-based representation of the tree model in Figure \ref{fig:initial_model}.},label=lst:cbpmodel_0]
+create n1 of Node
+set n1.name from null to "A"  
+create n2 of Node
+set n2.name from null to "B"  
+create n3 of Node
+set n3.name from null to "C"  
+add n2 to n1.children at 0  
+add n3 to n1.children at 1
+\end{lstlisting}
+\end{minipage}
 \hfill
-\begin{minipage}[t]{0.5\linewidth}
-\begin{lstlisting}[style=eol,caption={Change-based tree model.},label=lst:cbpmodel]
+\begin{minipage}[t]{0.49\linewidth}
+  \begin{lstlisting}[style=eol,caption={Change-based representation of the tree model in Figure \ref{fig:modified_model}.},label=lst:cbpmodel]
 create n1 of Node
 set n1.name from null to "A"  
 create n2 of Node
@@ -61,9 +92,9 @@ delete n3
 \end{lstlisting}
 \end{minipage}
 
-Listings \ref{lst:xmimodel} shows the state-based representation of the model, using simplified XMI. Listing \ref{lst:cbpmodel} shows the change-based representation, using the CBP syntax introduced in \cite{yohannis2017turning}. Lines 1-6 of Listing \ref{lst:cbpmodel} record the creation and naming of the three nodes; lines 7-8 record the addition of \textsf{n2} and \textsf{n3} as children of \textsf{n1}; lines 9-10 capture the deletion of \textsf{n3} (the \textsf{remove} command removes f \textsf{n3} from its container; the $delete$ command completely removes \textsf{n3} from its model). Changes in a CBP representation can be uniquely identified by their line numbers.
+Listings \ref{lst:xmimodel_0} and \ref{lst:xmimodel} show the simplified XMI format of the models in Figures \ref{fig:initial_model} and \ref{fig:modified_model} when they are persisted in state-based representation. Listings \ref{lst:cbpmodel_0} and \ref{lst:cbpmodel} show the change-based representation of both models respectively, using the CBP syntax introduced in Chapter \ref{ch:change_based_model_persistence}. As can be seen in both change-based representation, lines 1-6 record the creation and naming of the three nodes, and lines 7-8 record the addition of \textsf{n2} and \textsf{n3} as children of \textsf{n1}. Change-based representation in Listing \ref{lst:cbpmodel} records two additional rows since it also records the recent changes that produce the eventual state of the tree model in Figure \ref{fig:modified_model}. Lines 9-10 capture the deletion of \textsf{n3} (the \textsf{remove} command removes f \textsf{n3} from its container, and the $delete$ command completely removes \textsf{n3} from its model). Changes in a CBP representation can be uniquely identified by their line numbers.
 
-The example model history illustrates a case where  earlier events (creating \textsf{n3} in line 5, naming it in line 6, making it a child of \textsf{n1} in line 8, removing it from the container in line 9) are superseded by a subsequent event (deletion of \textsf{n3} in line 10).  Loading of the current model would arguably be faster if the events in lines 5, 6, 8, 9 and 10 could be ignored.
+The example model history illustrates a case where  earlier events (creating \textsf{n3} in line 5, naming it in line 6, making it a child of \textsf{n1} in line 8, removing it from the container in line 9) are superseded by a subsequent event (deletion of \textsf{n3} in line 10).  Loading of the eventual model would arguably be faster if the events in lines 5, 6, 8, 9 and 10 could be ignored.
 
 %\vspace{-10pt}
 \section{Towards Efficient Loading of Change-Based Models}
@@ -189,7 +220,7 @@ move n1 in p.children from 0 to 1   // children = [n3, n1]
 When an element is deleted, it is completely removed from the model. Therefore, all previous events ($create$, \textsf{set}, \textsf{unset}, \textsf{move}, \textsf{add}, \textsf{remove}, $delete$) on features of element can be ignored, along with all events on the element's features. For example, when node \textsf{n3} in Listing \ref{lst:cbpmodel} is deleted, the events in lines 5-6 and 8-10 are superseded. If the Listing \ref{lst:cbpmodel} is optimised -- some of its events are ignored -- when loading, it runs as if the Listing \ref{lst:cbpmodel_optimised} are executed.
 
 \vspace{-20pt}
-\begin{lstlisting}[style=eol,caption={Change-based representation of the model in Figure \ref{fig:initial_model} after removal of node \textsf{n3}.},label=lst:cbpmodel_optimised]
+\begin{lstlisting}[style=eol,caption={Change-based representation of the model in Figure \ref{fig:tree_example} after removal of node \textsf{n3}.},label=lst:cbpmodel_optimised]
 create n1 of Node
 set n1.name from null to "A"
 create n2 of Node
@@ -202,7 +233,7 @@ Using the Listing \ref{lst:cbpmodel}, we can construct the structure of historie
 \section{Performance Evaluation}
 \label{sec:performance_evaluation}
 
-This work has developed the proposed efficient loading approach on top of the original CBP implementation, EMF CBP \cite{DBLP:conf/models/YohannisKP17,epsilonlabs2019emfcbp}, and evaluated our approach's model loading performance, as well as its memory footprint and its impact on the time required to save changes made to CBP models. The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU@2.50GHz 2.59GHz, 12GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0\textunderscore162-b12).
+This work has developed the proposed efficient loading approach on top of the original CBP implementation \cite{DBLP:conf/models/YohannisKP17,epsilonlabs2019emfcbp} and evaluated our approach's model loading performance, as well as its memory footprint and its impact on the time required to save changes made to CBP models. The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU@2.50GHz 2.59GHz, 12GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0\textunderscore162-b12).
 
 Given that CBP is a very recent contribution and this work is not aware of any existing datasets containing real-world models expressed in a change-based format, this work has used synthetic change-based models for the experiments. The synthetic models were derived from real-world cases: the BPMN2 \cite{eclipse2017bpmn2,eclipse2018bpmn2git} and Epsilon \cite{eclipse2017epsilon,eclipse2018epsilongit} software projects, and the United States article \cite{wikipedia2018us} on Wikipedia (the article is further referred as Wikipedia). For the first two projects, for each version of the cases, MoDisco \cite{DBLP:journals/infsof/BruneliereCDM14} was used to generate a UML2 \cite{eclipse2017uml2} model that reflects its source code. For the Wikipedia article, a model that conforms to the Modisco XML metamodel \cite{eclipse2018modiscoxml} was generated. Since these cases have many versions -- represented by commits/revisions, different models of the versions can be generated, and to some degree, they reflect the time-ordered changes of the cases. The synthetic change-based model for each case was derived by comparing an initially-empty running model to different versions of the case's models sequentially. All identified differences were then reconciled by performing a unidirectional merging to the running model. All changes made to the running model during the merging process were captured and persisted into a CBP file. EMF Compare was used \cite{eclipse2017compare} to perform the comparison and merging.
 
@@ -297,7 +328,7 @@ $Mean$ = average, $SD$ = standard deviation, $t$ = t-test's $t$-$value$, $df$ = 
   \label{fig:loadtime}
 \end{figure}
 
-These loading times show a considerable time saving for optimised CBP: BPMN2 was 48.02\% faster, Epsilon 50.12\% faster, and the Wikipedia page 23.63\% faster than in the original CPB implementation (all optimised CBP's $means$ are  smaller than all original CBP's $means$), which has a positive correlation to the number of ignored events. All the t-test results also show that loading times for all the persistence types are significantly different (all the $p$-$values$ $<$ 0.05). 
+These loading times show a considerable time saving for optimised CBP: BPMN2 was 48.02\% faster, Epsilon 50.12\% faster, and the Wikipedia page 23.63\% faster than in the original CBP implementation (all optimised CBP's $means$ are  smaller than all original CBP's $means$), which has a positive correlation to the number of ignored events. All the t-test results also show that loading times for all the persistence types are significantly different (all the $p$-$values$ $<$ 0.05). 
 
 For reference, this work also compared CBP loading with the execution time for loading the equivalent state-based model in XMI. Figure \ref{fig:loadtime} shows that, even with the improvements delivered by the new algorithm, loading change-based models is still significantly slower than loading a state-based model (all XMI's means are smaller than other persistence types' means).
 

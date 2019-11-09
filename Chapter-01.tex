@@ -1,32 +1,19 @@
 \chapter{Introduction}
 \label{ch:introduction}
-This Chapter briefly presents the background of this work as well as the research questions that will be 
-addressed in this project. Several research objectives are then defined to answer the research questions. 
+This Chapter briefly presents the background of to the research presented in this thesis as well as the research questions addressed in this project. Several research objectives are then defined to answer the research questions. 
 Lastly, research outputs and scoping are also presented. 
 
 \section{Background}
 \label{sec:background}
-Most of the models in the context of Model-Driven Engineering are persisted in state-based formats. 
-In such approaches, model files contain snapshots of the models' contents, and activities like version control 
-and change detection are left to external systems such as file-based version-control systems and model differencing 
-facilities. Activities such as change-detection (identifying parts that have changed in a model compared 
-to a previous version) and model comparison (finding differences between models) are computationally consuming
-for state-based models \cite{Kolovos:2009:DMM:1564596.1564641}. Thus, a new approach is needed to make the 
-computation more efficient.
+In large-scale computer systems and software development, model-driven engineering is an approach that focuses on the development and management of models -- the models are usually expressed in diagrams, textual notations, or code. Most of these models are persisted in state-based formats. In such approaches, model files contain snapshots of the models' contents, and activities like version control and change detection are left to external systems such as file-based version-control systems and model differencing facilities. Activities such as model differencing (identifying parts of two versions of a model that are different) and conflict detection (finding conflicting changes between two versions of a model) are computationally expensive for state-based models \cite{Kolovos:2009:DMM:1564596.1564641}. The research presented in this thesis is motivated by the need to find a more efficient approach to model differencing and conflict detection.
 
-As an alternative to state-based persistence, this work proposes that a model can also be persisted in a change-based format, 
-which persists the full sequence of \emph{changes} made to the model instead. 
+As an alternative to state-based persistence, this work proposes that a model can be persisted in a change-based format, 
+which persists the full sequence of \emph{changes} made to the model. 
 The concept of change-based persistence is not new and has been used in persisting changes to software, 
 object-oriented databases, and hierarchical documents 
-\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05}. 
-The change-based approach can improve detecting differences more precisely at the semantic 
-level -- that is by providing finer-granularity information (e.g. types of changes, the order of the changes, 
-elements that were changed, previous values, etc.) -- and therefore provide support to resolve them \cite{mens2002state}. 
-The ordered nature of change-based persistence means that changes made to a model can be identified sequentially without 
-having to explore and compare all elements of the model and its previous version. Based on these arguments, 
-this work explores the advantages and shortcomings of change-based persistence as an alternative approach to 
-state-based persistence for models conforming to 3-layer metamodelling architectures such as EMF and MOF. 
-Persisting models in a change-based format can bring a number of envisioned benefits over state-based persistence, 
+\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05}. Change based approaches facilitate detection of differences between versions, and makes better semantic identification of difference -- that is by providing finer-granularity information (e.g. types of changes, the order of the changes, elements that were changed, previous values, etc.).  Better and more granular identification of differences allows better support for resolution of conflicts e.g. where versions of a model have been modified in different ways \cite{mens2002state}. 
+The ordered nature of change-based persistence means that changes made to a model can be identified sequentially without having to explore and compare all elements of the model and its previous version. Based on these arguments, 
+this work explores the advantages and shortcomings of change-based persistence as an alternative approach to state-based persistence for models conforming to 3-layer metamodelling architectures such as Eclipse Modelling Framework (EMF) \cite{eclipse2019emf} and Meta-Object Facility (MOF) \cite{omg2018mof}. Persisting models in a change-based format can bring a number of envisioned benefits over state-based persistence, 
 such as the ability to detect changes much faster and more precisely, which can then have positive 
 knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments, 
 and (2) incremental model management (e.g., incremental query \cite{DBLP:conf/ecmdafa/RathHV12} and 
@@ -34,14 +21,13 @@ model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}).
 
 Nevertheless, change-based persistence also comes with downsides, such as ever-growing model files 
 \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and increased model loading time \cite{mens2002state}
-which increase storage and computation costs. A model that is frequently modified will increase considerably in file size 
-since every change is added to the file. The increased file size (proportional to the number of persisted changes) will, 
+which increase storage and computation costs. 
+
+Every time a model is modified, the file of changes increases in size. The increased file size (proportional to the number of persisted changes), 
 in turn, increase the loading time of the model since all changes have to be replayed to reconstruct the model's 
 eventual state. These downsides have to be mitigated to enable the practical adoption of change-based persistence. 
-One approach to reducing the file size of change-based models is by removing changes that do not affect the eventual 
-state of the model. For the increased loading time, it can be mitigated by ignoring -- i.e. not replaying -- changes 
-that are cancelled out by later changes or employing change-based and state-based persistence side-by-side so that the
-benefits of state-based persistence on loading time can be obtained. Other downsides are change-based persistence requires 
+
+One approach to controlling the size-increase of the change file is to identifying changes that do not affect the eventual state of the model.  Loading time can be improved by ignoring -- i.e. not replaying -- changes that cancel out, or employing change-based and state-based persistence side-by-side so that the benefits of state-based persistence on loading time can be obtained. Other downsides are change-based persistence requires 
 integration with existing tools -- since it is still a non-standard approach -- for its adoption \cite{koegel2010emfstore}, 
 and still has limited support for standard, text-based version controls for collaborative development \cite{koegel2010emfstore}. 
 These downsides can be addressed by developing a change-based persistence plugin for a specific development environment 
@@ -49,19 +35,27 @@ These downsides can be addressed by developing a change-based persistence plugin
 
 \section{Research Questions}
 \label{sec:research_questions}
-The hypothesis of this work is that \textbf{``Change-based model persistence reduces the execution time of model differencing and conflict detection of large models compared to their execution time in state-based model persistence, with acceptable trade-offs on loading and persisting time, memory footprint, and storage space consumption''}. The execution time is the time required to complete the processes (e.g. change-detection, model comparison, model merging, or persisting changes). Model differencing is identifying the differences between two  versions of a model, which elements of features of the model that have different states. Model conflict detection is identifying changes applied to two versions of a model that cause an element or feature of the model has different states in both versions. This condition requires user decision to choose one of the possible states as the end state when both versions are merged.  This work refers ``large models'' to models with more than 1M elements, consistently with \cite{daniel2016neoemf,DBLP:conf/models/Espinazo-PaganCM11}. Model load time is the amount of time required to load a model from its persistence into memory. Persisting changes is saving changes made to a model into a persistent representation (e.g. a file). Memory footprint is the size of the memory occupied  at the time a process finished. Disk space consumption is the amount of storage consumed by the persistence. The term ``acceptable'' means that (1) the solutions proposed in this work deliver improvement on faster loading and saving time with less memory footprint compared to existing solutions as the baselines, or (2) the performance could be slightly worse but in rare condition or not statistically significant, or (3) the cost to accommodate the trade-off is affordable in the current context, such as the cost for extending memory and storage space.
+The hypothesis of this work is that \textbf{``Change-based model persistence reduces the execution time of model differencing and conflict detection of large models compared to their execution time in state-based model persistence, with acceptable trade-offs on loading and persisting time, memory footprint, and storage space consumption''}. 
+
+In general, the word `model' in the hypothesis refers typically to models -- either in visual or textual representation -- that capture the structure of the data or behaviour of systems. In particular, the word 'model' refers to models that confirms to the 3-layer metamodelling architectures such as Eclipse Modelling Framework (EMF) \cite{eclipse2019emf} and Meta-Object Facility (MOF) \cite{omg2018mof}. 
+
+Model differencing is used to identify how two or more versions of a model differ -- for example, determining what has been changed from the original model, or comparing new versions of a model created by different teams working independently.  A typical goal of model differencing is to ascertain whether independent updates can be merged, or whether there are conflicts in the model versions: elements or features that differ in ways that are incompatible.  Conflict resolution requires identification of conflicts, and user intervention to decide which the appropriate state of the conflicted elements of features in the eventual merged model. 
+
+%Model differencing is identifying the differences between two  versions of a model, which elements of features of the model that have different states. Model conflict detection is identifying changes applied to two versions of a model that cause an element or feature of the model has different states in both versions. This condition requires user decision to choose one of the possible states as the end state when both versions are merged. 
+
+The execution time referred in the hypothesis is the time required to complete the model differencing or the conflict detection. The hypothesis refers to large models. In this research, a large model is taken to have more than one million elements, a definition that is consistent with \cite{daniel2016neoemf,DBLP:conf/models/Espinazo-PaganCM11}. Model load time is the amount of time required to load a model from its persistence into memory. Persisting changes is saving changes made to a model into a persistent representation (e.g. a file). Memory footprint is the size of the memory occupied  at the time a process finished. Disk space consumption is the amount of storage consumed by the persistence. The term ``acceptable'' means that (1) the solutions proposed in this work deliver improvement on faster loading and saving time with less memory footprint compared to existing solutions as the baselines, or (2) the performance could be slightly worse but in rare condition or not statistically significant, or (3) the cost to accommodate the trade-off is affordable in the current context, such as the cost for extending memory and storage space.
 
 To assess the validity of the hypothesis, this work aims to answer the following research questions: 
 \begin{enumerate} 
-\item \textbf{How to persist models in a change-based format? How does it perform compared to state-based persistence on loading and saving models? (RQ1)} 
+\item \textbf{How can models be effectively persisted in a change-based format, and how does change-based persistence perform, compared to state-based persistence on loading and saving models? (RQ1)} 
 
 The concept of change-based persistence has to be translated into an implementation in a modelling framework context so that it can be applied for model persistence, and therefore its impact on model loading and saving, model differencing, and model conflict detection can be assessed.
 
-\item \textbf{How to identify differences between two versions of a change-based model? To what extent does change-based model differencing perform, in terms of speed and memory footprint, compared to state-based model differencing? (RQ2)} 
+\item \textbf{In a changed-based format, how can differences between models be identified, and how does change-based model differencing perform, in terms of speed and memory footprint, compared to state-based model differencing? (RQ2)} 
 
 The purpose of using change-based persistence in this work is to speed up model differencing. Due to the nature of change-based persistence, the mechanism to perform change-based model differencing will differ substantially from the current state-based model differencing. It is expected that model differencing in change-based persistence perform faster than model differencing in state-based persistence.        
 
-\item \textbf{How to detect conflicts between two versions of a change-based model? To what extent does change-based model conflict detection perform, in terms of speed and memory, compared to state-based model conflict detection? (RQ3)} 
+\item \textbf{Following change-based model differencing, how can conflicts be detected between versions of a model, and  how does change-based conflict detection perform, in terms of speed and memory, compared to state-based model conflict detection? (RQ3)} 
 
 The knock-on effect of change-based persistence on model conflict detection will also be investigated. It is expected that comparison of change-based models will be significantly faster than the comparison of state-based models.
 
@@ -75,7 +69,7 @@ The knock-on effect of change-based persistence on model conflict detection will
 \label{sec:research_objectives}
 This research aims to meet the following research objectives to answer the research questions.
 \begin{enumerate}
-\item Develop an implementation of change-based persistence so it can be applied to persist models in change-based format, and evaluate the correctness of change-based models that it produces and its performance on saving changes against state-based persistence. 
+\item Research and design an implementation of change-based persistence so it can be applied to persist models in change-based format, and evaluate the correctness of change-based models that it produces and its performance on saving changes against state-based persistence. 
 \item Develop a solution to perform change-based model differencing, and compare its execution time and memory footprint against state-based model differencing.
 \item Develop a solution to perform change-based model conflict detection, and compare its execution time and memory footprint against state-based model conflict detection.
 \end{enumerate}
@@ -84,8 +78,8 @@ This research aims to meet the following research objectives to answer the resea
 \label{sec:research_outputs}
 By the end of this research, these following outputs will have been produced:
 \begin{enumerate}
-\item Prototypes for change-based persistence. 
-\item Solutions -- including their implementation and evaluation -- for loading time reduction and saving, model differencing, and model conflict detection of change-based persistence.
+\item Prototypes of change-based persistence, change-based model differencing, and change-based conflict detection. 
+\item Designs and evaluation results of the solutions for loading time reduction and saving, model differencing, and model conflict detection of change-based persistence.
 \item Publications and a thesis documenting the outcomes of this research.
 \end{enumerate}
 
@@ -94,7 +88,7 @@ By the end of this research, these following outputs will have been produced:
 The scope of this research is as follows:
 \begin{enumerate}
 \item This work is restricted to models conforming to 3-level metamodelling architectures. The Eclipse Modelling Framework is used, as a representative example of such architectures, for the implementation of all solutions and prototypes.
-\item This work only covers change-based model persistence, differencing, and conflict detection. Change-based model merging is excluded from the scope due to the limited time of the PhD program.
+\item This work only covers change-based model persistence, differencing, and conflict detection. Change-based model merging is beyond the scope of the research presented in this thesis.
 \item Although it is mentioned several times in this report, the use of change-based persistence to support incremental model management is not part of this work. 
 \end{enumerate}
 
@@ -150,12 +144,16 @@ This chapter summarises the work that has been carried and the evaluation result
 
 \section{Publications}
 \label{sec:publications}
-This research has published several papers in workshops and conferences. They are as follow:
+The research in various parts of the thesis has been published in the following 
+papers: 
 \begin{enumerate}
-  \item A. Yohannis, D. S. Kolovos, and F. Polack, ``Turning models inside out,'' in Proceedings of MODELS 2017 Satellite Events co-located with ACM/IEEE 20th International Conference on Model Driven Engineering Languages and Systems (MODELS 2017), Austin, TX, USA, September, 17, 2017., 2017, pp. 430–434. [Online]. Available: \url{http://ceur-ws.org/Vol-2019/flexmde_8.pdf}.
-  \item  A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ``Towards efficient loading of change-based models,'' in Modelling Foundations and Applications - 14th European Conference, ECMFA 2018, Held as Part of STAF 2018, Toulouse,  France, June 26-28, 2018, Proceedings, 2018, pp. 235–250. [Online]. Available: \url{https://doi.org/10.1007/978-3-319-92997-2_15}.
+  \item A. Yohannis, D. S. Kolovos, and F. Polack, ``Turning models inside out,'' in Proceedings of MODELS 2017 Satellite Events co-located with ACM/IEEE 20th International Conference on Model Driven Engineering Languages and Systems (MODELS 2017), Austin, TX, USA, September, 17, 2017., 2017, pp. 430–434. [Online]. Available: \url{http://ceur-ws.org/Vol-2019/flexmde_8.pdf} (Chapter 3).
+  
+  \item  A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ``Towards efficient loading of change-based models,'' in Modelling Foundations and Applications - 14th European Conference, ECMFA 2018, Held as Part of STAF 2018, Toulouse,  France, June 26-28, 2018, Proceedings, 2018, pp. 235–250. [Online]. Available: \url{https://doi.org/10.1007/978-3-319-92997-2_15} (Chapter 4).
+  
   \item  A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ``Towards hybrid model persistence,'' in Proceedings of MODELS 2018 Workshops co-located with ACM/IEEE 21st International Conference on Model Driven Engineering Languages and Systems (MODELS 2018), Copenhagen, 
-  Denmark, October, 14, 2018., 2018, pp. 594–603. [Online]. Available:  \url{http://ceur-ws.org/Vol-2245/me_paper_3.pdf}.
+  Denmark, October, 14, 2018., 2018, pp. 594–603. [Online]. Available:  \url{http://ceur-ws.org/Vol-2245/me_paper_3.pdf} (Chapter 5).
+  
   \item  A. Yohannis, H. H. Rodriguez, F. Polack, and D. Kolovos,``Towards efficient comparison of change-based models,'' B. Combemale and A. Shaukat, Eds., vol. 18, no. 2, Jul. 2019, pp. 7:1–21, the 15th European Conference on Modelling Foundations and Applications. [Online]. Available: 
-  \url{http://www.jot.fm/contents/issue_2019_02/article7.html}.
+  \url{http://www.jot.fm/contents/issue_2019_02/article7.html} (Chapter 6).
 \end{enumerate}

@@ -262,3 +262,6 @@ TSWLatexianTemp*
 Thesis Report.pdf
 Thesis Report - Copy.pdf
 Thesis Report.ist
+scripts/images/*
+scripts/.Rhistory
+scripts/.RData

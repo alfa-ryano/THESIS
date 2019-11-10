@@ -9,7 +9,7 @@ saving a model in change-based persistence causes the model results in a large, 
 uses a text file to simplify saving changes by appending them and reading them into memory. The increasing records of changes also causes its loading time to increase, as the loading process has to reconstruct the model's current state from its history \cite{DBLP:conf/models/YohannisKP17}. This work proposes and evaluates an approach that reduces CBP model loading time by avoiding the replaying of historical changes that have no impact on the final state of the model.
 
 The rest of this chapter is structured as follows. Section \ref{sec:case_study} introduces a running example.
-Section \ref{sec:loading_time_optimisation} presents the approach to speed up model loading and its supporting data structures. Section \ref{sec:performance_evaluation} presents experimental results and evaluation.  Section \ref{sec:conclusions_4} concludes this chapter.
+Section \ref{sec:loading_time_optimisation} presents the approach to speed up model loading and its supporting data structures. Section \ref{sec:evaluation_4} presents experimental results and evaluation.  Section \ref{sec:conclusions_4} concludes this chapter.
 
 \section{Running Example}
 \label{sec:case_study}
@@ -230,8 +230,8 @@ add n2 to n1.children at index 0
 
 Using the Listing \ref{lst:cbpmodel}, we can construct the structure of histories that are related to element \textsf{n3} as follows: \textsf{n3}.$create$.\textsf{lines} = \{5\}, \textsf{n3}.\textsf{name}.\textsf{set}.\textsf{lines} = \{6\}, \textsf{n1}.\textsf{children}.\textsf{add}.\textsf{lines} = \{\{7, \textsf{n2}\}, \{8, \textsf{n3}\}\}, \textsf{n1}.\textsf{children}.\textsf{remove}.\textsf{lines} = \{\{9, \textsf{n3}\}\}, and \textsf{n3}.$delete$.\textsf{lines} = \{10\}. Thus, when element \textsf{n3} is deleted, by iterating through all these history structures, all line numbers associated with \textsf{n3} can be identified and added to \textsf{ignoreList} producing \textsf{ignoreList} = \{5 6, 8, 9, 10\} so they can be ignored in the next model loading.
 
-\section{Performance Evaluation}
-\label{sec:performance_evaluation}
+\section{Evaluation}
+\label{sec:evaluation_4}
 
 This work has developed the proposed efficient loading approach on top of the original CBP implementation \cite{DBLP:conf/models/YohannisKP17,epsilonlabs2019emfcbp} and evaluated our approach's model loading performance, as well as its memory footprint and its impact on the time required to save changes made to CBP models. The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU@2.50GHz 2.59GHz, 12GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0\textunderscore162-b12).
 

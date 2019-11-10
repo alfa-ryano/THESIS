@@ -1,128 +1,42 @@
 \chapter{Literature Review}
 \label{ch:literature_review}
-This work has conducted literature and existing tool review to identify problems that provide motivation for research. In this chapter present the review of this work on model persistence, model differencing and conflict detection, and the research method employed in this work.
+
+This chapter presents the literature review of this study. Firstly, it presents some work on model persistence by highlighting some key characteristics -- unique features, strong points, and downsides -- of some existing tools. It then and summarises the advantages and drawbacks of state-based and change-based persistence and concludes what key characteristics for a new change-based persistence that can support a faster model differencing and conflict detection. Secondly, this chapter then reviews the related work on identifying differences and detecting conflicts between versions of models. It then presents the current challenges that model differencing and conflict detection are dealing with as well as the downsides of existing approaches in tackling the problems, which gives motivation to this research to come with a new solution. Thirdly, this chapter provides an overview of the research method employed in this research. Lastly, the conclusions of the literature review are presented. 
+
+\section{Introduction}
+\label{sec:introduction_2}
+
+
 
 \section{Model Persistence}
 \label{sec:model_persistence}
-In constructing models, it is imperative that modelling tools should support model persistence so that models being constructed can be saved at any time and reloaded for further modification. Most of these tools persist models in state-based format which means the tools capture a snapshot of a model and persist it in its entirety. Another alternative is to persists these models in change-based format. In other words, a model is persisted in its complete historical changes. Replaying these changes produces the same eventual state as the state when the model was persisted. This section compares the advantages and downsides of change-based and state-based persistence in general as well as different model persistence solutions in terms of tool support, loading, saving, and collaboration support in particular. 
+In constructing models, it is imperative that modelling tools can support model persistence so that under-construction models can be saved at any time and reloaded for further modification. Most of these tools persist models in their state-based format that is capturing a snapshot of a model at a time and then persist its entire state into a storage. The persistence can take different forms, such as text files, relational databases, or NoSQL databases.
 
-\subsection{Change-based Model Persistence}
-\label{sec:change_based_model_persistence}
-Change-based persistence works by persisting the complete change history of models instead of persisting the snapshot -- the entire state -- of a model at a time. The concept of change-based persistence is not new and has been used in persisting changes of software, object-oriented databases, hierarchical documents, and models 
-\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010emfstore}. 
+\subsection{Text Files}
+\label{sec:text_file}
+The simplest and most common way to save a model is to persist it into a text file. By default, modelling tools that support the 3-layer metamodelling architectures of Eclipse Modelling Framework (EMF) \cite{steinberg2008emf} persist a model in a text file with a format of Metadata Interchange (XMI) -- a standard issued by Object Management Group (OMG) for exchanging metadata information via Extensible Markup Language (XML) \cite{omg2018xmi}. 
 
-The nature of change-based persistence give us two advantages. First, it contains finer-granularity information (e.g. types of changes, the order of the changes, elements that were changed, previous values, etc.) of changes which can improve the accuracy of change detection \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,mens2002state}. Second, it records changes ordered manner which means that changes made to a model can be identified sequentially without having to explore and compare all elements of compared versions of models \cite{DBLP:conf/edoc/KoegelHLHD10}. The advantages to detect changes more precisely and much faster can then have positive knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010emfstore}, and (2) incremental model management \cite{jouault2010towards,DBLP:conf/ecmdafa/OgunyomiRK15, DBLP:conf/ecmdafa/RathHV12}. Moreover, changed-based persistence contains abundant information which can be exploited for analytics \cite{DBLP:journals/entcs/RobbesL07}.
+Since it is the default standard for persisting EMF models, it is supported by  most modelling tools. In order to modify a model persisted in an XMI file, such as performing create, read, update, delete (CRUD) operations, a tool has to de-serialise and load the entire model from the file into memory. This can be a problem when we only want to make a small number of changes but the size of the model is very large -- it takes considerable time and memory to load the model. Also, when saving, the model has to be persisted in its entirety causing inefficiency when we only made small number of changes. Since it is a text-based file, the model can be duplicated and shared with minimum effort, e.g. through manual copy or version control systems (e.g. Git, SVN). However, for model comparison, text-based differencing \cite{DBLP:journals/algorithmica/Meyers86} cannot be applied accurately to XMI files since essentially they are tree documents which require different differencing approaches \cite{wang2003xdiff}.
 
-Nevertheless, change-based persistence also comes with downsides, such as ever-growing model files 
-\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and increased model loading time \cite{mens2002state}
-which increase storage and computation costs. A model that is frequently modified will increase considerably in file size 
-since every change is added to the file. The increased file size (proportional to the number of persisted changes) will, 
-in turn, increase the loading time of the model since all changes have to be replayed to reconstruct the model's 
-eventual state. 
+\subsection{Relational Databases}
+\label{sec:relational_databases}
+Models can also be persisted into relational databases. EMF Teneo \cite{eclipse2017teneo} is a solution that integerates EMF with existing persistency solutions, such as Hiberbate \cite{hibernate2019hibernateorm} and EclipseLink \cite{eclipse2019eclipselink}. Thus it can persists EMF models into relational database backends. In this way, EMF Teneo can utilise the power of storage, caching, and querying of the database backends. It also supports the automatic mapping of models to relational model schema with flexible mapping customisation. Using relational databases as its backends enables EMF Teneo to support lazy loading of models. So, when performing CRUD operations, it only loads and saves relevant elements and features -- not the entire model -- into and from memory, which is more efficient in memory usage  which causes EMF Teneo uses less memory than XMI in modifying large models.
 
-These downsides have to be mitigated to enable the practical adoption of change-based persistence. 
-One approach to reducing the file size of change-based models is by removing changes that do not affect the eventual 
-state of the model. For the increased loading time, it can be mitigated by ignoring -- i.e. not replaying -- changes 
-that are cancelled out by later changes or employing change-based and state-based persistence side-by-side so that the
-benefits of state-based persistence on loading time can be obtained. 
+Similar to EMF Teneo, Connected Data Objects (CDO) \cite{eclipse2019cdo} also supports persisting models into various database-backed model persistence (e.g. relational dan NoSQL databases). It is a development-time model and metamodel repository as well as a distribution and runtime persistence framework for EMF-based application systems. It supports model versioning and can perform model differencing and conflict detection -- it uses EMF Compare \cite{emfcompare2018developer} to perform the comparison \cite{cdo2019emfcompare}. One downside of CDO is its adoption necessitates the use of a separate version control system (e.g. a Git repository for code and a CDO repository for models), which introduces fragmentation and administration challenges \cite{barmpis2014evaluation}.
 
-Other downsides are change-based persistence requires 
-integration with existing tools -- since it is still a non-standard approach -- for its adoption \cite{koegel2010emfstore}, 
-and still has limited support for standard, text-based version controls for collaborative development \cite{koegel2010emfstore}. 
-These downsides can be addressed by developing a change-based persistence plugin for a specific development environment 
-(e.g. Eclipse) and persisting changes in text-based format to support text-based version controls (e.g. Git, SVN).
+\subsection{NoSQL Databases}
+\label{sec:NoSQL Databases}
+In the era where data is abundant and models are getting larger in sizes, ability to handle large models is necessary. Some work, such as Morsa \cite{DBLP:conf/models/Espinazo-PaganCM11} and NeoEMF \cite{daniel2016neoemf}, has been performed to persist models into non-relational, NoSQL databases dedicated for big data. Morsa saves models in documents with MongoDB as its backend \cite{mongodb}, while NeoEMF persists models in multi, NoSQL backends: Neo4j for Graph, MapDB for Map, and HBase for Column datastores. The advantages of using NoSQL databases are that users are given options to choose which datastores -- wih some degree for configuration -- that best fit with the characteristics of their models and metamodels and to maximise the features  the backends provide, such as lazy loading, caching, etc. Both Morsa and NeoEMF does not provides built-in support for versioning and models are eventually stored in binary files/folders which are known to be a poor fit for text-oriented version control systems like Git and SVN. 
 
-\subsubsection{EMFStore}
-\label{sec:emfstore}
-The work can only identify EMFStore \cite{koegel2010emfstore} as the only implementation of change-based persistence for EMF-based models. EMFStore is a change-based model repository and version control \cite{emfstore2019what}. Instead of using SVN or Git to share your entities that have been serialized to files (e.g., XML), EMFStore has its own change-based, model-oriented mechanism for versioning. Models are shared through a server and distributed to client applications. Clients can modify the entities, offline or online, in parallel and synchronize with the server, and conflicts caused by concurrent modification are detected automatically and can be resolved interactively. The historical changes of models are kept on the server, and the historical states as well as recorded changes can be retrieved between different versions of the models. 
+\subsection{Change-based Representation}
+\label{sec:change_based_representation}
+All the solutions previously mentioned persist models in state-based format. EMF Store \cite{koegel2010emfstore} takes a different approach; it persists models in change-based representation. EMF Store appears to be the only current implementation of change-based persistence for EMF models.
 
-Every projects of EMFStore has a version history and each version represents a commit of a client. A commit sends a package of changes to the server. The package itself contains a collection of operations applied to a version that transforms it to a newer version or can be said as the deltas between the two versions. The operations can be add, delete, set, unset or move that modifies an element or feature, or they can be a composite operation, an operation that consists of many operations, e.g. refactoring that moves a method to a superclass. 
+EMF Store is a model repository and supports collaborative editing and versioning of models \cite{emfstore2019what}. Instead of using standard text-oriented version controls (e.g., Git, SVN) for model versioning, EMF Store has its own dedicated, change-based, model-oriented versioning mechanism. Models are shared through a server and distributed to client applications. Clients can modify the models in parallel, offline or online, and synchronize with the server. Conflicts caused by concurrent modification are detected automatically and can be resolved interactively by users. The historical changes of models are kept on the server, and different versions of a model as well as changes that produce the them can be retrieved from the server. 
 
-To obtain a certain version of an existing project, a client can perform checkout. This version is called the base version at the client side. The client then can perform modification to this version. Every operations applied to the version is recorded by EMF Store. Whe the client commits, these operations are put into one package and sent to the server. If the base version is still the head version of the project on the sever, the commit are accepted, and a new version is created. If they are different, it means that there is another client that already committed its changes to the server. Thus the current client has to synchronise it by updating its local project. This is the state where conflicts potentially can happen between the incoming and local changes, that is when they modify the same element or feature of a model. EMFStore performs conflict detection to identify the conflicts automatically. The mechanism of EMFStore to identify conflicts is discussed in detail in Section \ref{sec:emfstore_conflict_detection}.  
+In EMF Store, to version models, a project has to be created first. A project can contain one or more models. Every project has a version history, and each version represents a commit of a client. A commit sends a package of changes to the server. The package itself contains a collection of operations applied to a version that transforms it to a newer version or can be said as the deltas between the two versions. The operations can be add, delete, set, unset or move that modifies an element or feature, or they can be a composite operation, an operation that consists of many operations, e.g. refactoring that moves a method to a superclass.
 
-The main motivation EMFStore applies change-based approach is that calculating the differences between two versions might be expensive and is not able to recover all information since the order and logical coherence of changes is lost. Since it follows change-based approach, it does not store the state of every version. It only stores operations of each version in an ordered, logical, and coherent manner so that they can be executed and reversible to obtain the states between versions. Nevertheless, it also stores the intermediate cache states for selected versions, including the head version, to speed up the retrieval of certain versions.
-
-The advantages of EMF Store are (1) it was designed to allow semantic versioning of models, which can support model merging and conflict detection to be more effective, and (2) efficient to identify changes particularly for large models with small modification. By default, the packages of operations are persisted in XMI files but it can also be configured to use other backends, e.g. MongoDB. EMF Store has its own mechanism for controlling versions thus limits its adopters to use common text-oriented version controls, such as Git and SVN. Its performance can also degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}. 
-
-\begin{table*}[h]
-  \centering
-  \caption{The advantages and downsides between change-based and state-based persistence.}
-  \label{table:advantages_drawbacks}
-  \begin{scriptsize}
-    \begin{tabular}
-      {|>{\centering\arraybackslash}p{1.1cm}|>{\centering\arraybackslash}p{1.1cm}|>{\centering\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{5cm}|}
-      \hline 
-      \multicolumn{2}{|c|}{\textbf{Dimensions}}&\textbf{Change-based Approach}&\textbf{State-based Approach}\\
-      \hline 
-      \multicolumn{2}{|p{2.2cm}|}{\centering Advantages} &
-      \begin{minipage}[t]{5cm}
-        \begin{itemize}[leftmargin=9pt]
-          \setlength\itemsep{2pt}
-          \item[+] Faster for detecting changes \cite{DBLP:conf/edoc/KoegelHLHD10}
-          \item[+] More accurate, carry semantic information \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,mens2002state}  
-          \item[+] Faster and more accurate for comparison and merging \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010emfstore}
-          \item[+] Information carried is useful for analytics \cite{DBLP:journals/entcs/RobbesL07}
-        \end{itemize}
-      \end{minipage}
-      & 
-      \begin{minipage}[t]{5cm}
-        \raggedright
-        \begin{itemize}[leftmargin=9pt]
-          \setlength\itemsep{2pt}
-          \item[+] Faster for loading large models \cite{DBLP:conf/models/Espinazo-PaganCM11,daniel2016neoemf,eclipse2019cdo}
-          \item[+] A default standard, no need integration with existing tools \cite{koegel2010emfstore}  
-        \end{itemize}
-      \end{minipage}
-      \\
-      \hline
-      \multicolumn{2}{|p{2.2cm}|}{\centering Disadvantages} & \begin{minipage}[t]{5cm}
-        \raggedright
-        \begin{itemize}[leftmargin=9pt]
-          \setlength\itemsep{2pt}
-          \item[--] Increased record size \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10}
-          \item[--] Is not efficient for replaying (loading) long records \cite{mens2002state}
-          \item[--] Limited supports from standard, text-based version controls (e.g. GitHub) \cite{koegel2010emfstore} 
-          \item[--] Not a standard, need integration with existing tools \cite{koegel2010emfstore} 
-        \end{itemize}
-      \end{minipage}
-      & 
-      \begin{minipage}[t]{5cm}
-        \raggedright
-        \begin{itemize}[leftmargin=9pt]
-          \setlength\itemsep{2pt}
-          \item[--] Slower for saving changes  \cite{mens2002state,daniel2016neoemf,DBLP:conf/models/Espinazo-PaganCM11}
-          \item[--] Slower for comparison \cite{DBLP:conf/edoc/KoegelHLHD10}
-          \item[--] Less accurate, does not carry semantic information \cite{mens2002state,DBLP:conf/edoc/KoegelHLHD10}  
-        \end{itemize}
-      \end{minipage}
-      \\
-      \hline
-    \end{tabular} 
-  \end{scriptsize}
-\end{table*}
-
-\subsection{State-based Model Persistence}
-\label{sec:state_based_model_persistence}
-Models saved in state-based persistence can be persisted in several formats, such as text files, relational databases, or NoSQL databases. This section discusses briefly the advantages and drawbacks of different solutions that persist models in these formats.
-
-\subsubsection{EMF Default Persistence Format (XMI)}
-\label{sec:xmi}
-By default, modelling tools that support the 3-layer metamodelling architectures of Eclipse Modelling Framework (EMF) \cite{steinberg2008emf} employ state-based persistence to persist models in Metadata Interchange (XMI) format in text-based files. XMI is a standard issued by Object Management Group (OMG) for exchanging metadata information via Extensible Markup Language (XML) \cite{omg2018xmi}. 
-
-Since it is the default standard, most model modelling tools support this model persistence format. In order to modify a model persisted in XMI (e.g. performing CRUD operations), the entire model has to be loaded into the memory. This can be a problem when we only want to make a small number of changes but the size of the model is very large -- it takes considerable time and memory to load the model. Also, when saving, the model has to be persisted in its entirety causing inefficiency when we only made small number of changes. Since it is a text-based file, the model can be duplicated and shared with minimum effort, e.g. through manual copy or version control systems (e.g. Git, SVN). 
-However, for model comparison, text-based differencing \cite{DBLP:journals/algorithmica/Meyers86} cannot be applied accurately to XMI files since essentially they are tree documents which require different differencing approaches \cite{wang2003xdiff}.
-
-\subsubsection{EMF Teneo}
-\label{sec:emf_teneo}
-EMF Teneo \cite{eclipse2017teneo} is a solution that integerates EMF with existing persistency solutions, such as Hiberbate \cite{hibernate2019hibernateorm} and EclipseLink \cite{eclipse2019eclipselink}, so that EMF models can be persisted into relational database backends. In this way, it can utilise the power of storage, caching, and querying of the database backends. It supports the automatic mapping of models to relational model schema with flexible mapping customisation. Using relational databases as its backends enables EMF Teneo to support lazy loading of models. So, when performing CRUD operations, it only loads affected elements and features into the memory as well as when saving them, which causes EMF Teneo uses less memory than XMI for large models. Thus, the perofrma  
-
-\subsubsection{CDO}
-\label{sec:cdo}
-Connected Data Objects (CDO) \cite{eclipse2019cdo} is a development-time model and metamodel repository as well as a distribution and runtime persistence framework for EMF-based application systems. It supports various database-backed model persistence (e.g. relational dan NoSQL databases) and also provides facilities for collaboration, such as model differencing and conflict detection; it uses EMF Compare \cite{emfcompare2018developer} to perform the comparison \cite{cdo2019emfcompare}. However, CDO adoption necessitates the use of a separate version control system (e.g. a Git repository for code and a CDO repository for models), which introduces fragmentation and administration challenges \cite{barmpis2014evaluation}. Since it uses database backends, it also supports lazy loading of models which avoids loading and saving models in their entirety. 
-
-\subsubsection{Morsa and NeoEMF}
-\label{sec:morsa_neoemf}
-Some work also has persisted EMF-based models into relational, NoSQL databases such Morsa \cite{DBLP:conf/models/Espinazo-PaganCM11} and NeoEMF \cite{daniel2016neoemf}. Morsa  persist models in documents with MongoDB backend \cite{mongodb}, while NeoEMF persists models in multi, NoSQL backends (Graph, Map, Column). However, none of these approaches provides built-in support for versioning and models are eventually stored in binary files/folders which are known to be a poor fit for text-oriented version control systems like Git and SVN. Both facilitate lazy loading which avoids loading and saving models in their entirety.
+To obtain a certain version of an existing project, a client can perform a checkout. This version is called the base version on the client side. The client then can perform modification to this version. Every operation applied to the version is recorded by EMF Store. When the client commits, these operations are put into one package and sent to the server. If the base version is still the head version of the project on the server, the commit is accepted, and a new version is created. If they are different, it means that there is another client that already committed its changes to the server. Thus the current client has to synchronise it by updating its local project. This is the state where conflicts can happen potentially between the incoming and local changes, that is when they modify the same element or feature of a model. EMF Store performs conflict detection to identify conflicts automatically. The mechanism of EMF Store to identify conflicts is discussed in detail in Section \ref{sec:emfstore_conflict_detection}.
 
 \begin{table*}[]
   \centering
@@ -226,7 +140,7 @@ Some work also has persisted EMF-based models into relational, NoSQL databases s
     \end{minipage} 
     \\
     \hline
-    EMFStore
+    EMF Store
     &
     \begin{minipage}[t]{\linewidth}
       \raggedright
@@ -251,12 +165,109 @@ Some work also has persisted EMF-based models into relational, NoSQL databases s
 \end{scriptsize}
 \end{table*}
   
-In summary, state-based model persistence has several strong points. First, since it is the default standard of persisting models -- particularly XMI, most of the available modelling tools support this kind of persistence thus it requires minimum effort to integrate with existing tools \cite{koegel2010emfstore}. Second, it is faster in loading models since there is no need to replay all changes as in change-based persistence. Also, applying lazy loading -- elements of models are not loaded upfront -- enables faster CRUD (create, read, update, delete) operations \cite{DBLP:conf/models/Espinazo-PaganCM11,daniel2016neoemf}. 
+The primary motivation EMF Store applies change-based approach is that calculating the differences between two versions in state-based persistence might be expensive and less accurate (state-based model differencing identify differences using LCS algorithms \cite{emfcompare2018developer,DBLP:journals/algorithmica/Meyers86}, not from the real changes). Since it follows a change-based approach, it does not store the state of every version. It only saves operations of each version in an ordered, logical, and coherent manner so that they can be executed and reversible to obtain the states between versions. Nevertheless, it also stores the intermediate cache states for selected versions, including the head version, to speed up the retrieval of specific versions.
+
+The strong points of EMF Store are it was designed to allow semantic versioning of models, which can support model differencing and conflict detection to be more accurate and efficient rather than performing them on state-based model persistence. By default, the packages of operations are persisted in XMI files but it can also be configured to use other backends, e.g. MongoDB. The downsides of EMF Store are it has its own mechanism for controlling versions thus limits its adopters to use common text-oriented version controls, such as Git  and SVN. Its performance can also degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}. EMF Store is discussed more in Section \ref{sec:a_new_change_based_persistence} on how its strong points and downsides affect the design of a new change-based persistence to enable high-performance model differencing and conflict detection.
+
+The summary of the advantages and downsides between the different model persistence solutions presented in this section can be found in \ref{table:model_persistence_comparison}.
+
+\subsection{Change-based vs. State-based Persistence}
+\label{sec:change_based_vs_state_based_persistence}
+This section compares the advantages and drawbacks between change-based and state-based persistence. Change-based persistence works by persisting the complete change history of models instead of persisting the snapshot -- the entire state -- of a model at a time. The concept of change-based persistence is not new and has been used in persisting changes of software, object-oriented databases, hierarchical documents, and models 
+\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010EMF Store}. 
+
+The nature of change-based persistence give us two advantages. First, it contains finer-granularity information (e.g. types of changes, the order of the changes, elements that were changed, previous values, etc.) of changes which can improve the accuracy of change detection \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,mens2002state}. Second, it records changes ordered manner which means that changes made to a model can be identified sequentially without having to explore and compare all elements of compared versions of models \cite{DBLP:conf/edoc/KoegelHLHD10}. The advantages to detect changes more precisely and much faster can then have positive knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010EMF Store}, and (2) incremental model management \cite{jouault2010towards,DBLP:conf/ecmdafa/OgunyomiRK15, DBLP:conf/ecmdafa/RathHV12}. Moreover, changed-based persistence contains abundant information which can be exploited for analytics \cite{DBLP:journals/entcs/RobbesL07}.
+
+Nevertheless, change-based persistence also comes with downsides, such as ever-growing model files 
+\cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10} and increased model loading time \cite{mens2002state}
+which increase storage and computation costs. A model that is frequently modified will increase considerably in file size 
+since every change is added to the file. The increased file size (proportional to the number of persisted changes) will, 
+in turn, increase the loading time of the model since all changes have to be replayed to reconstruct the model's 
+eventual state. 
+
+These downsides have to be mitigated to enable the practical adoption of change-based persistence. 
+One approach to reducing the file size of change-based models is by removing changes that do not affect the eventual 
+state of the model. For the increased loading time, it can be mitigated by ignoring -- i.e. not replaying -- changes 
+that are cancelled out by later changes or employing change-based and state-based persistence side-by-side so that the
+benefits of state-based persistence on loading time can be obtained. 
+
+Other downsides are change-based persistence requires 
+integration with existing tools -- since it is still a non-standard approach -- for its adoption \cite{koegel2010EMF Store}, 
+and still has limited support for standard, text-based version controls for collaborative development \cite{koegel2010EMF Store}. 
+These downsides can be addressed by developing a change-based persistence plugin for a specific development environment 
+(e.g. Eclipse) and persisting changes in text-based format to support text-based version controls (e.g. Git, SVN).
+
+In summary, state-based model persistence has several strong points. First, since it is the default standard of persisting models -- particularly XMI, most of the available modelling tools support this kind of persistence thus it requires minimum effort to integrate with existing tools \cite{koegel2010EMF Store}. Second, it is faster in loading models since there is no need to replay all changes as in change-based persistence. Also, applying lazy loading -- elements of models are not loaded upfront -- enables faster CRUD (create, read, update, delete) operations \cite{DBLP:conf/models/Espinazo-PaganCM11,daniel2016neoemf}. 
 
 Compared to change-based persistence, state-based persistence has several downsides. First, it is slower than change-based persistence in saving changes \cite{mens2002state}. Even thought its backends already implemented lazy loading, it still needs to undergo certain indexing mechanism to persist changes \cite{daniel2016neoemf,DBLP:conf/models/Espinazo-PaganCM11,eclipse2019cdo}. Second, state-based persistence does not have any records of recent elements that have been changed in a model. Thus, every element has to be checked for differences which can be less efficient if the comparison is performed in change-based format \cite{DBLP:conf/edoc/KoegelHLHD10}. Third, since comparison in state-based format requires deriving differences through a diffing process -- not based on actual change records, it can be less accurate than comparison in change-based persistence which is provided with more information to detect changes accurately \cite{mens2002state,DBLP:conf/edoc/KoegelHLHD10}. 
 
-The summary of the advantages and downsides between change-based and state-based persistence and between the different model persistence solutions 
-are presented in Table \ref{table:advantages_drawbacks} and \ref{table:model_persistence_comparison} respectively.
+The summary of the advantages and downsides between change-based and state-based persistence are presented in Table \ref{table:advantages_drawbacks}.
+
+\begin{table*}[h]
+  \centering
+  \caption{The advantages and downsides between change-based and state-based persistence.}
+  \label{table:advantages_drawbacks}
+  \begin{scriptsize}
+    \begin{tabular}
+      {|>{\centering\arraybackslash}p{1.1cm}|>{\centering\arraybackslash}p{1.1cm}|>{\centering\arraybackslash}p{5cm}|>{\centering\arraybackslash}p{5cm}|}
+      \hline 
+      \multicolumn{2}{|c|}{\textbf{Dimensions}}&\textbf{Change-based Approach}&\textbf{State-based Approach}\\
+      \hline 
+      \multicolumn{2}{|p{2.2cm}|}{\centering Advantages} &
+      \begin{minipage}[t]{5cm}
+        \begin{itemize}[leftmargin=9pt]
+          \setlength\itemsep{2pt}
+          \item[+] Faster for detecting changes \cite{DBLP:conf/edoc/KoegelHLHD10}
+          \item[+] More accurate, carry semantic information \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,mens2002state}  
+          \item[+] Faster and more accurate for comparison and merging \cite{DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010EMF Store}
+          \item[+] Information carried is useful for analytics \cite{DBLP:journals/entcs/RobbesL07}
+        \end{itemize}
+      \end{minipage}
+      & 
+      \begin{minipage}[t]{5cm}
+        \raggedright
+        \begin{itemize}[leftmargin=9pt]
+          \setlength\itemsep{2pt}
+          \item[+] Faster for loading large models \cite{DBLP:conf/models/Espinazo-PaganCM11,daniel2016neoemf,eclipse2019cdo}
+          \item[+] A default standard, no need integration with existing tools \cite{koegel2010EMF Store}  
+        \end{itemize}
+      \end{minipage}
+      \\
+      \hline
+      \multicolumn{2}{|p{2.2cm}|}{\centering Disadvantages} & \begin{minipage}[t]{5cm}
+        \raggedright
+        \begin{itemize}[leftmargin=9pt]
+          \setlength\itemsep{2pt}
+          \item[--] Increased record size \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/edoc/KoegelHLHD10}
+          \item[--] Is not efficient for replaying (loading) long records \cite{mens2002state}
+          \item[--] Limited supports from standard, text-based version controls (e.g. GitHub) \cite{koegel2010EMF Store} 
+          \item[--] Not a standard, need integration with existing tools \cite{koegel2010EMF Store} 
+        \end{itemize}
+      \end{minipage}
+      & 
+      \begin{minipage}[t]{5cm}
+        \raggedright
+        \begin{itemize}[leftmargin=9pt]
+          \setlength\itemsep{2pt}
+          \item[--] Slower for saving changes  \cite{mens2002state,daniel2016neoemf,DBLP:conf/models/Espinazo-PaganCM11}
+          \item[--] Slower for comparison \cite{DBLP:conf/edoc/KoegelHLHD10}
+          \item[--] Less accurate, does not carry semantic information \cite{mens2002state,DBLP:conf/edoc/KoegelHLHD10}  
+        \end{itemize}
+      \end{minipage}
+      \\
+      \hline
+    \end{tabular} 
+  \end{scriptsize}
+\end{table*}
+
+\subsection{Summary: Towards a New Change-based Model Persistence}
+\label{sec:a_new_change_based_persistence}
+The research introduced in this thesis aims at enabling high-performance model differencing and conflict detection which are the bottleneck when they are performed on models persisted in state-based format. This problem can be potentially solved by exploiting change-based model persistence. 
+
+EMF Store exists as the only one implementation of change-based persistence for models. However, this research does not consider to extend EMF Store since it has some critical downsides that this study try to avoid: (1) This works aims for change-based persistence that can version and share models through different text-oriented version controls (e.g., Git, SVN) so that administration activities can be delegated to the version controls and to avoid dependency on EMF Store that uses its own mechanism to version models. (2) The performance of EMF Store can also degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}.
+
+This study also consider to adopt some strong points for the new change-based persistence. (1) Its implementation should be able to capture and persist relevant changes of models to allow accurate and efficient model differencing and conflict detection.
+
 
 \section{Model Differencing and Conflict Detection}
 \label{sec:model_differencing_and_conflict_detection}
@@ -267,7 +278,7 @@ Applying this diffing approach to some non-text artefacts, such as XML \cite{w3c
 There are several existing tools for model differencing. 
 EMF Compare \cite{emfcompare2018developer} is a popular tool used to compare and merge EMF models, with generic support for different kinds of metamodels. It is an extensible framework so that it can be adapated to the specific needs of certain metamodels. EMF Compare works by performing matching between elements of models being compared and then executing differencing to identify differences between the matched elements. These matching and differencing are discussed in detail in Chapter \ref{ch:model_differencing}. It used in this study as a benchmark for comparative evaluation due to its maturity and ongoing development activity. EMF DiffMerge (EDM) \cite{eclipse2019emfdiffmerge} is similar to EMF Compare except that its abstraction is at a lower level. It means that its difference model is technical and also to support the expression of consistency rules. As consequence, EMF Compare could use EDM engine when it needs to enforce a particular consistency policy. Also, it supports model scopes which are arbitrarily-defined sets of model elements or can be said as subsets of models that can be defined by specific filters. Beyond EMF Compare and EMF DiffMerge, tools such as SiDiff \cite{Treude2007SiDiff} and DSMDiff \cite{lin2009dsmdiff} also provide language-agnostic graph-based model comparison, with some room for configuration (e.g., assigning different weights to features of types in the language). Additional expressive power -- at the cost of increased complexity and configuration effort -- is offered by dedicated comparison languages such as the Epsilon Comparison Language, which can be used to compare both homogeneous and heterogeneous models \cite{kolovos2009ecl}. All of these tools works with state-based persistence to identify differences between models.
 
-This work does not aware of any other work that targets comparison of change-based models persisted in text files. Only EMF Store \cite{koegel2010emfstore} identified addresses change-based model conflict detection but it persists models in its own dedicated backend system. Moreover, since it is designed to identify conflicts of changes, it does not provide direct information about the differences between two versions of a model being compared. Database or dedicated-backend model persistence and version control solutions such as CDO \cite{eclipse2019cdo} and EMF Store provide model comparison capabilities between different versions of the same model but they present integration challenges when users want to use text-oriented version controls (e.g. Git, SVN) which are typically file-based and commonly used, and their performance can also degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}. 
+This work does not aware of any other work that targets comparison of change-based models persisted in text files. Only EMF Store \cite{koegel2010EMF Store} identified addresses change-based model conflict detection but it persists models in its own dedicated backend system. Moreover, since it is designed to identify conflicts of changes, it does not provide direct information about the differences between two versions of a model being compared. Database or dedicated-backend model persistence and version control solutions such as CDO \cite{eclipse2019cdo} and EMF Store provide model comparison capabilities between different versions of the same model but they present integration challenges when users want to use text-oriented version controls (e.g. Git, SVN) which are typically file-based and commonly used, and their performance can also degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}. 
 
 \subsection{The Challenges of Model Comparison}
 \label{sec:the_key_challenge_of_incrementality}
@@ -324,7 +335,7 @@ memory-greedy.
 
 \subsection{A Novel Solution to Model Change Detection}
 \label{sec:a_novel_solution_to_model_change_detection}
-A novel solution to model change detection should be able to deliver the advantages of both notification and model differencing approaches while eliminate their drawbacks. To realize such solution, this work comes with an idea that models can be persisted in their complete history of changes, a.k.a. change-based model persistence, as opposed to state-based model persistence that persists models in their snapshots at a time. The change-based model persistence should be text-based. Thus, information about changes of models can be preserved and can be shared across the members of a team through Version Control Systems (e.g., SVN, Git).The proposed change-based model persistence is discussed later in Chapter \ref{ch:change_based_model_persistence}. 
+A novel solution to model change detection should be able to deliver the advantages of both notification and model differencing approaches while eliminate their drawbacks. To realize such solution, this work comes with an idea that models can be persisted in their complete history of changes, also known as change-based model persistence, as opposed to state-based model persistence that persists models in their snapshots at a time. The change-based model persistence should be text-based. Thus, information about changes of models can be preserved and can be shared across the members of a team through Version Control Systems (e.g., SVN, Git).The proposed change-based model persistence is discussed later in Chapter \ref{ch:change_based_model_persistence}. 
 
 Moreover, change-based model persistence also can be exploited to optimise model comparison to only compares versions of a model on parts that have only been changed since their last shared common version. In other words, not every element of the versions is compared which can lead to a faster model comparison. This solution is discussed later in Chapters \ref{ch:model_differencing} and \ref{ch:conflict_detection}. 
 

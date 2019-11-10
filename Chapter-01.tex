@@ -15,7 +15,7 @@ object-oriented databases, and hierarchical documents
 The ordered nature of change-based persistence means that changes made to a model can be identified sequentially without having to explore and compare all elements of the model and its previous version. Based on these arguments, 
 this work explores the advantages and shortcomings of change-based persistence as an alternative approach to state-based persistence for models conforming to 3-layer metamodelling architectures such as Eclipse Modelling Framework (EMF) \cite{eclipse2019emf} and Meta-Object Facility (MOF) \cite{omg2018mof}. Persisting models in a change-based format can bring a number of envisioned benefits over state-based persistence, 
 such as the ability to detect changes much faster and more precisely, which can then have positive 
-knock-on effects on supporting (1) developers compare and merge models in collaborative modelling environments, 
+knock-on effects on supporting (1) model differencing, conflict detection, and merging in collaborative modelling environments, 
 and (2) incremental model management (e.g., incremental query \cite{DBLP:conf/ecmdafa/RathHV12} and 
 model-to-text transformation \cite{DBLP:conf/ecmdafa/OgunyomiRK15}). 
 

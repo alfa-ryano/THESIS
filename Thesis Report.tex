@@ -172,8 +172,6 @@ In large-scale computer systems and software development, model-driven engineeri
 To reduce the loading time, this work has investigated two approaches. First, by cancelling superseded changes, and second, through the use of hybrid model persistence. While the first approach is still by far outperformed by state-based persistence, the hybrid model persistence only experience insignificant slight slowdown in most cases compared to loading models from state-based persistence. 
 
 This work has proposed an approach for a faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence which allows us to find differences and conflicts between two versions of a model by only comparing the last set of changes applied to them, without having to compare every element and feature in both versions as traditionally performed in state-based model comparison. This work's evaluation shows that the proposed changed-based model differencing and conflicts detection outperforms existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reduction on model size could impair the performance of the proposed model differencing and conflict detection as a great number of change records have to be read and loaded into memory.
-
-
 \end{abstract}
 
 \tableofcontents

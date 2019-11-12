@@ -334,7 +334,7 @@ For reference, this work also compared CBP loading with the execution time for l
 
 \subsection{Model Saving Time}
 \label{subsec:saving_time_test}
-This subsection presents the results of the saving time measurement of change-based models for each pair of the persistence types and cases, and the t-test results of their comparisons (Table \ref{table:ttest_results_savetime} and Figure \ref{fig:savetime}). As discussed in\,\cite{yohannis2017turning}, CBP loading time penalties are balanced against the benefits that CBP brings, in terms of  persisting changes (saving time).
+This subsection presents the results of the saving time measurement of change-based models for each pair of the persistence types and cases, and the t-test results of their comparisons (Table \ref{table:ttest_results_savetime} and Figure \ref{fig:savetime}). As discussed in \cite{DBLP:conf/models/YohannisKP17}, CBP loading time penalties are balanced against the benefits that CBP brings, in terms of  persisting changes (saving time).
 
 \begin{table}[ht]
 \footnotesize
@@ -541,6 +541,9 @@ For the original CBP loading, the total time required to load a model is $T_{CBP
 %\vspace{-5pt}
 \section{Conclusions}
 \label{sec:conclusions_4}
-This chapter proposes an efficient algorithm and supporting data structures for loading change-based models.  Performance is evaluated on synthesised models, with comparison against the existing change-based implementation, and state-based XMI. Our results show considerable savings in terms of loading time with a negligible impact on saving time, but at the cost of a higher memory footprint.  
+Change-based persistence can be slow when it comes to loading a model since its change records have to be replayed. This study has optimised the loading of change-based persistence by only replaying change events that affect the eventual state of a model. In other words, the replay ignores change events that are superseded by later change events.
+ 
+This chapter has proposed an efficient algorithm and supporting data structures for the proposed optimisation. Performance is evaluated on synthesised models, with comparison against the unoptimised change-based implementation, and state-based XMI. Compared to the unoptimised change-based persistence, the optimised version shows considerable savings in terms of loading time with a negligible impact on saving time, but at the cost of a higher memory footprint. However, in terms of loading time and memory footprint, XMI outperforms both approaches but is much less efficient in saving changes. 
 
+This chapter also has addressed the first research question of this study partially, \textbf{How can models be effectively persisted in a change-based format, and how does change-based persistence perform, compared to state-based persistence on loading and saving models?} (RQ1). Based on the evaluation results, we can identify that the performance of change-based persistence on loading models is poor compared state-based persistence. Even though it has been optimised by ignoring replaying change events that superseded by their subsequent change events, it is still significantly outperformed by loading models from their state-based persistence. It also suffers greatly on memory footprint because of the dedicated data structure employed to track change events. In terms of saving, change-based persistence shows more favourable results compared to state-based persistence since we only need to persist the recent changes applied to a model rather than saving the entire model. This condition is very favourable when we work with large models in their mature stage where only small changes occur. 
 

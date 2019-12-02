@@ -21,5 +21,24 @@
   \textbf{Answer}:
   
   No, so far the proposed approach cannot handle changes at the metamodel level. One solution to address this challenge is by introducing a new change event that indicates an upgrade/downgrade of metamodel version. Thus, when replaying the change event, some adjustment should be performed so that following change events are handled accordingly to the active metamodel.
- 
+  
+  \item \textbf{If change-based persistence can be or has been applied to other artefacts, how come is it not the prevalent persistent paradigm? Why is it (more) suitable for models?}
+  
+  \textbf{Answer}:
+  
+  If change-based persistence can be or has been applied to other artefacts, how come is it not the prevalent persistent paradigm? Why is it (more) suitable for models? The concept of change-based persistence is not new and has been used in persisting changes of software, object-oriented databases, hierarchical documents, and models 
+  \cite{DBLP:journals/entcs/RobbesL07,DBLP:conf/sde/LippeO92,DBLP:conf/caise/IgnatN05,koegel2010emfstore}. However, it has never been the prevalent persistent paradigm. While there can be many reasons for this fact, we only present some of them. 
+  
+  The first reason is the cost -- the slow loading and ever-growing file size -- of change-based persistence is high. As a consequence, this causes the persisted changes cannot be easily shared and distributed. The cost also makes change-based persistence too expensive for artefacts with persistence files that are dominantly small in size, short-lived, not-evolving, used for trivial purposes, and not in collaborative experiment. In other words, knowing and maintaining all the changes of an artefact does not bring significant benefits. 
+  
+  Nevertheless, recording changes of artefacts is crucial in certain cases. For example, the logging systems of servers that record their activities. Even though logs are mainly used for analytical purpose, we can still reconstruct the partial states of the server at certain points of time. The other case is inventory and accounting systems that record the changes of goods and financial states. Persisting every single record of changes is critical in these systems. These records can then be aggregated to produce monthly or yearly goods and financial states, and then they can be used to perform analytical comparison, such as sales performance analysis between months. Most of these systems are not small and demand high cost. Forcing this kind of approach to small-size models (or other artefacts) is overkill. The second reason, we can only gain the benefits of change-based persistence when we deal with large-size models (or other artefacts) and their changes are crucial, such as in collaborative development of large-scale models.
+  
+  \item \textbf{If change-based persistence has been tried before for documents, software, etc. What is new in this work?}
+  
+  \textbf{Answer}:
+  
+  \item \textbf{Why have you not chosen an environment that is representative of a typical developer workstation?}
+  
+  \textbf{Answer}:
+  
 \end{enumerate}

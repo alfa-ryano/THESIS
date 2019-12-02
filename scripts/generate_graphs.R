@@ -295,7 +295,7 @@ generate_graph <- function(type, dimension, case, filename, target_file, max_y) 
 #add only
 generate_graph("general", "time", "all", "..\\data\\add-multiconflict.csv", "images/add-conflict-time-events.pdf", 45)
 generate_graph("general", "memory","all", "..\\data\\add-multiconflict.csv", "images/add-conflict-memory-events.pdf", 20)
-generate_graph("general", "count","all", "..\\data\\add-multiconflict.csv", "images/add-conflict-count-events.pdf", 19)
+generate_graph("general", "count","all", "..\\data\\add-multiconflict.csv", "images/add-conflict-count-events.pdf", 20)
 
 #change only
 generate_graph("general", "time", "all", "..\\data\\change-multiconflict.csv", "images/change-conflict-time-events.pdf", 45)
@@ -305,17 +305,17 @@ generate_graph("general", "count", "all", "..\\data\\change-multiconflict.csv", 
 #delete only
 generate_graph("general", "time", "all", "..\\data\\delete-multiconflict.csv", "images/delete-conflict-time-events.pdf", 73)
 generate_graph("general", "memory", "all", "..\\data\\delete-multiconflict.csv", "images/delete-conflict-memory-events.pdf", 3.5)
-generate_graph("general", "count", "all", "..\\data\\delete-multiconflict.csv", "images/delete-conflict-count-events.pdf", 82)
+generate_graph("general", "count", "all", "..\\data\\delete-multiconflict.csv", "images/delete-conflict-count-events.pdf", 80)
 
 #move only
 generate_graph("general", "time", "all", "..\\data\\move-multiconflict.csv", "images/move-conflict-time-events.pdf", 45)
 generate_graph("general", "memory", "all", "..\\data\\move-multiconflict.csv", "images/move-conflict-memory-events.pdf", 20)
-generate_graph("general", "count", "all", "..\\data\\move-multiconflict.csv", "images/move-conflict-count-events.pdf", 200)
+generate_graph("general", "count", "all", "..\\data\\move-multiconflict.csv", "images/move-conflict-count-events.pdf", 120)
 
 #mix general
 generate_graph("general", "time", "all", "..\\data\\mix-multiconflict.csv", "images/conflict-time-events.pdf", 45)
 generate_graph("general", "memory", "all", "..\\data\\mix-multiconflict.csv", "images/conflict-memory-events.pdf", 20)
-generate_graph("general", "count", "all", "..\\data\\mix-multiconflict.csv", "images/conflict-count-events.pdf", 140)
+generate_graph("general", "count", "all", "..\\data\\mix-multiconflict.csv", "images/conflict-count-events.pdf", 120)
 generate_graph("count", "count", "all", "..\\data\\mix-multiconflict.csv", "images/conflict-size-events.pdf", 1200)
 
 #mix detail

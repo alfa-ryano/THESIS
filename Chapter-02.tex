@@ -1,7 +1,7 @@
 \chapter{Literature Review}
 \label{ch:literature_review}
 
-This chapter presents the literature review of this study. Firstly, it discusses some work on model persistence by highlighting some key characteristics -- unique features, strong points, and downsides -- of some existing implementations. It then summarises the advantages and drawbacks of the two main types of persistence: state-based and change-based persistence, and introduces desirable characteristics for a new change-based persistence implementation. This chapter then reviews the related work on identifying differences and detecting conflicts between versions of models. It then presents the current challenges that model differencing and conflict detection are dealing with as well as the downsides of existing approaches in tackling the problems, which gives motivation to this research to come up with a new solution. Thirdly, this chapter provides an overview of the research method employed in this research. Lastly, the conclusions of the literature review are presented.  
+This chapter presents the literature review of this study. Firstly, it discusses some work on model persistence by highlighting some key characteristics -- unique features, strong points, and downsides -- of some existing implementations. It then summarises the advantages and drawbacks of the two main types of persistence: state-based and change-based persistence, and introduces desirable characteristics for a new change-based persistence implementation. This chapter then reviews the related work on identifying differences and detecting conflicts between versions of models. It then presents the current challenges that model differencing and conflict detection are dealing with as well as the downsides of existing approaches in tackling the problems, which gives motivation to this research to come up with a new solution. Lastly, the conclusions of the literature review are presented.  
 
 %\section{Introduction}
 %\label{sec:introduction_2}
@@ -11,13 +11,13 @@ This chapter presents the literature review of this study. Firstly, it discusses
 %
 %The rest of this chapter is structured as follows. Section \ref{sec:model_persistence} reviews some key implementations of model persistence; their strong points and drawbacks. Section \ref{sec:model_differencing_and_conflict_detection} presents the current approaches in model differencing and conflict detection, their existing challenges, as well as the motivation for a new change-based model persistence. Section \ref{sec:benefits_and_novel_capabilities} presents briefly the research method employed in this research. Section \ref{sec:conclusions_2} concludes this chapter.
 
-\section{Models in Model-Driven Engineering}
-\label{sec:models_in_model_driven_engineering))}
+\section{Models in This Research}
+\label{sec:models_in_this_research)}
 
-First of all you should explain what kind of models this thesis is concerned with i.e. models conforming to object-oriented languages defined using technologies such as EMF and MOF
+A model is an abstract representation of an entity \cite{volter2013model}. It can be used for different purposes: as a sketch to communicate a system, as a blueprint to define the specification of a system, or as a modifiable artefact to generate a working system \cite{fowler2019umlmode}. In model-based software engineering, the latter is the case in which models are mainly used. 
+In this context, a model are created using a modelling language, and the model should conform to its metamodel -- an abstraction that describes the model. Later, the model can be transformed to generate a software artefact through model transformation/code generation \cite{brambilla2012model}. The software artefact, its model, and the model's metamodel of its model create three layers of abstraction which are known as the 3-layer metamodelling architecture.  
 
-modelling tools that support the 3-layer metamodelling architectures of Eclipse Modeling Framework (EMF) \cite{steinberg2008emf}
-
+Eclipse Modeling Framework (EMF) \cite{steinberg2008emf} is a technical implementation of such architecture. It is a framework and code generation facility that allows developers to define metamodels, create models, and to generate implementations of the models \cite{steinberg2008emf}. In this literature review, we focus on modelling tools that support the 3-layer metamodelling architecture of EMF.
 
 \section{Model Persistence}
 \label{sec:model_persistence}
@@ -265,18 +265,6 @@ In summary, state-based persistence has several strong points. First, since it i
 
 Compared to change-based persistence, state-based persistence also has  downsides. First, it is slower than change-based persistence in saving changes \cite{mens2002state}. For an artefact persisted in state-based format and does not support lazy loading, the the artefact has to be persisted in its entirety even thought only a single change has been made. Second, state-based persistence does not have any records of changes of an artefact. Thus, every part of the artefact has to be checked for differences which can be less efficient if the comparison is performed in change-based format \cite{DBLP:conf/edoc/KoegelHLHD10}. Third, since comparison in state-based format requires deriving differences through a diffing process -- not based on actual change records, it can be less accurate than comparison in change-based persistence which is provided with more information to detect changes accurately \cite{mens2002state,DBLP:conf/edoc/KoegelHLHD10}. The summary of the advantages and downsides between change-based and state-based persistence are presented in Table \ref{table:advantages_drawbacks}.
 
-\subsection{Towards a New Change-based Model Persistence}
-\label{sec:a_new_change_based_persistence}
-The research presented in this thesis aims at improving the performance of model differencing and conflict detection. Based on the literature review of existing model persistence implementations and the advantages and drawbacks of state-based and change-based persistence, this study has identified some considerations that have affected the design of this research and the implementation of the proposed change-based persistence. Points 1 to 4 are addressed in Chapter \ref{ch:change_based_model_persistence}, while point 5 is addressed in Chapter \ref{ch:hybrid_model_persistence}.
-
-\begin{enumerate}
-  \item The implementation should exploit change-based persistence to avoid the overhead cost when performing model differencing and conflict detection in state-based persistence.
-  \item The implementation should be able to capture and persist relevant changes of models to allow accurate and efficient model differencing and conflict detection as EMF Store does.
-  \item Even though EMF Store is the only existing implementation of change-based persistence of models, this research does not consider to use and extend EMF Store since it has some critical downsides that are worth to avoid: (1) This work aims for change-based persistence that can version and share models through different text-oriented version controls (e.g., Git, SVN). In this way, administration activities can be delegated to the version controls, and it can avoid dependency on EMF Store that uses its mechanism to version models. (2) The performance of EMF Store can also degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}.
-  \item Aiming for compatibility with text-oriented version controls (e.g., Git, SVN) requires a model to be persisted in a text file. This decision can affect the technical implementation, which can be different from EMF Store that wraps changes into packages and persist them in XMI files.
-  \item Given that it is not efficient for replaying (loading) long records of change-based persistence, this study also considers incorporating state-based persistence into the implementation to reduce the overhead cost of loading models and also to utilise the features of database backends. EMF Store caches the states of versions to speed up loading models, and most of the state-based persistence with database backends support lazy-loading.
-\end{enumerate}
-
 \section{Model Differencing and Conflict Detection}
 \label{sec:model_differencing_and_conflict_detection}
 The history of model differencing and conflict detection can be traced back to the presence of \textsf{diff} program on Unix or Unix-like platform \cite{hunt1976algorithm}. The program can perform diffing that is comparing text files ``in order to determine how or whether they differ'' \cite{diff}. Diffing basically is about finding the longest common subsequence between two or more sequences which commonly known as the Longest Common Subsequence (LCS) algorithms \cite{bergroth2000lcs}. This problem is equivalent to the Shortest Edit Script (SES) problem that is to find the smallest number of editing (add and delete) in order to make a sequence equal to another sequence \cite{DBLP:journals/algorithmica/Meyers86}. LCS or SES algorithms are commonly implemented by Version Control Systems, such as SVN \cite{svn-diff} and Git \cite{git-diff}, in their \textsf{diff} programs to identify differences between versions of files.   
@@ -336,30 +324,8 @@ developers need to either forgo the notification approach altogether
 or to work with model differencing, which is computationally expensive and 
 memory-greedy.
 
-\subsection{A Novel Solution to Model Change Detection}
-\label{sec:a_novel_solution_to_model_change_detection}
-A novel solution to model change detection should be able to deliver the advantages of both notification and model differencing approaches while eliminate their drawbacks. To realize such solution, this work comes with an idea that models can be persisted in their complete history of changes, also known as change-based model persistence, as opposed to state-based model persistence that persists models in their snapshots at a time. The change-based model persistence should be text-based. Thus, information about changes of models can be preserved and can be shared across the members of a team through Version Control Systems (e.g., SVN, Git).The proposed change-based model persistence is discussed later in Chapter \ref{ch:change_based_model_persistence}. 
 
-Moreover, change-based model persistence also can be exploited to optimise model comparison to only compares versions of a model on parts that have only been changed since their last shared common version. In other words, not every element of the versions is compared which can lead to a faster model comparison. This solution is discussed later in Chapters \ref{ch:model_differencing} and \ref{ch:conflict_detection}. 
-
-\section{Research Method}
-\label{sec:research_method}
-In performing this research, this work follows the experiment process proposed by Wohlin et al. \cite{DBLP:books/daglib/0029933/Wohlin}. The experiment process consist of 5 activities: scoping, planning, operation, analysis and interpretation, and presentation and package.
-
-\textbf{Scoping}. In the scoping activity, the hypothesis, goals, and objectives of an experiment have to be defined clearly \cite{DBLP:books/daglib/0029933/Wohlin}. Basili et al. \cite{basili1988tame} provide the following questions (scoping points) in their framework to help determining the scope of an experiment in software engineering: (1) what is studied? (object of study), (2) what is the intention? (purpose), (3) which effect is studied? (quality focus), (4) whose view? (perspective), and where is the study conducted? (context).
-
-\textbf{Planning}. In the planning activity, these components have to be defined in detail: context selection, hypothesis formulation, variables selection, selection of subjects, experiment design selection, instrumentation, and validity evaluation\cite{DBLP:books/daglib/0029933/Wohlin}. The context can be offline vs. online, student vs. professional, toy vs. real problems, specific vs. general. Null and alternative hypotheses have to be stated formally, and the data gathered throughout the experiment should be used -- using appropriate statistical tests -- to reject the null hypothesis if possible. In the variables selection, we determine the independent and dependent variables to be measured. The subjects should be selected carefully that they are representative of the case experimented to generalise the results of the experiment. The experiment should be designed carefully to get the desired results, and suitable standard design types should be selected. Experiment objects, guidelines, and measurement instruments also should be defined to ensure the experiment is executable. Lastly, validity threats should be identified and evaluated.
-
-\textbf{Operation}. The operation activity consists of three steps: preparation, execution, and validation \cite{DBLP:books/daglib/0029933/Wohlin}. 
-In the preparation, we select and prepare all the required materials to facilitate the execution of the experiment. The experiment can be executed in several ways, such as in one or multiple occasions, or one or multiyear.  While performing, we have to make sure that the experiment is on the right track, not interrupted, and running correctly. We also have to validate the produced data if they are reasonable and collected orderly.
-
-\textbf{Analysis and interpretation}.
-To understand the data gathered, descriptive statistics and visualization can be used. We can also remove unnecessary data and variables to facilitate analysis and interpretation. We can then perform hypothesis testing to reject or accept the experiment's hypotheses. The analysis and interpretation should explain how the data gathered contribute to the rejection or acceptance of the hypotheses. The results might be statistically insignificant, but the lessons might still worth to be learned \cite{DBLP:books/daglib/0029933/Wohlin}. 
-
-\textbf{Presentation and package}. In this activity, experiment results should be documented and published in research papers for the dissemination of the results. The experiment also should be packaged to support other parties to replicate it \cite{DBLP:books/daglib/0029933/Wohlin}. 
 
 \section{Conclusions}
 \label{sec:conclusions_2}
-This chapter presented a review of literature in the areas of model persistence and differencing. It summarised the advantages and drawbacks of state-based and change-based model persistence, and related work on identifying differences and detecting conflicts between versions of models. This chapter also provided an overview of the research method employed in this research. 
-
-Based on the identified advantages, downsides, and challenges of current approaches on model persistence, differencing, and conflict detection, this chapter has pointed out some design considerations that the change-based persistence proposed in this research should deliver to achieve high-performance model differencing and conflict detection.
+This chapter presented a review of literature in the areas of model persistence and differencing. It summarised the advantages and drawbacks of state-based and change-based model persistence, and related work on identifying differences and detecting conflicts between versions of models.

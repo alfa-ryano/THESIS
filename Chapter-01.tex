@@ -68,7 +68,7 @@ This chapter summarises work related to change-based persistence and comparison,
 
 \subsection{Chapter 3: Analysis and Hypothesis}
 \label{sec:ch:analysis_and_hypothesis}
-This chapter summarises work related to change-based persistence and comparison, critically assesses the advantages and disadvantages of current approaches, and seeks opportunities to contribute novel knowledge to the field. The chapter comprises brief discussion on methods to identify changes in models, the benefits of change-based solutions to model management, the advantages and drawbacks of state and change-based persistence in the context of software engineering, the state of the art in model persistence, the state of the art in model comparison, state-based model differencing, state-based conflict detection, change-based conflict detection, and the research method applied in this work.
+This chapter reflects on the findings of the literature review and presents the motivation for a new change-based persistence format and a novel approach to improve the performance of model differencing and conflict detection by exploiting the change-based persistence. Based on the findings in Chapter \ref{ch:literature_review}, this chapter presents the hypothesis and research questions addressed in this study. It also presents an overview of the employed research method in answering the research questions. 
 
 \subsection{Chapter 4: Designing Change-based Persistence for Models}
 \label{sec:chapter_3_Change-based_model_ersistence_plan}
@@ -81,11 +81,15 @@ Change-based persistence comes with a downside of ever-growing file sizes \cite{
 
 To evaluate the efficiency of the proposed approach, an optimised loading algorithm that ignores superseded change events is compared to a naive loading of a change-based representation and loading the same model from a state-based representation. They are compared on time required to load models and their memory footprints. Evaluation is also performed on time required for persisting changes between change-based and state-based persistence. The contents of this chapter is largely based on a published conference paper \cite{yohannis2018towards}. 
 
+Compared to the naive change-based representation, the optimised version shows considerable savings in terms of loading time with a negligible impact on saving time, but at the cost of a higher memory footprint. However, in terms of loading time and memory footprint, XMI outperforms both approaches but is much less efficient in saving changes. 
+
 \subsection{Chapter 6: Hybrid Model Persistence}
 \label{sec:chapter_5_hybrid_model_persistence}
 While optimised loading is faster than naive loading, the benefits are moderate and optimised loading is still slower than loading from a state-based representation \cite{DBLP:conf/models/YohannisRPK18}. This finding has motivated the design and development of a hybrid persistence approach, that augments a change-based representation with a fully derived, state-based representation. 
 
 The hybrid model persistence approach is evaluated by comparing it to state-based persistence (e.g. XMI, NeoEMF \cite{daniel2016neoemf}) on time, memory footprint, and storage space required for loading models and persisting changes. The evaluation is also performed on time required for detecting changes between hybrid and state-based persistence. The contents of this chapter are largely based on a conference paper \cite{DBLP:conf/models/YohannisRPK18}.
+
+Based on the evaluation results, the hybrid model persistence provides benefits on model loading time, since its performance is comparable to loading a model from a change-based persistence only, with trade-offs on increased memory footprint and storage space usage. 
 
 \subsection{Chapter 7: Efficient Model Differencing of Change-based Models}
 \label{sec:chapter_6_model_differencing}
@@ -93,11 +97,15 @@ This chapter presents a change-based model differencing with its implementation 
 
 The proposed model differencing is evaluated by comparing it to state-based model differencing on the time and memory footprint required to find all differences between two versions of a model. The contents of this chapter are largely based on a workshop paper \cite{yohannis2019efficient}.
 
+Based on our experiments, this study argues that the change-based comparison approach works at its best for large models that have been modified a moderate number of times. Our experiments demonstrate savings of the order of 90\% for (relatively) small changes made to large models. However, models that have been excessively modified and experience a significant reduction on model size could impair the performance of change-based model differencing as a high number of change records have to be read and loaded into memory.
+
 \subsection{Chapter 8: Efficient Conflict Detection of Change-based Models}
 \label{sec:chapter_7_conflict_detection}
 This chapter presents change-based model conflict detection. After identifying the differences between two versions of a change-based model, this work also aims to detect conflicts between two versions of a model. Model conflict detection is a crucial step that precedes model merging.
 
 Similar to change-based model comparison, the proposed conflict detection is also evaluated by comparing it to the conflict detection of existing change and state-based persistence on the affected time and memory footprint.
+
+Based on the findings in the conflict detection evaluation, The proposed approach can substantially reduce conflict detection time (up to more than 90\% in some experiments) compared to existing state-based and change-based conflict detection approaches. Nevertheless, models that have been excessively modified or experience significant reduction on model size could impair the performance of the conflict detection as a great number of change records have to be read and loaded into memory.
 
 \subsection{Chapter 9: Conclusions and Future Work}
 \label{sec:chapter_8_conclusions_and_future_work}

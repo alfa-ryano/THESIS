@@ -925,6 +925,35 @@ In the mixed operation measurement, we modify two identical models differently b
 
 The growing number of change events in the conflict detection evaluation is followed by the logarithmic increase of affected elements (Figure \ref{fig:conflict-size-events}). The total number of both elements can also be kept relatively constant due to 1:1 ratio of \textsf{add} and \textsf{delete} operations' occurrence. These change events produce different numbers of conflicts for EMF CBP, EMF Compare, and EMF Store as can be seen in Figure \ref{fig:conflict-count-events}. The differences are due to their distinct conflict detection approaches. EMF Compare detects fewer conflicts than EMF CBP and EMF Store since its change events are derived, not the real changes. EMF Store detects fewer conflicts than EMF CBP since its conflicts that depends to each other are grouped into one conflict.
 
+\begin{figure*}[ht]
+  \centering
+  \begin{subfigure}[t]{0.490\linewidth}
+    \includegraphics[width=\linewidth]{conflict-size-events}
+    \caption{number of elements}
+    \label{fig:conflict-size-events}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.490\linewidth}
+    \includegraphics[width=\linewidth]{conflict-count-events}
+    \caption{number of conflicts}
+    \label{fig:conflict-count-events}
+  \end{subfigure}
+  \\
+  \begin{subfigure}[t]{0.490\linewidth}
+    \includegraphics[width=\linewidth]{conflict-time-events}
+    \caption{execution time}
+    \label{fig:conflict-time-events}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.490\linewidth}
+    \includegraphics[width=\linewidth]{conflict-memory-events}
+    \caption{memory footprint}
+    \label{fig:conflict-memory-events}
+  \end{subfigure}
+  \caption{EMF CBP vs. EMF Compare vs. EMF Store comparison as change events increase.}
+  \label{fig:conflict_events}
+\end{figure*}
+
 Figure \ref{fig:conflict-time-events} exhibits EMF CBP outperforms EMF Compare and EMF Store in terms of execution time in detecting conflicts, even when the number of change events approaching a million. EMF Store is the slowest. It takes more than 35 seconds even though the number of change events has just reached 0.1 millions. Figure \ref{fig:conflict-memory-events} also shows EMF CBP outperforms EMF Compare and EMF Store in terms of memory footprint in conflict detection. At the last measurement point, a million change events, EMF CBP only consumes 6 GBs which is much less than EMF Compare and EMF Store. EMF Compare occupies around 16 GBs while EMF Store already consumes the same amount of memory footprint only for 0.5 million change events.
 
 \begin{figure*}[]

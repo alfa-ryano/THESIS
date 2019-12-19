@@ -265,6 +265,6 @@ Thesis Report.ist
 scripts/images/*
 scripts/.Rhistory
 scripts/.RData
-Thesis Report - 2019.11.11.pdf
-scripts/.RData
-Thesis Report - 2019.11.12.pdf
+Thesis Report *.pdf
+word/*
+proofread/*

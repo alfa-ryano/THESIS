@@ -35,7 +35,7 @@
 \usepackage{array}
 \usepackage{subcaption}
 %\usepackage{caption}
-\graphicspath{{images/}} 
+\graphicspath{{images/}}
 \usepackage{geometry}
 \geometry{a4paper,left=4cm,top=3cm,bottom=3cm,right=3cm}
 \usepackage{multirow}
@@ -47,20 +47,20 @@
 \usepackage{algcompatible}
 \usepackage{listings}
 \lstset{
-    basicstyle=\ttfamily,
-    frame=none, 
-    breaklines=true,
-    numbers=left,
-    xleftmargin=2.5em,
-    framexleftmargin=0em,
-    emphstyle=\textbf,
-    float=t
+  basicstyle=\ttfamily,
+  frame=none,
+  breaklines=true,
+  numbers=left,
+  xleftmargin=2.5em,
+  framexleftmargin=0em,
+  emphstyle=\textbf,
+  float=t
 }
 \lstdefinestyle{ocl}{
-    basicstyle=\ttfamily\scriptsize,
-    emph={
-        context, inv
-    }
+  basicstyle=\ttfamily\scriptsize,
+  emph={
+    context, inv
+  }
 }
 \lstdefinestyle{cbpfile}{
   basicstyle=\ttfamily\scriptsize,
@@ -73,42 +73,42 @@
   }
 }
 \lstdefinestyle{xmi}{
-    basicstyle=\ttfamily\scriptsize,
-    emph={
-        Node, children
-    }
+  basicstyle=\ttfamily\scriptsize,
+  emph={
+    Node, children
+  }
 }
 \lstdefinestyle{xml}{
-    basicstyle=\ttfamily\scriptsize,
-    emph={
-        register, create, add, to, resource, at,
-        from, eattribute, remove, ereference,
-        set, unset, session, Roy, Jen,
-        Moss, Richmond
-    }
+  basicstyle=\ttfamily\scriptsize,
+  emph={
+    register, create, add, to, resource, at,
+    from, eattribute, remove, ereference,
+    set, unset, session, Roy, Jen,
+    Moss, Richmond
+  }
 }
 \lstdefinestyle{java}{
-    basicstyle=\ttfamily\scriptsize,
-    emph={
-        case, $unset$,
-        instanceof, else, if, void,
-        new, UnsetEAttributeEvent,
-        UnsetEReferenceEvent,
-        @override, public, class, extends
-    }
+  basicstyle=\ttfamily\scriptsize,
+  emph={
+    case, $unset$,
+    instanceof, else, if, void,
+    new, UnsetEAttributeEvent,
+    UnsetEReferenceEvent,
+    @override, public, class, extends
+  }
 }
 \lstdefinestyle{eol}{
-    basicstyle=\ttfamily\scriptsize,
-    emph={
-        var, new, for, in, create, set, with, type, at,
-        unset, to, add, remove, delete, register, move,
-        composite,
-        from, position, from, move-within, session, \.
-    }
+  basicstyle=\ttfamily\scriptsize,
+  emph={
+    var, new, for, in, create, set, with, type, at,
+    unset, to, add, remove, delete, register, move,
+    composite,
+    from, position, from, move-within, session, \.
+  }
 }
 
-\hyphenation{op-tical net-works semi-conduc-tor Hybrid-Change-Event-Adapter Hybrid-XMI-Change-Event-Adapater
-    Hybrid-Neo-EMF-Change-Event-Adapater change-events Change-Event-Adapter EContent-Adapter notify-Changed Hybrid-Resource Resource-Impl state-Based-Resource cbp-Output-Stream Output-Stream Hybrid-Change-Event-Adapater Output-Stream Hybrid-XMI-Resource-Impl Hybrid-Neo-EMF-Resource-Impl Persistence-Resource change-Events get-All-Related-Left-Events get-All-Related-Right-Events get-Unequal-Left-And-Right-Values get-Unequal-Left-And-Right-Values get-XOR-Left-And-Right-Values
+\hyphenation{op-tical net-works semi-conduc-tor Hybrid-Change-Event-Adapter Hybrid-XMI-Change-Event-Adapter
+  Hybrid-Neo-EMF-Change-Event-Adapter change-events Change-Event-Adapter EContent-Adapter notify-Changed Hybrid-Resource Resource-Impl state-Based-Resource cbp-Output-Stream Output-Stream Hybrid-Change-Event-Adapter Output-Stream Hybrid-XMI-Resource-Impl Hybrid-Neo-EMF-Resource-Impl Persistence-Resource change-Events get-All-Related-Left-Events get-All-Related-Right-Events get-Unequal-Left-And-Right-Values get-XOR-Left-And-Right-Values
 }
 
 \definecolor{gray1}{gray}{0.90}
@@ -124,128 +124,131 @@
 \newcommand{\eqnum}{\refstepcounter{equation}\textup{\tagform@{\theequation}}}
 
 \begin{document}
+  
+  \begin{titlepage}
+    \begin{center}
+      
+      \textbf{\Large Change-Based Model Differencing\\and Conflict Detection}
+      
+      \vfill
+      \begin{figure}[ht]
+        \centering
+        \includegraphics[width=0.5\linewidth]{uoy}
+        \label{fig:uoy}
+      \end{figure}
+      \vfill
+      
+      Alfa Ryano Yohannis\\
+      ary506@york.ac.uk
+      
+      \vspace{1cm}
+      
+      Supervisors:\\
+      Dimitris Kolovos\\
+      Fiona Polack\\
+      Horacio Hoyos Rodriguez
+      \vspace{1cm}
+      
+      Department of Computer Science\\
+      University of York\\
+      United Kingdom\\
+      \vspace{1cm}
+      \today
+      
+      \vfill
+      A Thesis Submitted in Partial Fulfilment of the Requirements\\
+      for the Degree of Doctor of Philosophy in Computer Science
+      
+    \end{center}
+  \end{titlepage}
+  
+  \cleardoublepage
+  \pdfbookmark{Dedication}{dedication}
+  \thispagestyle{empty}  
+  \begin{center}
+    \vspace*{5cm}
+    \LARGE \emph{``Trima kase, Mami!''}
+  \end{center}
 
-\begin{titlepage}
-\begin{center}
-
-\textbf{\Large Change-Based Model Differencing\\and Conflict Detection}
-
-\vfill
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\linewidth]{uoy}
-\label{fig:uoy}
-\end{figure}
-\vfill
-
-Alfa Ryano Yohannis\\
-ary506@york.ac.uk
-
-\vspace{1cm}
-
-Supervisors:\\
-Dimitris Kolovos\\
-Fiona Polack\\
-Horacio Hoyos Rodriguez
-\vspace{1cm}
-
-Department of Computer Science\\
-University of York\\
-United Kingdom\\
-\vspace{1cm}
-\today
-
-\vfill
-A Thesis Submitted in Partial Fulfillment of the Requirements\\
-for the Degree of Doctor of Philosophy in Computer Science
-
-
-\end{center}
-\end{titlepage}
-
-
-\begin{abstract}
-\label{abstract}
-\addcontentsline{toc}{chapter}{Abstract}
-In large-scale computer systems and software development, model-driven engineering is an approach that focuses on the development and management of models -- the models are usually expressed in diagrams, textual notations, or code. Most of of these models are persisted in state-based formats. While state-based persistence has certain advantages, it is problematic when it comes to detecting changes in large-scale models. As an alternative, this work proposes a change-based approach that involves persisting the full sequence of changes made to models. Persisting a model in a change-based format has the potential to deliver benefits over state-based persistence, such as the ability to perform model differencing and conflict detection much faster and more precisely, which can then yield positive knock-on effects on helping developers compare and merge models in collaborative modelling environments. Nevertheless, change-based persistence also comes with downsides, and one of them is the increased model loading time. 
-
-To reduce the loading time, this work has investigated two approaches. First, by cancelling superseded changes, and second, through the use of hybrid model persistence. While the first approach is still by far outperformed by state-based persistence, the hybrid model persistence only experience insignificant slight slowdown in most cases compared to loading models from state-based persistence. 
-
-This work has proposed an approach for a faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence which allows us to find differences and conflicts between two versions of a model by only comparing the last set of changes applied to them, without having to compare every element and feature in both versions as traditionally performed in state-based model comparison. This work's evaluation shows that the proposed changed-based model differencing and conflicts detection outperforms existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reduction on model size could impair the performance of the proposed model differencing and conflict detection as a great number of change records have to be read and loaded into memory.
-\end{abstract}
-
-\tableofcontents
-\addcontentsline{toc}{chapter}{Contents}
-
-\cleardoublepage
-\listoffigures
-\addcontentsline{toc}{chapter}{List of Figures}
-
-\cleardoublepage
-\listoftables
-\addcontentsline{toc}{chapter}{List of Tables}
-
-\cleardoublepage
-\lstlistoflistings
-\addcontentsline{toc}{chapter}{Listings}
-
-\cleardoublepage
-%\chapter*{Preface}
-%
-%An introduction to the thesis as a whole. It should contain:
-%
-%Why did you write the thesis? Why did you choose the particular subject? What was your motivation? 
-%
-%State the purpose of the thesis
-%
-%Describe the journey of writing the thesis
-%
-%Talk about any problems that came up
-%
-%discuss your research process
-%
-%Include any suggestions about how to read the thesis
-
-\cleardoublepage
-\chapter*{Acknowledgements}
-I would like to thank my supervisor Professor Dimitris Kolovos for providing this opportunity, and for his endless support and advice throughout this PhD. I would also like to thank my second supervisor, Professor Fiona Polack, for her help and comments, especially during the early stages of this PhD. Also, I am very grateful to my third supervisor Dr Horacio Hoyos Rodriguez, for all his insightful comments during his time at the University of York. 
-
-I would further like to thank all members of the Enterprise Systems research group for all their helpful comments on my thesis. Thank you to Antonio García-Domínguez and Ran Wei who have done the preliminary work on EMF CBP. Thank you to Nicholas Matragkas, my internal examiners, who always asks me with challenging questions to prepare me for the viva.  
-
-The achievements of this thesis would not have been possible without the support of my parents, who provided me with the opportunity to pursue my doctorate. It would not be possible also without the help of my brothers during my time working on the project. Thank you to all my friends, Kang Allyn, Jandy, Micky, Dibyo, Teny, Nungky, and others. It was precious spending time with you guys here in York sharing our PhD stories.
-
-This work was partly supported through a scholarship managed by \emph{Lembaga Pengelola Dana Pendidikan Indonesia} (Indonesia Endowment Fund for Education). 
-Without the scholarship, this thesis would not be possible.
-
-\cleardoublepage
-\chapter*{Declaration}
-I declare that this thesis is a presentation of original work and 
-I am the sole author. This work has not previously been presented 
-for an award at this, or any other, University. All sources are 
-acknowledged as References.
-
-\cleardoublepage
-\input{Chapter-01}
-\input{Chapter-02}
-\input{Chapter-03}
-\input{Chapter-04}
-\input{Chapter-05}
-\input{Chapter-06}
-\input{Chapter-07}
-\input{Chapter-08}
-\input{Chapter-09}
-
-\begin{appendices}
-\input{appendix_cbp}
-\input{appendix_qna}
-\end{appendices}
-
-
-
-\cleardoublepage
-\addcontentsline{toc}{chapter}{Bibliography}
-\bibliographystyle{IEEETran}
-\bibliography{references}
-
-
+  \begin{abstract}
+    \label{abstract}
+    \addcontentsline{toc}{chapter}{Abstract}
+    In large-scale computer systems and software development, model-driven engineering is an approach that focuses on the development and management of models. The models are usually expressed in diagrams, textual notations, or code. Most of these models persist in state-based formats. While state-based persistence has certain advantages, it is problematic when it comes to detecting changes in large-scale models. As an alternative, this work proposes a change-based approach that involves persisting the full sequence of changes made to models. Persisting a model in a change-based format has the potential to deliver benefits over state-based persistence, such as the ability to perform model differencing and conflict detection much faster and more precisely. This can then yield positive follow-on effects to help developers compare and merge models in collaborative modelling environments. Nevertheless, change-based persistence also comes with downsides, including increased model loading time.
+    
+    This work investigates two approaches to reduce loading time. The first is to cancel superseded changes, and second uses hybrid model persistence. While the first approach is still greatly outperformed by state-based persistence, the hybrid model persistence experiences only a slight slowdown in most cases compared to loading models from state-based persistence.
+    
+    This work proposes an approach for faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence, which allows us to find differences and conflicts between two versions of a model by comparing only the last set of changes applied to them, without having to compare every element and feature in both versions as is traditionally done in state-based model comparison. This work's evaluation shows that the proposed change-based model differencing and conflict detection outperform the existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reductions in model size could impair the performance of the proposed model differencing and conflict detection as a great number of change records must be read and loaded into memory.
+  \end{abstract}
+  
+  \tableofcontents
+  \addcontentsline{toc}{chapter}{Contents}
+  
+  \cleardoublepage
+  \listoffigures
+  \addcontentsline{toc}{chapter}{List of Figures}
+  
+  \cleardoublepage
+  \listoftables
+  \addcontentsline{toc}{chapter}{List of Tables}
+  
+  \cleardoublepage
+  \lstlistoflistings
+  \addcontentsline{toc}{chapter}{Listings}
+  
+  \cleardoublepage
+  %\chapter*{Preface}
+  %
+  %An introduction to the thesis as a whole. It should contain:
+  %
+  %Why did you write the thesis? Why did you choose the particular subject? What was your motivation?
+  %
+  %State the purpose of the thesis
+  %
+  %Describe the journey of writing the thesis
+  %
+  %Talk about any problems that came up
+  %
+  %discuss your research process
+  %
+  %Include any suggestions about how to read the thesis
+  
+  \cleardoublepage
+  \chapter*{Acknowledgements}
+  I would like to thank my supervisor, Professor Dimitris Kolovos, for providing this opportunity and for his endless support and advice throughout this PhD. I would also like to thank my second supervisor, Professor Fiona Polack, for her help and comments, especially during the early stages of this PhD. Also, I am very grateful to my third supervisor, Dr Horacio Hoyos Rodriguez, for all his insightful comments during his time at the University of York.
+  
+  I would further like to thank all the members of the Enterprise Systems research group for their helpful comments on my thesis. Thank you to Antonio García-Domínguez and Ran Wei who did the preliminary work on EMF CBP. Thank you to Nicholas Matragkas, my internal examiner, who always asks me challenging questions to prepare me for the viva.
+  
+  The achievements of this thesis would not have been possible without the support of my parents, who provided me with the opportunity to pursue my doctorate. It would not be possible also without the help of my brothers during my time working on the project. Thank you to all my friends, Kang Allyn, Jandy, Micky, Dibyo, Teny, Nungky, and others. It was precious spending time with you here in York sharing our PhD stories.
+  
+  This work was partly supported through a scholarship managed by \emph{Lembaga Pengelola Dana Pendidikan Indonesia} (Indonesia Endowment Fund for Education).
+  Without that scholarship, this thesis would not be possible.
+  
+  \cleardoublepage
+  \chapter*{Declaration}
+  I declare that this thesis is a presentation of original work and
+  I am the sole author. This work has not previously been presented
+  for an award at this, or any other, University. All sources are
+  acknowledged as References.
+  
+  \cleardoublepage
+  \input{Chapter-01}
+  \input{Chapter-02}
+  \input{Chapter-03}
+  \input{Chapter-04}
+  \input{Chapter-05}
+  \input{Chapter-06}
+  \input{Chapter-07}
+  \input{Chapter-08}
+  \input{Chapter-09}
+  
+  \begin{appendices}
+    \input{appendix_cbp}
+%    \input{appendix_qna}
+  \end{appendices}
+  
+  \cleardoublepage
+  \addcontentsline{toc}{chapter}{Bibliography}
+  \bibliographystyle{IEEETran}
+  \bibliography{references}
+  
 \end{document}

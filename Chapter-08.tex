@@ -1,13 +1,13 @@
 \chapter{Efficient Conflict Detection of Change-based Models}
 \label{ch:conflict_detection}
 
-In Chapter \ref{ch:model_differencing}, it was demonstrated that change-based model persistence can be used to speed up model differencing. This Chapter explores whether change-based model persistence can be leveraged to improve conflict detection in model versioning. Results show that the proposed approach can reduce conflict detection time (up to 90\% in some experiments) compared to existing state-based and change-based conflict detection approaches.
+In Chapter \ref{ch:model_differencing}, it was demonstrated that change-based model persistence can be used to speed up model differencing. This chapter explores whether change-based model persistence can be leveraged to improve conflict detection in model versioning. Results show that the proposed approach can reduce conflict detection time (up to 90\% in some experiments) compared to existing state-based and change-based conflict detection approaches.
 
 \section{Introduction}
 \label{sec:introduction_7}
 State-based and change-based model conflict detection are discussed briefly in Sections \ref{sec:emfcompare_conflict_detection} and \ref{sec:emfstore_conflict_detection}. The state-based approach, represented by EMF Compare \cite{emfcompare2018developer}, does have drawbacks. First, it cannot detect conflicts as accurately as a change-based approach can. This is because their changes are derived; they are not working with real historical changes. Second, EMF Compare uses a three-way model comparison \cite{emfcompare2018developer}. Therefore, its conflict detection should perform somewhat more slowly than the change-based approach, since it has to perform state-based model differencing twice. It must derive change events between left and original versions and between right and original versions.
 
-Change-based model conflict detection \cite{koegel2010operation}, represented by EMF Store \cite{emfstore2019what}, also has drawbacks. EMF Store works only on change events,  and it detects conflicts based on pre-defined rules; it does not consider the eventual states of two versions that are being compared. Thus, two change events that modifies a same feature are considered in conflict even though both change events produce the same eventual states. In terms of performance, as has been presented in Chapter \ref{ch:model_differencing}, the change-based approach is faster than its state-based counterparts in model differencing. Thus, it is expected that it can also performs better than the state-based approach in detecting conflicts.
+Change-based model conflict detection \cite{koegel2010operation}, represented by EMF Store \cite{emfstore2019what}, also has drawbacks. EMF Store works only on change events,  and it detects conflicts based on pre-defined rules; it does not consider the eventual states of two versions that are being compared. Thus, two change events that modify a same feature are considered in conflict even though both change events produce the same eventual states. In terms of performance, as has been presented in Chapter \ref{ch:model_differencing}, the change-based approach is faster than its state-based counterparts in model differencing. Thus, it is expected that it can also perform better than the state-based approach in detecting conflicts.
 
 This chapter introduces a proposed change-based approach to detect conflicts between two versions of a model, based not only on recent change events of the two versions but also by considering the eventual states of the elements affected by the change events. Thus, the performance and accuracy of model conflict detection can be improved compared to existing state-based and change-based approaches represented by EMF Compare and EMF Store, respectively.
 
@@ -18,7 +18,7 @@ The rest of this chapter is structured as follows. Sections \ref{sec:emfcompare_
 
 In this study, we select EMF Compare \cite{emfcompare2018developer} as an example to explain conflict detection in state-based model persistence. We also use it as a benchmark in the comparative evaluation of this paper. It is selected because of its maturity and ongoing development activity—4,682 commits and 103 releases on GitHub \cite{github2019emfcompare}. Another implementation of state-based conflict detection is EMF DiffMerge \cite{eclipse2019emfdiffmerge}. However, its comparison approach is similar to EMF Compare \cite{eclipse2019emfdiffmerge}, and it is less mature than EMF Compare—only 442 commits and 20 releases on GitHub \cite{github2019emfdiffmerge}.
 
-In state-based model comparison, a conflict occurs when the states of an element or a feature are different in the versions of a model that are being compared. In other words, the change events that cause the differences are in conflict, since they produce two different states. State-based persistence does not record change events that cause the differences, thus the change events must be identified through model differencing \cite{emfcompare2018developer,yohannis2019efficient}.
+In state-based model comparison, a conflict occurs when the states of an element or a feature are different in the versions of a model that are being compared. In other words, the change events that cause the differences are in conflict, since they produce two different states. State-based persistence does not record change events that cause the differences. Thus, the change events must be identified through model differencing \cite{emfcompare2018developer,yohannis2019efficient}.
 
 Let’s say that we have three versions of model $M$, the original shared version $m_{o}$ and two other modified versions: the left version $m_{l}$ and the right version $m_{r}$. There are also two sets of identified change events, left change events $C_{L}$ and right change events $C_{R}$. These sets are obtained by differencing $m_{l}$ to $m_{o}$ and $m_{r}$ to $m_{o}$ using an LCS (Longest Common Subsequence) algorithm \cite{emfcompare2018developer,DBLP:journals/algorithmica/Meyers86}, where $C_{L}$ = $\{c_{l1}$, $c_{l2}$, ..., $c_{olm}\}$, $C_{R}$ = $\{c_{r1}$, $c_{r2}$, ..., $c_{rn}\}$, $m$ is the number of left change events in $C_{L}$ or $m = |C_{L}|$, and $n$ is the number of change events in $C_{R}$ or $n = |C_{R}|$. Applying $C_{L}$ to model $m_{o}$ transforms it into model $m_{l}$, and applying $C_{R}$ to model $m_{o}$ transforms it into model $m_{r}$. These derived change events are used to detect conflicts using Equations (\ref{eq:state_real_conflict}), (\ref{eq:state_pseudo_conflict}), and (\ref{eq:state_nonapplicability_conflict}).
 
@@ -250,7 +250,7 @@ c_{l}\;!\;c_{r} \wedge c_{r} \in cc_{r} \Rightarrow c_{l}\;!\; \forall c_{rn} | 
   \end{scriptsize}
 \end{table*}
 
-In change-based conflict detection, all change events applied to a model are readily available, thus there is no need to derive change events through a diffing process. The availability of real historical changes can improve the accuracy of change detection, since elements that have been changed can be identified according to fact—not derivation. Therefore, change-based conflict detection can detect conflicts that cannot be detected by state-based conflict detection. For example, in Listing \ref{lst:cbp_right} line 31, parameter \textsf{target} has been moved from index 1 to 0, while in Listing \ref{lst:cbp_left} line 37, it was moved from index 1 to 2. Since both change events modified the same parameter \textsf{target}, both change events can be identified as being in conflict using (\ref{eq:change_comodifiability}). The same parameter \textsf{target} is modified by two different change events.
+In change-based conflict detection, all change events applied to a model are readily available. Thus, there is no need to derive change events through a diffing process. The availability of real historical changes can improve the accuracy of change detection, since elements that have been changed can be identified according to fact—not derivation. Therefore, change-based conflict detection can detect conflicts that cannot be detected by state-based conflict detection. For example, in Listing \ref{lst:cbp_right} line 31, parameter \textsf{target} has been moved from index 1 to 0, while in Listing \ref{lst:cbp_left} line 37, it was moved from index 1 to 2. Since both change events modified the same parameter \textsf{target}, both change events can be identified as being in conflict using (\ref{eq:change_comodifiability}). The same parameter \textsf{target} is modified by two different change events.
 
 The drawback of EMF Store is that it considers two change events to be in conflict if they modify the same element but create the same end state of the element \cite{DBLP:conf/sfm/BroschKLSWW12}. In common sense, two changes should not be in conflict if they are applied to a same element or feature and produce same eventual states. Moreover, EMF Store does not classify conflicts as \textsf{REAL} or \textsf{PSEUDO}, in EMF Compare does, to automate conflict resolution.
 
@@ -722,7 +722,7 @@ For example, when the iteration reaches feature \textsf{name} of class \textsf{t
 \label{sec:ordered_conflict}
 Conflicts that involve multi-valued features are handled by the procedure at line \ref{line:conflict_multi_value} in Algorithm \ref{alg:conflict_detection}. The procedure is elaborated in Algorithm \ref{alg:conflict_multi_valued_feature}, where ordered multi-valued features are addressed at lines 3–15. The procedure relies on the function \textsf{getUnequalLeftAndRightValues}. This function returns all values from left and right sides that are not equal to their original states in terms of (in)existence and indexes. For example, in Figure \ref{fig:right_element_tree_diagram}, parameter \textsf{target} in feature \textsf{parameters} is at index 2 on the left side but at index 1 in its original state. Thus, the value is included in the returned set. On the right side, this parameter is also at an index different from its original index, but it is already included in the returned set.
 
-The algorithm then iterates through the values of the set. For each value, it retrieves all events related to the value of this feature. (Element, feature, and value act as map keys to access the events.) The algorithm uses function \textsf{getAllRelated *Events($element$, $feature$, $value$)}, which yields two sets of events, \textsf{leftEvents} and \textsf{rightEvents}. If both sets of events are not empty, then a conflict is created. If the value on both sides is at the same index then the conflict is \textsf{PSEUDO}. Finally, the conflict is added to \textsf{conflictList}. The parameter \textsf{target} in feature \textsf{parameters} has been concurrently modified; it has one event on each side: parameter \textsf{target} is moved to the last index on the left side and to the first index on the right. Thus, a conflict in detected. This conflict is presented as conflict \textsf{CB2} in Table \ref{table:conflicts_cbp}.
+The algorithm then iterates through the values of the set. For each value, it retrieves all events related to the value of this feature. (Element, feature, and value act as map keys to access the events.) The algorithm uses function \textsf{getAllRelated *Events($element$, $feature$, $value$)}, which yields two sets of events, \textsf{leftEvents} and \textsf{rightEvents}. If both sets of events are not empty, then a conflict is created. If the value on both sides is at the same index, then the conflict is \textsf{PSEUDO}. Finally, the conflict is added to \textsf{conflictList}. The parameter \textsf{target} in feature \textsf{parameters} has been concurrently modified; it has one event on each side: parameter \textsf{target} is moved to the last index on the left side and to the first index on the right. Thus, a conflict is detected. This conflict is presented as conflict \textsf{CB2} in Table \ref{table:conflicts_cbp}.
 
 %\begin{figure}[ht]
 % \includegraphics[width=\linewidth]{multi_valued_conflict_detection}
@@ -745,7 +745,7 @@ EMF Compare uses model differencing to derive changes—not the real changes—b
   
   \item \emph{Real Move Conflict}. EMF CBP accurately identifies an element that has been moved, but EMF Compare picks another element. This case is presented in the running example where EMF CBP detects that \textsf{target} has been moved on both sides (Conflict CB2, Table \ref{table:conflicts_cbp}), while EMF Compare detects that \textsf{target} and \textsf{gem} have been moved on the left and right sides respectively (Listings \ref{lst:cbp_left_state} and \ref{lst:cbp_right_state}).
   
-  \item \emph{One-sided Reset Conflict}. EMF CBP detects a \textsf{PSEUDO} conflict on an element or feature that is simultaneously modified but then is set back to its original state on one sides (see Figure \ref{fig:statechart_04}). However, this condition is not determined to be in conflict by EMF Compare since the states of the element or feature are the same in both the original and modified versions.
+  \item \emph{One-sided Reset Conflict}. EMF CBP detects a \textsf{PSEUDO} conflict on an element or feature that is simultaneously modified but then is set back to its original state on one side (see Figure \ref{fig:statechart_04}). However, this condition is not determined to be in conflict by EMF Compare since the states of the element or feature are the same in both the original and modified versions.
   
   \item \emph{Single-valued Containment Conflict}. The change of state of a single-valued containment feature. EMF CBP detects two different changes to be in conflict if they modify a single-valued containment feature concurrently. For example, element \textsf{e1} contained in \textsf{c1}.\textsf{value}, and element \textsf{e2} contained in \textsf{c2}.\textsf{value}, are moved into \textsf{c3}.\textsf{value} concurrently, where \textsf{value} is a single-valued containment feature. Both changes are detected in conflict by EMF CBP but strangely not detected in conflict by EMF Compare.
 \end{itemize}
@@ -759,142 +759,28 @@ The following is the only kind of conflict detected by EMF Compare but not detec
 \label{sec:emf_cbp_vs_emf_store}
 Even though both EMF CBP and EMF Store real records of changes to determine conflicts, EMF Store does not consider the eventual states of elements or features. This leads them to detect different conflicts. Following is the only kind of conflict detected by EMF CBP but not detected by EMF Store.
 \begin{itemize}
-  \item \emph{First-time Move Conflict}. EMF Store can identify a conflict between two different changes that modify an element concurrently in a multi-valued feature only if both changes are the first changes applied to that multi-valued feature. If an earlier change is applied on another element in the same multi-valued feature, then the following two changes on the same element do cause a conflict. For example, in the original version, a multi-valued feature \textsf{c1}.\textsf{children} contains elements \textsf{e1}, \textsf{e2}, and \textsf{e3}. If in the left version, \textsf{e2} is moved to the first position and, in the right version, \textsf{e2} is moved to the last position, then these concurrent changes are detected in conflict by EMF Store. However, if in the left version, the feature is modified with another change, let’s say the addition of element \textsf{e4} at any position, the two \textsf{move} changes are \textbf{not} detected in conflict by EMF Store. EMF CBP still detects both \textsf{move} changes in conflict.
+  \item \emph{First-time Move Conflict}. EMF Store can identify a conflict between two different changes that modify an element concurrently in a multi-valued feature only if both changes are the first changes applied to that multi-valued feature. If an earlier change is applied to another element in the same multi-valued feature, then the following two changes on the same element do cause a conflict. For example, in the original version, a multi-valued feature \textsf{c1}.\textsf{children} contains elements \textsf{e1}, \textsf{e2}, and \textsf{e3}. If in the left version, \textsf{e2} is moved to the first position and, in the right version, \textsf{e2} is moved to the last position, then these concurrent changes are detected in conflict by EMF Store. However, if in the left version, the feature is modified with another change, let’s say the addition of element \textsf{e4} at any position, the two \textsf{move} changes are \textbf{not} detected in conflict by EMF Store. EMF CBP still detects both \textsf{move} changes in conflict.
 \end{itemize}
 
 Following is the only kind of conflict detected by EMF Store but not detected by EMF CBP. In other words, this should not be detected as a conflict by EMF Store.
 \begin{itemize}
-  \item \emph{Two-sided Reset Conflict}. This kind of conflict arises when two sets of changes modify an element or feature but reset its state to the original state on both sides. For example, in the left version, the value of attribute \textsf{e1}.\textsf{isEnabled} is set from \textsf{false} to \textsf{true}, but then it is set back again to \textsf{false}. In the right version, the same changes also applied on the same attribute. Thus, \textsf{e1}.\textsf{isEnabled} has eventual value \textsf{false} on both versions, the same as in the original version. This kind of change is treated as a conflict by EMF Store but \textbf{not} a conflict by EMF CBP (see Figure \ref{fig:statechart_03}). The same rule also applies to an element that has been moved but then is moved back to its initial position.
+  \item \emph{Two-sided Reset Conflict}. This kind of conflict arises when two sets of changes modify an element or feature but reset its state to the original state on both sides. For example, in the left version, the value of attribute \textsf{e1}.\textsf{isEnabled} is set from \textsf{false} to \textsf{true}, but then it is set back again to \textsf{false}. In the right version, the same changes are also applied to the same attribute. Thus, \textsf{e1}.\textsf{isEnabled} has eventual value \textsf{false} on both versions, the same as in the original version. This kind of change is treated as a conflict by EMF Store but \textbf{not} a conflict by EMF CBP (see Figure \ref{fig:statechart_03}). The same rule also applies to an element that has been moved but then is moved back to its initial position.
 \end{itemize}
 
 Numbers of conflicts detected by EMF CBP and EMF Store can also be different because of the way that EMF Store groups dependent conflicts. For example, let’s say that we have a model with initial state element \textsf{e1} contained in feature \textsf{c1}.\textsf{value} and two other empty features, \textsf{c2}.\textsf{value} and \textsf{c3}.\textsf{value}. On the left side, \textsf{e1} is moved twice; first to \textsf{c2}.\textsf{value} and then to \textsf{c3}.\textsf{value}. The model is also modified on the right side; a new element \textsf{e2} is assigned to \textsf{c2}.\textsf{value}, and then another new element \textsf{e3} is assigned to \textsf{c3}.\textsf{value}.
 
 In this scenario, EMF CBP identifies two conflicts. The first conflict is a \textsf{PSEUDO} conflict (see Figure \ref{fig:statechart_04}). That is, \textsf{c2}.\textsf{value} is concurrently modified on both sides, but, on one side, the value is set back to its original state. On the right side, \text{e2} is assigned to \textsf{c2}.\textsf{value}, but, on the left side, \textsf{c2}.\textsf{value} becomes empty when \textsf{e1} moves to \textsf{c3}.\textsf{value}. The second conflict is a \textsf{REAL} conflict, since \textsf{c3}.\textsf{value} is concurrently modified and has different values on the two sides. On the left side, it contains \textsf{e1}, but, on the right side, it contains \textsf{e3}. EMF Store also identifies these conflicts, but they are merged into one conflict. Another example of conflict grouping can be found in Tables \ref{table:emfc_conflicts}, \ref{table:conflicts_emfs}, and \ref{table:conflicts_cbp}. Conflicts \textsf{EC3} and \textsf{EC4} in EMF Compare or conflicts \textsf{CB3} and \textsf{CB4} in EMF CBP are grouped into one conflict \textsf{ES4} in EMF Store since both are in the same composite event \textsf{l2}.
 
-%\begin{figure*}
-% \begin{tabular}{l|c|r}
-% \begin{subfigure}[t]{0.31\linewidth}
-% \includegraphics[width=\linewidth]{class_diagram_merged_ecbp}
-% \caption{EMF CBP}
-% \label{fig:class_diagram_merged_ecbp}
-% \end{subfigure}
-% &
-% \begin{subfigure}[t]{0.31\linewidth}
-% \includegraphics[width=\linewidth]{class_diagram_merged_emfc}
-% \caption{EMF Compare}
-% \label{fig:class_diagram_merged_emfc}
-% \end{subfigure}
-% &
-% \begin{subfigure}[t]{0.31\linewidth}
-% \includegraphics[width=\linewidth]{class_diagram_merged_emfs}
-% \caption{EMF Store}
-% \label{fig:class_diagram_merged_emfs}
-% \end{subfigure}
-% \end{tabular}
-% \caption{Merged models of models in Figure \ref{fig:class_diagram_rpg} after applying all-left-to-right merging.}
-% \label{fig:class_diagram_merged}
-%\end{figure*}
-
-%\section{Merging}
-%\label{sec:merging}
-%Conflict resolution and merging strategies are beyond the scope of this paper. However, it is important to present the merged models of these three approaches to inspect their correctness. Thus, we present the merged models of the models in Figure \ref{fig:class_diagram_rpg} using these three different approaches. An all-left-to-right merge means that the left changes are prioritised above right changes. In other words, the right changes are applied to the original model first, so that the left changes can override the right changes. If there is a conflict, then the conflicting right changes are cancelled. In EMF Compare, this cancellation means that only the left changes are executed, the right changes are \emph{not executed}, while in EMF CBP and EMF Store, the right changes are \emph{reversed} so that the affected elements are brought back to their original states.
-%
-%In the default implementation of EMF Compare, the all-left-to-right merge sets the right model as the target and the left model as the source. This means the left changes are not applied to the original model. Instead, they are applied to the right model. Using this strategy, if we resolve all the conflicts in Table \ref{table:conflicts_emfc} using the all-left-to-right merge, we get a merged model as in Figure \ref{fig:class_diagram_merged_emfc}. All the right events are not executed. Instead, in the right model, class \textsf{character}’s feature \text{name} is set to “Hero” and class \textsf{troll}’s feature \textsf{name} is set to “Ogre”. Also, operation \textsf{cast} and class \textsf{giant} are removed from the right model. The removal of class \textsf{giant} also removes operation \textsf{smash} since the operation is contained by the class in the right model.
-%
-%For EMF CBP and EMF Store, applying the all-left-to-right merge requires all the right events of the conflicts in Tables \ref{table:conflicts_emfs} and \ref{table:conflicts_cbp} to be reversed. This reversal brings back the states of the elements affected by the conflicting right events to their original states. This makes it safe to apply the conflicting left events to the original model. All right events are applied first, followed by the reversed conflicting right events, and then by all left events (see Listings \ref{lst:cbp_merged_emfs} and \ref{lst:cbp_merged_ecbp}). In this order, the events are applied to the original model, not to the right model as in EMF Compare, to produce the merged model.
-%
-%\begin{lstlisting}[firstnumber=1,style=eol,caption={Merged change events of the models in Figure \ref{fig:class_diagram_rpg} and Listings \ref{lst:cbp_right} and \ref{lst:cbp_left} using EMF Store. The commented lines are added only to improve readability.},label=lst:cbp_merged_emfs]
-%#--right events--
-%move target in attack.parameters from 1 to 0
-%remove smash from knight.operations at 0 composite l1
-%add smash to giant.operations at 0 composite l1
-%remove cast from giant.operations at 1 composite l2
-%add cast to mage.operations at 0 composite l2
-%create rightGen type Generalization
-%set rightGen.general to character
-%set troll.generalization to rightGen
-%set character.name from "Character" to "Hero"
-%remove rightGen from troll.generalization composite l3
-%set mage.generalization to rightGen composite l3
-%set troll.name from "Troll" to "Orc"
-%#--reversed conflicting right events--
-%set troll.name from "Orc" to "Troll"
-%remove rightGen from mage.generalization composite l3r
-%set troll.generalization to rightGen composite l3r
-%set character.name from "Hero" to "Character"
-%remove rightGen from troll.generalization
-%set rightGen.general from character to null
-%delete rightGen
-%remove cast from mage.operations at 0 composite l2r
-%add cast to giant.operations at 1 composite l2r
-%remove smash from giant.operations at 0 composite l1r
-%add smash to knight.operations at 0 composite l1r
-%move target in attack.parameters from 0 to 1
-%#--left events--
-%create leftGen type Generalization
-%set leftGen.general to character
-%set troll.generalization to leftGen
-%set character.name from "Character" to "Hero"
-%remove leftGen from troll.generalization composite r1
-%set knight.generalization to leftGen composite r1
-%move target in attack.parameters from 1 to 2
-%unset cast.name from "cast" to null composite r2
-%remove cast from giant.operations at 0 composite r2
-%delete cast composite r2
-%unset giant.name from "Giant" to null composite r2
-%delete giant comp r2
-%set troll.name from "Troll" to "Ogre"
-%\end{lstlisting}
-%
-%\vspace{-20pt}
-%\begin{lstlisting}[firstnumber=1,style=eol,caption={Merged change events (operations) of the models in Figure \ref{fig:class_diagram_rpg} and Listings \ref{lst:cbp_right} and \ref{lst:cbp_left} using EMF CBP. The commented lines are added only to improve readability.},label=lst:cbp_merged_ecbp]
-%#--right events--
-%move target in attack.parameters from 1 to 0
-%remove smash from knight.operations at 0 composite l1
-%add smash to giant.operations at 0 composite l1
-%remove cast from giant.operations at 1 composite l2
-%add cast to mage.operations at 0 composite l2
-%create rightGen type Generalization
-%set rightGen.general to character
-%set troll.generalization to rightGen
-%set character.name from "Character" to "Hero"
-%remove rightGen from troll.generalization composite l3
-%set mage.generalization to rightGen composite l3
-%set troll.name from "Troll" to "Orc"
-%#--reversed conflicting right events--
-%set troll.name from "Orc" to "Troll"
-%remove cast from mage.operations at 0 composite l2r
-%add cast to giant.operations at 1 composite l2r
-%remove smash from giant.operations at 0 composite l1r
-%add smash to knight.operations at 0 composite l1r
-%move target in attack.parameters from 0 to 1
-%#--left events--
-%create leftGen type Generalization
-%set leftGen.general to character
-%set troll.generalization to leftGen
-%set character.name from "Character" to "Hero"
-%remove leftGen from troll.generalization composite r1
-%set knight.generalization to leftGen composite r1
-%move target in attack.parameters from 1 to 2
-%unset cast.name from "cast" to null composite r2
-%remove cast from giant.operations at 0 composite r2
-%delete cast composite r2
-%unset giant.name from "Giant" to null composite r2
-%delete giant comp r2
-%set troll.name from "Troll" to "Ogre"
-%\end{lstlisting}
-%
-%The drawback of the EMF Compare approach is that it sets the right model as the target for merging changes. This results in the loss of operation \textsf{smash} in the merged model (Figure \ref{fig:class_diagram_merged_emfc}). In contrast, EMF CBP and EMF Store reverse the event that moves operation \textsf{smash} from class \textsf{knight} to class \textsf{giant} so it moves back operation \textsf{smash} from class \textsf{giant} to class \textsf{knight}. The drawback of EMF Store is that it is not concerned about the eventual states produced by the conflicting events. It is concerned only that a feature has been modified concurrently on both sides (identified by the presence of at least one event on each side). For example, the eventual states of class \textsf{troll}’s feature \textsf{generalization} are \textsf{null} in the original, left, and right models. However, EMF Store does not consider this. Instead, it identifies only that there are events on both sides associated with this feature. Thus, conflict \textsf{ES1} in \ref{table:conflicts_emfs} is generated. As a consequence, all events related to the feature on the right side, and the events that are part of their composite events, are reversed. This results in the exclusion of generalization \textsf{rightGen} from the merged model. This drawback has been addressed by EMF CBP by checking the equality of the original, left, and right states of the feature. Since they are all equal, there is no conflict between the events. Thus, EMF CBP produces a merged model as in Figure \ref{fig:class_diagram_merged_ecbp}.
 
 \section{Evaluation Method}
 \label{sec:evaluation_method}
-This section presents the method that was used to evaluate the change-based conflict detection approach proposed in this study, and it discuss the results. To assess the performance benefits of the proposed conflict detection approach, this study evaluated it against a mature and widely used state-based model comparison tool, EMF Compare \cite{emfcompare2018developer,eclipse2017compare}, and another implementation of change-based model persistence, EMF Store \cite{koegel2010emfstore}.
+This section presents the method that was used to evaluate the change-based conflict detection approach proposed in this study, and it discusses the results. To assess the performance benefits of the proposed conflict detection approach, this study evaluated it against a mature and widely used state-based model comparison tool, EMF Compare \cite{emfcompare2018developer,eclipse2017compare}, and another implementation of change-based model persistence, EMF Store \cite{koegel2010emfstore}.
 
 Since there are no large, manually developed models persisted in the proposed change-based format yet, the dataset for this experiment was constructed from a large model reverse-engineered from the Eclipse Epsilon project \cite{eclipse2018epsilongit, eclipse2017epsilon}. This model conforms to the Java meta-model \cite{eclipse2018modiscojava}. It comprises more than 500 thousand elements with a size of 71.1 MB when persisted in XMI. We aimed for larger sizes of models, but, because EMF Store was slow when it replayed change events, we used the current sizes as they are large enough to identify the performance gaps between the approaches.
 
-The original model was cloned to produce two new (left and right) models, and operations (\textsf{add}, \textsf{remove}, \textsf{move}, \textsf{set} with random elements, features, indexes, and values) were performed on both models to create differences. In the evaluation, 0.44 million artificial changes were applied to each model, generating almost 0.5 million events. (One operation can generate more than one event, e.g. a \textsf{move} between features generates \textsf{remove} and \textsf{add} events). Events generated by the changes were persisted in the proposed change-based format (to be used later in change-based model comparison). After every 20,000 changes, a measurement point was made. The modified models were persisted in state-based format (to be used later in state-based model comparison), and changes persisted in EMF CBP were also replayed on EMF Store to produce equivalent changes. After that, conflict detection using EMF Compare, EMF Store, and EMF CBP were performed and their execution time and memory footprint were measured. In one experiment, 22 measurement points were analysed to capture their trends.
+The original model was cloned to produce two new (left and right) models, and operations (\textsf{add}, \textsf{remove}, \textsf{move}, \textsf{set} with random elements, features, indexes, and values) were performed on both models to create differences. In the evaluation, 0.44 million artificial changes were applied to each model, generating almost 0.5 million events. (One operation can generate more than one event, e.g. a \textsf{move} between features generates \textsf{remove} and \textsf{add} events). Events generated by the changes were persisted in the proposed change-based format (to be used later in change-based model comparison). After every 20,000 changes, a measurement point was made. The modified models were persisted in state-based format (to be used later in state-based model comparison), and changes persisted in EMF CBP were also replayed on EMF Store to produce equivalent changes. After that, conflict detection using EMF Compare, EMF Store, and EMF CBP were performed, and their execution time and memory footprint were measured. In one experiment, 22 measurement points were analysed to capture their trends.
 
-This evaluation conducted five experiments to evaluate the model conflict detection of the proposed approach. In the first experiment, the ratio of occurrence between \textsf{add}, \textsf{remove}, \textsf{move}, and \textsf{set} changes is set to 1:1:20:40 reflecting the assumption that, in a mature model, \textsf{move} and \textsf{set} events occur more frequent than addition and deletion. To reduce the effect of the change on the number of total elements to our measurement, the number of total elements should be kept constant. For example, it is difficult to tell an increase of time in comparison is caused by an increase in the number of elements or by the number of change events. One way to do this was to exclude \textsf{add} and \textsf{remove} operations. However, excluding both operations made measurement less representative. Thus, both operations were still included but their probabilities were made equal so that the number of total elements remain largely unchanged. In the rest of the experiments,
+This evaluation conducted five experiments to evaluate the model conflict detection of the proposed approach. In the first experiment, the ratio of occurrence between \textsf{add}, \textsf{remove}, \textsf{move}, and \textsf{set} changes is set to 1:1:20:40 reflecting the assumption that, in a mature model, \textsf{move} and \textsf{set} events occur more frequent than addition and deletion. To reduce the effect of the change on the number of total elements to our measurement, the number of total elements should be kept constant. For example, it is difficult to tell an increase of time in comparison is caused by an increase in the number of elements or by the number of change events. One way to do this was to exclude \textsf{add} and \textsf{remove} operations. However, excluding both operations made measurement less representative. Thus, both operations were still included but their probabilities were made equal so that the number of total elements remains largely unchanged. In the rest of the experiments,
 homogeneous type change events—isolated from other types—were performed per experiment (e.g. add-only, move-only change events). In the end, 5 results of the experiments were obtained: mixed, add-only, remove-only, move-only, and set-only measurement results. They are useful to assess whether operations of different types have a different impact on model comparison. 
 Because EMF Store is slow when it replays \textsf{delete} events, for the delete-only experiment, the size of the models was reduced from 0.54 million to only 39.5 thousand elements each, and the number of changes was reduced from 0.44 million to 33 thousand in 22 measurement points—1.5 thousand changes for each measurement point.
 
@@ -1104,7 +990,7 @@ Figure \ref{fig:homogeneous_operation_count_events} displays the number of confl
   \label{fig:homogeneous_operation_count_events}
 \end{figure*}
 
-Figure \ref{fig:change-conflict-count-events} shows the results of the change-only experiment. We can see that the number of conflicts detected by EMF Compare is lower than EMF CBP. This is mainly because EMF Compare detects no change on an element or feature that has been modified but is changed back to its original state. In EMF CBP, that is counted as a change with potential to raise a {PSEUDO} conflict as defined and showed in (\ref{eq:ecbp_pseudoconflict}), Section \ref{sec:emf_cbp_vs_emf_compare}, and Figure \ref{fig:statechart_04}. At the last measurement point in Figure \ref{fig:change-conflict-count-events}, there are 17 thousand conflicts of this kinds that EMF Compare does not detect. (This is 13.1\% of the 130 thousand conflicts that EMF CBP detects) EMF Compare itself detects only 113 thousand conflicts.
+Figure \ref{fig:change-conflict-count-events} shows the results of the change-only experiment. We can see that the number of conflicts detected by EMF Compare is lower than EMF CBP. This is mainly because EMF Compare detects no change on an element or feature that has been modified but is changed back to its original state. In EMF CBP, that is counted as a change with potential to raise a {PSEUDO} conflict as defined and showed in (\ref{eq:ecbp_pseudoconflict}), Section \ref{sec:emf_cbp_vs_emf_compare}, and Figure \ref{fig:statechart_04}. At the last measurement point in Figure \ref{fig:change-conflict-count-events}, there are 17 thousand conflicts of this kind that EMF Compare does not detect. (This is 13.1\% of the 130 thousand conflicts that EMF CBP detects) EMF Compare itself detects only 113 thousand conflicts.
 
 It should also be noticed that the number of conflicts detected by EMF CBP is slightly less than those detected by EMF Store. This happens because, as previously discussed, EMF Store does not consider states in detecting conflicts. Thus two different change events that are applied to the same element or feature, even though they yield states that are equal to their original state, are considered to be in conflict. In Figure \ref{fig:change-conflict-count-events}, at the last measurement point, EMF Store detects 133 thousand conflicts, but 3.1 thousand (2.3\%) cannot be detected by EMF CBP because of the two-sided reset conflict (see Section \ref{sec:emf_cbp_vs_emf_store}).
 

@@ -325,8 +325,8 @@ generate_graph("detail", "time", "ecbp", "..\\data\\mix-multiconflict.csv", "ima
 generate_graph("detail", "memory", "emfc", "..\\data\\mix-multiconflict.csv", "images/emfc-conflict-memory-events.pdf", 8.2)
 generate_graph("detail", "time", "emfc", "..\\data\\mix-multiconflict.csv", "images/emfc-conflict-time-events.pdf", 19)
 
-generate_graph("detail", "memory", "emfs", "..\\data\\mix-multiconflict.csv", "images/emfs-conflict-memory-events.pdf", 450)
-generate_graph("detail", "time", "emfs", "..\\data\\mix-multiconflict.csv", "images/emfs-conflict-time-events.pdf", 460)
+generate_graph("detail", "memory", "emfs", "..\\data\\mix-multiconflict.csv", "images/emfs-conflict-memory-events.pdf", 560)
+generate_graph("detail", "time", "emfs", "..\\data\\mix-multiconflict.csv", "images/emfs-conflict-time-events.pdf", 560)
 
 
 

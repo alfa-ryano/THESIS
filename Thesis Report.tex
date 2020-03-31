@@ -2,6 +2,7 @@
 \linespread{1.5}
 %\usepackage{lineno}
 %\linenumbers
+\usepackage{fancyhdr}
 \usepackage{lscape}
 \usepackage{pdflscape}
 \usepackage{amsmath}
@@ -123,6 +124,13 @@
 \newcommand{\Or}{\textnormal{\textbf{or }}}
 \newcommand{\eqnum}{\refstepcounter{equation}\textup{\tagform@{\theequation}}}
 
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\nouppercase{\leftmark}}
+\rhead{\thepage}
+
+
 \begin{document}
   
   \begin{titlepage}
@@ -162,23 +170,24 @@
     \end{center}
   \end{titlepage}
   
-  \cleardoublepage
-  \pdfbookmark{Dedication}{dedication}
-  \thispagestyle{empty}  
-  \begin{center}
-    \vspace*{5cm}
-    \LARGE \emph{``Trima kase, Mami!''}
-  \end{center}
+%  \cleardoublepage
+%  \pdfbookmark{Dedication}{dedication}
+%  \thispagestyle{empty}  
+%  \begin{center}
+%    \vspace*{5cm}
+%    \LARGE \emph{``Thank you, Mum!''}
+%  \end{center}
 
   \begin{abstract}
     \label{abstract}
     \addcontentsline{toc}{chapter}{Abstract}
     In large-scale computer systems and software development, model-driven engineering is an approach that focuses on the development and management of models. The models are usually expressed in diagrams, textual notations, or code. Most of these models persist in state-based formats. While state-based persistence has certain advantages, it is problematic when it comes to detecting changes in large-scale models. As an alternative, this work proposes a change-based approach that involves persisting the full sequence of changes made to models. Persisting a model in a change-based format has the potential to deliver benefits over state-based persistence, such as the ability to perform model differencing and conflict detection much faster and more precisely. This can then yield positive follow-on effects to help developers compare and merge models in collaborative modelling environments. Nevertheless, change-based persistence also comes with downsides, including increased model loading time.
     
-    This work investigates two approaches to reduce loading time. The first is to cancel superseded changes, and second uses hybrid model persistence. While the first approach is still greatly outperformed by state-based persistence, the hybrid model persistence experiences only a slight slowdown in most cases compared to loading models from state-based persistence.
+    This work investigates two approaches to reduce loading time. The first is to identify and ignore superseded changes, and the second uses hybrid model persistence. While the first approach is still greatly outperformed by state-based persistence, the hybrid model persistence experiences only a slight slowdown in most cases compared to loading models from state-based persistence.
     
-    This work proposes an approach for faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence, which allows us to find differences and conflicts between two versions of a model by comparing only the last set of changes applied to them, without having to compare every element and feature in both versions as is traditionally done in state-based model comparison. This work's evaluation shows that the proposed change-based model differencing and conflict detection outperform the existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reductions in model size could impair the performance of the proposed model differencing and conflict detection as a great number of change records must be read and loaded into memory.
-  \end{abstract}
+    This work proposes an approach for faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence, which allows us to find differences and conflicts between two versions of a model by comparing only the last set of changes applied to them, without having to compare every element and feature in both versions as 
+    is traditionally done in state-based model comparison. This work's evaluation shows that the proposed change-based model differencing and conflict detection outperform the existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reductions in model size could impair the performance of the proposed model differencing and conflict detection as numerous change records must be read and loaded into memory.
+\end{abstract}
   
   \tableofcontents
   \addcontentsline{toc}{chapter}{Contents}
@@ -212,16 +221,16 @@
   %
   %Include any suggestions about how to read the thesis
   
-  \cleardoublepage
-  \chapter*{Acknowledgements}
-  I would like to thank my supervisor, Professor Dimitris Kolovos, for providing this opportunity and for his endless support and advice throughout this PhD. I would also like to thank my second supervisor, Professor Fiona Polack, for her help and comments, especially during the early stages of this PhD. Also, I am very grateful to my third supervisor, Dr Horacio Hoyos Rodriguez, for all his insightful comments during his time at the University of York.
-  
-  I would further like to thank all the members of the Enterprise Systems research group for their helpful comments on my thesis. Thank you to Antonio García-Domínguez and Ran Wei who did the preliminary work on EMF CBP. Thank you to Nicholas Matragkas, my internal examiner, who always asks me challenging questions to prepare me for the viva.
-  
-  The achievements of this thesis would not have been possible without the support of my parents, who provided me with the opportunity to pursue my doctorate. It would not be possible also without the help of my brothers during my time working on the project. Thank you to all my friends, Kang Allyn, Jandy, Micky, Dibyo, Teny, Nungky, and others. It was precious spending time with you here in York sharing our PhD stories.
-  
-  This work was partly supported through a scholarship managed by \emph{Lembaga Pengelola Dana Pendidikan Indonesia} (Indonesia Endowment Fund for Education).
-  Without that scholarship, this thesis would not be possible.
+%  \cleardoublepage
+%  \chapter*{Acknowledgements}
+%  I would like to thank my supervisor, Professor Dimitris Kolovos, for providing this opportunity and for his endless support and advice throughout this PhD. I would also like to thank my second supervisor, Professor Fiona Polack, for her help and comments, especially during the early stages of this PhD. Also, I am very grateful to my third supervisor, Dr Horacio Hoyos Rodriguez, for all his insightful comments during his time at the University of York.
+%  
+%  I would further like to thank all the members of the Enterprise Systems research group for their helpful comments on my thesis. Thank you to Antonio García-Domínguez and Ran Wei who did the preliminary work on EMF CBP. Thank you to Nicholas Matragkas, my internal examiner, who always asks me challenging questions to prepare me for the viva.
+%  
+%  The achievements of this thesis would not have been possible without the support of my parents, who provided me with the opportunity to pursue my doctorate. It would not be possible also without the help of my brothers during my time working on the project. Thank you to all my mates, Kang Allyn, Jandy, Micky, Dibyo, Teny, Nungky, and others. It was precious spending time with you here in York sharing our PhD stories.
+%  
+%  This work was partly supported through a scholarship managed by \emph{Lembaga Pengelola Dana Pendidikan Indonesia} (Indonesia Endowment Fund for Education).
+%  Without that scholarship, this thesis would not be possible.
   
   \cleardoublepage
   \chapter*{Declaration}
@@ -241,14 +250,15 @@
   \input{Chapter-08}
   \input{Chapter-09}
   
-  \begin{appendices}
-    \input{appendix_cbp}
-%    \input{appendix_qna}
-  \end{appendices}
-  
   \cleardoublepage
   \addcontentsline{toc}{chapter}{Bibliography}
-  \bibliographystyle{IEEETran}
+%  \bibliographystyle{IEEETran}
+  \bibliographystyle{splncs}
   \bibliography{references}
+  
+  \begin{appendices}
+    \input{appendix_cbp}
+    %    \input{appendix_qna}
+  \end{appendices}
   
 \end{document}

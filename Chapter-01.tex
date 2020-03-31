@@ -15,7 +15,7 @@ Nevertheless, change-based persistence also comes with downsides, such as ever-i
 
 \section{Research Aim}
 \label{sec:research_aim}
-The aim of this work is to assess the advantages and shortcomings of a novel change-based approach to model persistence against existing textual and database-backed state-based and database-backed changed-based model persistence formats. This work is concerned with models that conform to meta-models expressed in object-oriented meta-modelling languages such as Ecore and MOF. The advantages and shortcomings considered in this work are in terms of computational cost and memory usage for 1) model loading, 2) model saving, 3) model differencing and 4) conflict detection.
+The aim of this work is to assess the advantages and shortcomings of a novel change-based approach to model persistence against existing textual and database-backed state-based and database-backed changed-based model persistence formats. This work is concerned with models that conform to meta-models expressed in object-oriented meta-modelling languages such as Ecore and MOF. The advantages and shortcomings considered in this work are in terms of computational cost and memory usage for 1) model loading, 2) model saving, 3) model differencing, and 4) conflict detection.
 
 \section{Research Objectives}
 \label{sec:research_objectives}
@@ -26,9 +26,6 @@ This research has defined the following research objectives to accomplish the ai
   \item Design a generic change-based model persistence format for models that conform to arbitrary EMF (Ecore) meta-models and to implement algorithms for saving and loading models in that format.
   \item Implement algorithms for differencing and conflict detection between two versions of change-based models.
   \item Assess the performance and memory use of loading, saving, differencing, and conflict detection of change-based models against established model persistence approaches within EMF.
-  %\item Research and design an implementation of change-based persistence so it can be applied to persist models in change-based formats and evaluate against state-based persistence the correctness of change-based models produced by this design and their performance saving changes.
-  %\item Develop a solution to perform change-based model differencing and compare its execution time and memory footprint against state-based model differencing.
-  %\item Develop a solution to perform change-based model conflict detection and compare its execution time and memory footprint against state-based model conflict detection.
 \end{enumerate}
 
 \section{Research Outputs}
@@ -109,13 +106,13 @@ This chapter summarises the work that has been carried out and uses the results 
 \section{Publications}
 \label{sec:publications}
 The research in various parts of the thesis has been published in the following papers:
-%\begin{enumerate}
-%  \item A. Yohannis, D. S. Kolovos, and F. Polack, ‘Turning models inside out,’ in Proceedings of MODELS 2017 Satellite Events co-located with ACM/IEEE 20th International Conference on Model Driven Engineering Languages and Systems (MODELS 2017), Austin, TX, USA, September, 17, 2017., 2017, pp. 430–434. [Online]. Available: \url{http://ceur-ws.org/Vol-2019/flexmde_8.pdf} (Chapter 3).
-%  
-%  \item A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ‘Towards efficient loading of change-based models,’ in Modelling Foundations and Applications—14th European Conference, ECMFA 2018, held as Part of STAF 2018, Toulouse, France, June 26–28, 2018, Proceedings, 2018, pp. 235–250. [Online]. Available: \url{https://doi.org/10.1007/978-3-319-92997-2_15} (Chapter 4).
-%  
-%  \item A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ‘Towards hybrid model persistence,’ in Proceedings of MODELS 2018 Workshops co-located with ACM/IEEE 21st International Conference on Model Driven Engineering Languages and Systems (MODELS 2018), Copenhagen, Denmark, October, 14, 2018., 2018, pp. 594–603. [Online]. Available: \url{http://ceur-ws.org/Vol-2245/me_paper_3.pdf} (Chapter 5).
-%  
-%  \item A. Yohannis, H. H. Rodriguez, F. Polack, and D. Kolovos, ‘Towards efficient comparison of change-based models,’ B. Combemale and A. Shaukat, Eds., vol. 18, no. 2, Jul. 2019, pp. 7:1–21, the 15th European Conference on Modelling Foundations and Applications. [Online]. Available:
-%  \url{http://www.jot.fm/contents/issue_2019_02/article7.html} (Chapter 6).
-%\end{enumerate}
+\begin{enumerate}
+  \item A. Yohannis, D. S. Kolovos, and F. Polack, ‘Turning models inside out,’ in Proceedings of MODELS 2017 Satellite Events co-located with ACM/IEEE 20th International Conference on Model Driven Engineering Languages and Systems (MODELS 2017), Austin, TX, USA, September, 17, 2017., 2017, pp. 430–434. [Online]. Available: \url{http://ceur-ws.org/Vol-2019/flexmde_8.pdf} (Chapter 4).
+  
+  \item A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ‘Towards efficient loading of change-based models,’ in Modelling Foundations and Applications—14th European Conference, ECMFA 2018, held as Part of STAF 2018, Toulouse, France, June 26–28, 2018, Proceedings, 2018, pp. 235–250. [Online]. Available: \url{https://doi.org/10.1007/978-3-319-92997-2_15} (Chapter 5).
+  
+  \item A. Yohannis, H. H. Rodriguez, F. Polack, and D. S. Kolovos, ‘Towards hybrid model persistence,’ in Proceedings of MODELS 2018 Workshops co-located with ACM/IEEE 21st International Conference on Model Driven Engineering Languages and Systems (MODELS 2018), Copenhagen, Denmark, October, 14, 2018., 2018, pp. 594–603. [Online]. Available: \url{http://ceur-ws.org/Vol-2245/me_paper_3.pdf} (Chapter 6).
+  
+  \item A. Yohannis, H. H. Rodriguez, F. Polack, and D. Kolovos, ‘Towards efficient comparison of change-based models,’ B. Combemale and A. Shaukat, Eds., vol. 18, no. 2, Jul. 2019, pp. 7:1–21, the 15th European Conference on Modelling Foundations and Applications. [Online]. Available:
+  \url{http://www.jot.fm/contents/issue_2019_02/article7.html} (Chapter 7).
+\end{enumerate}

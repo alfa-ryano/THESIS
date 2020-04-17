@@ -287,9 +287,43 @@ Compared to change-based persistence, state-based persistence also has downsides
 \label{sec:model_differencing_and_conflict_detection} 
 The history of model differencing and conflict detection can be traced back to the presence of the \textsf{diff} program on Unix or Unix-like platforms \cite{hunt1976algorithm}. Diffing is a function that compares text files ‘to determine how or whether they differ’ \cite{diff}. It is commonly known as the Longest Common Subsequence (LCS) algorithm \cite{bergroth2000lcs}, and it is equivalent to the Shortest Edit Script (SES) problem: finding the smallest number of edits (adds and deletes) to make a sequence equal to another sequence \cite{DBLP:journals/algorithmica/Meyers86}. LCS or SES algorithms are commonly implemented by Version Control Systems, such as SVN \cite{svn-diff} and Git \cite{git-diff}, in their \textsf{diff} programs to identify differences between versions of files.
 
-Using diffing on graph-based artefacts, such as XML \cite{w3c-xml} and Ecore models \cite{steinberg2008emf}, is not straightforward since they are different from text files. For example, XML is a hierarchical document with a tree structure; one node can contain other nodes. The unique feature of XML is that its containment is unordered, whereas in text files differencing order is a necessary feature. This has been addressed by Wang et al. \cite{wang2003xdiff} by exploiting key XML structure characteristics. Identifying differences between Ecore models is even more complex since those models support multiple characteristics of features, such as attribute/reference, literal/object values, single/multiple values, and containment/non-containment\cite{steinberg2008emf}.
+Using diffing on graph-based artefacts, such as XML \cite{w3c-xml} and Ecore models \cite{steinberg2008emf}, is not straightforward since they are different from text files. For example, XML is a hierarchical document with a tree structure; one node can contain other nodes. The unique feature of XML is that its containment is unordered, whereas in text files differencing order is a necessary feature. This has been addressed by Wang et al. \cite{wang2003xdiff} by exploiting key XML structure characteristics. 
 
-There are several existing tools for model differencing. EMF Compare \cite{emfcompare2018developer} is a popular tool for comparing and merging EMF models, with generic support for different meta-models. It is an extensible framework, so it can be adapted to the specific needs of certain meta-models. EMF Compare works by matching elements of the models being compared and then executing differencing to identify the differences between them. Matching and differencing are discussed in detail in Chapter \ref{ch:model_differencing}. EMF DiffMerge (EDM) \cite{eclipse2019emfdiffmerge} is similar to EMF Compare except that its abstraction is at a lower level, and it is designed to prevent data loss and enforce model consistency \cite{eclipse2019emfdiffmerge2}. As a consequence, EMF Compare could use the EDM engine when it needs to enforce a particular consistency policy. Also, it supports scoping, which means that the comparison does not must be at the model level. It could also be applied to sets of model elements—subsets of models—that can be defined arbitrarily by using specific filters \cite{jaxenter2019emfdiffmerge}. In this study, EMF Compare is used as a baseline for evaluation because of its maturity and ongoing development activity. Other tools, such as SiDiff \cite{Treude2007SiDiff} and DSMDiff \cite{lin2009dsmdiff}, also provide language-agnostic graph-based model comparison, with some room for configuration (e.g., assigning different weights to features of types in the language). Additional expressive power—at the cost of increased complexity and configuration effort—is offered by dedicated comparison languages such as the Epsilon Comparison Language, which can be used to compare both homogeneous and heterogeneous models \cite{kolovos2009ecl}. All of these tools work with state-based persistence to identify differences between models.
+%% begin revision point 2
+For example, in Listings \ref{lst:left_xml} and \ref{lst:right_xml}, we have two XML documents that are semantically equivalent. However, a text-based differencing will identify that `<c/>' is at different lines in both documents (at line 3 in the left document, at line 2 in the right document). Moreover, `<d/>' and `<d></d>' at line 4 are identified as two different lines even though they have the same meaning. This also applies to `<e></e>' that is expressed in two lines (lines 5, 6) in the left XML document but expressed as one line (line 5) in the right XML document.
+
+\vspace{-20pt}
+\begin{minipage}[t]{0.49\linewidth}
+\begin{lstlisting}[style=eol,caption={Left XML document.}, label=lst:left_xml]
+<a>
+  <b/>
+  <c/>
+  <d/>
+  <e>
+  </e>
+<a/>
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.49\linewidth}
+  \begin{lstlisting}[style=eol,caption={Right XML document.}, label=lst:right_xml]
+<a>
+  <c/>
+  <b/>
+  <d></d>
+  <e></e>
+<a/>
+  \end{lstlisting}
+\end{minipage}
+%% end revision point 2
+
+Identifying differences between Ecore models is even more complex than XML differencing since those models support multiple characteristics of features, such as attribute/reference, literal/object values, single/multiple values, and containment/non-containment\cite{steinberg2008emf}. There are several existing tools for model differencing. 
+
+EMF Compare \cite{emfcompare2018developer} is a popular tool for comparing and merging EMF models, with generic support for different meta-models. It is an extensible framework, so it can be adapted to the specific needs of certain meta-models. EMF Compare works by matching elements of the models being compared and then executing differencing to identify the differences between them. Matching and differencing are discussed in detail in Chapter \ref{ch:model_differencing}. 
+
+EMF DiffMerge (EDM) \cite{eclipse2019emfdiffmerge} is similar to EMF Compare except that its abstraction is at a lower level, and it is designed to prevent data loss and enforce model consistency \cite{eclipse2019emfdiffmerge2}. As a consequence, EMF Compare could use the EDM engine when it needs to enforce a particular consistency policy. Also, it supports scoping, which means that the comparison does not must be at the model level. It could also be applied to sets of model elements—subsets of models—that can be defined arbitrarily by using specific filters \cite{jaxenter2019emfdiffmerge}. In this study, EMF Compare is used as a baseline for evaluation because of its maturity and ongoing development activity. 
+
+Other tools, such as SiDiff \cite{Treude2007SiDiff} and DSMDiff \cite{lin2009dsmdiff}, also provide language-agnostic graph-based model comparison, with some room for configuration (e.g., assigning different weights to features of types in the language). Additional expressive power—at the cost of increased complexity and configuration effort—is offered by dedicated comparison languages such as the Epsilon Comparison Language, which can be used to compare both homogeneous and heterogeneous models \cite{kolovos2009ecl}. All of these tools work with state-based persistence to identify differences between models.
 
 Our literature review has not identified any other work that targets comparison of change-based models persisted in text files. Only EMF Store \cite{koegel2010emfstore} addresses change-based model conflict detection, but it persists models in its own dedicated backend system. Moreover, since it is designed to identify conflicts between changes, it does not give direct, summarised information about which parts of two versions of a model are different—not for model differencing. It only gives lists of changes to users. The summarised information is useful in the scenario where a model is excessively changed in both versions since users do not have to interpret the long lists to identify differences between the versions. Moreover, it works only on changes; it does not consider eventual states of models in detecting conflicts \cite{DBLP:conf/sfm/BroschKLSWW12}. Thus, if an element has been changed concurrently, but the changes produce eventual states that are equal to their original state, EMF Store still treats these changes as if they were in conflict. Database or dedicated-backend model persistence and version control solutions such as CDO \cite{eclipse2019cdo} and EMF Store provide model conflict detection capabilities between different versions of the same model, but they present integration challenges when users wish to use text-oriented version control systems (e.g. Git, SVN) which are typically file-based. Moreover, their performance can degrade as more models/users are added to a repository \cite{KolovosRMPGCLRV13}.
 

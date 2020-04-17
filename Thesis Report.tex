@@ -170,13 +170,13 @@
     \end{center}
   \end{titlepage}
   
-%  \cleardoublepage
-%  \pdfbookmark{Dedication}{dedication}
-%  \thispagestyle{empty}  
-%  \begin{center}
-%    \vspace*{5cm}
-%    \LARGE \emph{``Thank you, Mum!''}
-%  \end{center}
+  \cleardoublepage
+  \pdfbookmark{Dedication}{dedication}
+  \thispagestyle{empty}  
+  \begin{center}
+    \vspace*{5cm}
+    \LARGE \emph{``Thank you, Mum!''}
+  \end{center}
 
   \begin{abstract}
     \label{abstract}
@@ -185,8 +185,8 @@
     
     This work investigates two approaches to reduce loading time. The first is to identify and ignore superseded changes, and the second uses hybrid model persistence. While the first approach is still greatly outperformed by state-based persistence, the hybrid model persistence experiences only a slight slowdown in most cases compared to loading models from state-based persistence.
     
-    This work proposes an approach for faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence, which allows us to find differences and conflicts between two versions of a model by comparing only the last set of changes applied to them, without having to compare every element and feature in both versions as 
-    is traditionally done in state-based model comparison. This work's evaluation shows that the proposed change-based model differencing and conflict detection outperform the existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reductions in model size could impair the performance of the proposed model differencing and conflict detection as numerous change records must be read and loaded into memory.
+    This work also proposes an approach for faster model differencing and conflict detection. It works by exploiting the nature of change-based persistence, which allows us to find differences and conflicts between two versions of a model by comparing only the last set of changes applied to them, without having to compare every element and feature in both versions as is traditionally done in state-based model comparison. This work's evaluation shows that the proposed change-based model differencing and conflict detection outperform the existing traditional state-based approach. Nevertheless, models that have been excessively modified or experience significant reductions in model size could impair the performance of the proposed model differencing and conflict detection as numerous change records must be read and loaded into memory.
+    \vspace{-10pt}
 \end{abstract}
   
   \tableofcontents
@@ -221,16 +221,19 @@
   %
   %Include any suggestions about how to read the thesis
   
-%  \cleardoublepage
-%  \chapter*{Acknowledgements}
-%  I would like to thank my supervisor, Professor Dimitris Kolovos, for providing this opportunity and for his endless support and advice throughout this PhD. I would also like to thank my second supervisor, Professor Fiona Polack, for her help and comments, especially during the early stages of this PhD. Also, I am very grateful to my third supervisor, Dr Horacio Hoyos Rodriguez, for all his insightful comments during his time at the University of York.
-%  
-%  I would further like to thank all the members of the Enterprise Systems research group for their helpful comments on my thesis. Thank you to Antonio García-Domínguez and Ran Wei who did the preliminary work on EMF CBP. Thank you to Nicholas Matragkas, my internal examiner, who always asks me challenging questions to prepare me for the viva.
-%  
-%  The achievements of this thesis would not have been possible without the support of my parents, who provided me with the opportunity to pursue my doctorate. It would not be possible also without the help of my brothers during my time working on the project. Thank you to all my mates, Kang Allyn, Jandy, Micky, Dibyo, Teny, Nungky, and others. It was precious spending time with you here in York sharing our PhD stories.
-%  
-%  This work was partly supported through a scholarship managed by \emph{Lembaga Pengelola Dana Pendidikan Indonesia} (Indonesia Endowment Fund for Education).
-%  Without that scholarship, this thesis would not be possible.
+  \cleardoublepage
+  \chapter*{Acknowledgements}
+  I would like to thank my supervisor, Professor Dimitris Kolovos, for providing this opportunity and for his endless support and advice throughout this PhD. I would also like to thank my second supervisor, Professor Fiona Polack, for her help and comments, especially during the early stages of this PhD. Also, I am very grateful to my third supervisor, Dr Horacio Hoyos Rodriguez, for all his insightful comments during his time at the University of York.
+  
+  I would further like to thank all the members of the Enterprise Systems research group for their helpful comments on my thesis. Thank you to Antonio García-Domínguez and Ran Wei who did the preliminary work on EMF CBP. I give my thanks to James Goodwin, Athanasios Zolotas, Patrick Neubauer, Sultan Almutairi, Faisal Alhwikem, and Alfonso De La Vega for helping me reviewing my thesis report and giving some valuable advice for my viva. Thank you to Dr Nicholas Matragkas, my internal examiner, who always asked me challenging questions to prepare me for the viva. Thank you to Dr Phillip James, my external examiner, who gave some valuable feedback for my thesis, and Dr Radu Calinescu, who has been an excellent moderator in my viva.
+  
+  The achievements of this thesis would not have been possible without the support of my parents, who provided me with the opportunity to pursue my doctorate. It would not be possible also without the help of my brothers during my time working on the project. Thank you to all my mates, Kang Allyn, Jandy, Micky, Dibyo, Teny, Nungky, and others. It was precious spending time with you here in York sharing our PhD stories.
+  \\
+  \\
+  This work was partly supported through a scholarship managed by \emph{Lembaga Pengelola Dana Pendidikan Indonesia} (Indonesia Endowment Fund for Education). Without that scholarship, this thesis would not be possible.
+  
+  Praise to the Lord Jesus Christ who has been my role model of determination, persistence, and perseverance. ``And let us not grow weary of doing good, for in due season we will reap, if we do not give up.''---Galatians 6:9.
+  
   
   \cleardoublepage
   \chapter*{Declaration}
@@ -258,6 +261,7 @@
   
   \begin{appendices}
     \input{appendix_cbp}
+    \input{reproducing_experiments}
     %    \input{appendix_qna}
   \end{appendices}
   

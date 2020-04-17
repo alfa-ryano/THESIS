@@ -1,0 +1,17 @@
+\chapter{Reproducing the Experiments}
+\label{sec:reproducing_experiments}
+
+The source and input models for evaluation of this project can be downloaded from \url{https://github.com/epsilonlabs/emf-cbp} and \url{https://drive.google.com/open?id=1W_DTOloflZt6aYvObDCTfcnSMqhiRJY1}.
+
+All of the experiments of this research are developed and executed with the following specification Eclipe 4.6.3 (Neon.3) 32-bit and Java Development Kit 1.8. Some important libraries that are used in the source are BPMN2 Metamodel	1.3.0, Epsilon 1.4.0, EMF 2.12.0, UML2 Extender SDK	5.2.3, NeoEMF 1.0.2, 
+EMF Store 1.9.0, EMF Compare 3.3.2, and MoDisco 1.0.1. These libraries can be installed as plugins on Eclipse. Other jar dependencies are Apache commons-io-2.6.jar for file operation utility and Java Specification Request jsr305-3.0.1.jar that is required by NeoEMF.
+
+\begin{itemize}
+  \item \textbf{Chapter 5}. The test code to run the evaluation of Chapter 5 is in file ECMFATest3.java. This file is located in package org.eclipse.epsilon.cbp.state2change.test under project
+  org.eclipse.epsilon.cbp.state2change.
+  \item \textbf{Chapter 6}. HybridXMITest.java, NeoEMFTest.java, HybridNeoEMFTest.java, and CBPTest.java are the test files for the evaluation of Chapter 6. They are located in package org.eclipse.epsilon.cbp.hybrid.test in project org.eclipse.epsilon. cbp.hybrid.test.
+  \item \textbf{Chapter 7}. The test code to run the evaluation of Chapter 7 is in file CBPComparisonTest.java. This file is in package org.eclipse.epsilon.cbp.comparison. test under project
+  org.eclipse.epsilon.cbp.comparison.
+  \item \textbf{Chapter 8}. The test code to run the evaluation of Chapter 8 is in file CBPConflictTest.java Application.java under package org.eclipse.epsilon.cbp.conflict.test in project org.eclipse.epsilon.cbp.comparison and file
+  Application.java under package org.eclipse.epsilon.cbp.comparison.emfstore.test in project org.eclipse. epsilon.cbp.comparison.emfstore. 
+\end{itemize}

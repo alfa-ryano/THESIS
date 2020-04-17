@@ -12,88 +12,60 @@ Section \ref{sec:loading_time_optimisation} presents the proposed approach to sp
 
 \section{Running Example}
 \label{sec:case_study}
-To explain the optimised loading algorithm for change-based models, this chapter uses the minimal tree meta-model and example tree models in Figure \ref{fig:tree_example}.
-
-The meta-model for the minimal tree model is expressed in the Eclipse Modeling Framework (EMF) Ecore meta-modelling language, the de-facto standard for object-oriented meta-modelling. The example is contrived to avoid unnecessary repetition, while providing adequate coverage of the core features of Ecore (classes, single/multi-valued features, references).
-In this example, a tree model consists of named nodes which can—optionally—contain other nodes (\textsf{child} reference).
+To explain the optimised loading algorithm for change-based models, this chapter uses the running example model in Figure \ref{fig:class_diagram_rpg}.
+Let's say that there is another person named Alex that copied and modified Jane's model in Figure \ref{fig:class_diagram_origin}. He decided to persist and modify the model in change-based persistence. He modified the initial state of class Hero (Figure \ref{fig:initial_model}) by adding a new parameter \textsf{combo} to operation \textsf{attack} producing the intermediate state in Figure \ref{fig:intermediate_model}, but then he changed his mind and remove the parameter from the operation resulting an eventual state as in Figure \ref{fig:modified_model}.
 
 \begin{figure}[ht]
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{node_metamodel}
-    \caption{the tree meta-model (EMF/Ecore)}
-    \label{fig:tree_metamodel}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[t]{0.32\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{initial_chart_1}
-    \caption{the initial state of a tree model}
+    \includegraphics[width=\linewidth]{class_hero_a}
+    \caption{the initial state}
     \label{fig:initial_model}
   \end{subfigure}
   \hfill
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{initial_chart_2}
-    \caption{the eventual state after \textsf{n3} is deleted}
+    \includegraphics[width=\linewidth]{class_hero_b}
+    \caption{the intermediate state}
+    \label{fig:intermediate_model}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{class_hero_a}
+    \caption{the eventual state}
     \label{fig:modified_model}
   \end{subfigure}
-  \caption{Running example of a meta-model and a conformant model.}
+  \caption{Running example of the modification of class \textsf{Hero} in Figure \ref{fig:class_diagram_origin}.}
   \label{fig:tree_example}
 \end{figure}
 
-The initial state of the model in Figure \ref{fig:initial_model} has three nodes, \textsf{n1}, \textsf{n2}, and \textsf{n3}. It was initially constructed by creating the three nodes (\textsf{n1}, \textsf{n2}, and \textsf{n3}), and nodes \textsf{n2} and \textsf{n3} were added as children of \textsf{n1}. The model was modified by deleting node \textsf{n3} producing the eventual state in Figure \ref{fig:modified_model}.
 
 \vspace{-20pt}
-\begin{minipage}[t]{0.49\linewidth}
-\begin{lstlisting}[style=xmi,caption={State-based representation in simplified XMI of the tree model in Figure \ref{fig:initial_model}.},label=lst:xmimodel_0]
-<Node id="n1" name="A">
-  <children id="n2" name="B"/>
-  <children id="n3" name="C"/>
-</Node>
+\begin{lstlisting}[firstnumber=30,style=eol,caption={Change-based representation of the intermediate state of class \textsf{Hero} in Figure \ref{fig:intermediate_model} after the addition of parameter \textsf{combo}.},label=lst:cbpmodel_0]
+session "Alex-01"
+create combo of Parameter
+set combo.name from null to "combo"
+add combo to attack.parameters at 3
 \end{lstlisting}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.49\linewidth}
-\begin{lstlisting}[style=xmi,caption={State-based representation in simplified XMI of the tree model in Figure \ref{fig:modified_model}.},label=lst:xmimodel]
-<Node id="n1" name="A">
-  <children id="n2" name="B"/>
-</Node>
-\end{lstlisting}
-\end{minipage}
 
 \vspace{-20pt}
-\begin{minipage}[t]{0.49\linewidth}
-\begin{lstlisting}[style=eol,caption={Change-based representation of the tree model in Figure \ref{fig:initial_model}.},label=lst:cbpmodel_0]
-create n1 of Node
-set n1.name from null to "A"
-create n2 of Node
-set n2.name from null to "B"
-create n3 of Node
-set n3.name from null to "C"
-add n2 to n1.children at 0
-add n3 to n1.children at 1
+\begin{lstlisting}[firstnumber=30,style=eol,caption={Change-based representation of the eventual state of class \textsf{Hero} in Figure \ref{fig:modified_model} after the removal of parameter \textsf{combo}.},label=lst:cbpmodel]
+session "Alex-01"
+create combo of Parameter
+set combo.name from null to "combo"
+add combo to attack.parameters at 3
+unset combo.name from "combo" to null
+remove combo from attack.parameters at 3
+delete combo
 \end{lstlisting}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.49\linewidth}
-\begin{lstlisting}[style=eol,caption={Change-based representation of the tree model in Figure \ref{fig:modified_model}.},label=lst:cbpmodel]
-create n1 of Node
-set n1.name from null to "A"
-create n2 of Node
-set n2.name from null to "B"
-create n3 of Node
-set n3.name from null to "C"
-add n2 to n1.children at 0
-add n3 to n1.children at 1
-remove n3 from n1.children at 1
-delete n3
-\end{lstlisting}
-\end{minipage}
 
-Listings \ref{lst:xmimodel_0} and \ref{lst:xmimodel} show the simplified XMI format of the models in Figures \ref{fig:initial_model} and \ref{fig:modified_model} when they are persisted in state-based representation. Listings \ref{lst:cbpmodel_0} and \ref{lst:cbpmodel} show the change-based representation of the two models respectively, using the CBP syntax introduced in Chapter \ref{ch:change_based_model_persistence}. As both change-based representations show, lines 1–6 record the creation and naming of the three nodes, and lines 7–8 record the addition of \textsf{n2} and \textsf{n3} as children of \textsf{n1}. Change-based representation in Listing \ref{lst:cbpmodel} records two additional rows since it also records the recent changes that produce the eventual state of the tree model in Figure \ref{fig:modified_model}. Lines 9–10 capture the deletion of \textsf{n3} (the \textsf{remove} command removes f \textsf{n3} from its container, and the $delete$ command completely removes \textsf{n3} from its model). Changes in a CBP representation can be uniquely identified by their line numbers.
+Figure \ref{fig:tree_example} shows the different states of class \textsf{Hero} when they are persisted in state-based representation. 
+Listings \ref{lst:cbpmodel_0} and \ref{lst:cbpmodel} show the change-based representation of the intermediate state and eventual states of class \textsf{Hero} in Figure \ref{fig:tree_example}. 
 
-This example model history illustrates a case where earlier events (creating \textsf{n3} in line 5, naming it in line 6, making it a child of \textsf{n1} in line 8, and removing it from the container in line 9) are superseded by a subsequent event (deletion of \textsf{n3} in line 10). Loading the eventual model would arguably be faster if the events in lines 5, 6, 8, 9, and 10 could be ignored.
+As both change-based representations show, line 31-32 records the creation and naming of parameter \textsf{combo}, and lines 33 record the addition of parameter \textsf{combo} as one of the parameters of operation \textsf{attack}. Change-based representation in Listing \ref{lst:cbpmodel} records two additional rows since it also records the recent changes that produce the eventual state of the tree model in Figure \ref{fig:modified_model}. Lines 34-36 capture the deletion of \textsf{combo} (the \textsf{unset} command resent the value of parameter \textsf{combo}'s name to null, the \textsf{remove} command removes f \textsf{combo} from its container, and the \textsf{delete} command completely removes \textsf{combo} from its model). Changes in a CBP representation can be uniquely identified by their line numbers.
+
+This example model history illustrates a case where earlier events (creating \textsf{combo} in line 31, naming it in line 32, making it a child of \textsf{hero} in line 33, naming it in line 34, and removing it from the container in line 35) are superseded by a subsequent event (deletion of \textsf{combo} in line 36). Loading the eventual model would arguably be faster if the events in lines 31-36 could be ignored.
 
 %\vspace{-10pt}
 \section{Toward Efficient Loading of Change-Based Models}
@@ -133,100 +105,101 @@ A \textsf{ModelHistory} has a \textsf{URI} attribute to identify the model for w
   \label{fig:history_structure}
 \end{figure}
 
-An \textsf{EventHistory} represents a series of events of the same type; it has an attribute \textsf{type} to identify the events’ type and can have many \textsf{Line}s. A \textsf{Line} has a \textsf{number} attribute to record the event number and a \textsf{value} that records the element involved in the event (Value is only used for events with types \textsf{add}, \textsf{remove}, and \textsf{move}). Each \textsf{FeatureHistory} can have many \textsf{EventHistories} to represent events that modify the values of the features. Each \textsf{ElementHistory} can have many \textsf{EventHistories} to represent events that affect the state of the elements (life-cycle and relations to multi-valued features). Figure \ref{fig:history_structure} shows an object diagram corresponding to the model in Figure \ref{fig:object_history}, which captures the model history shown in Listing \ref{lst:cbpmodel}. The grey rectangles are \textsf{History} objects related to the deleted node \textsf{n3}. The rectangles with dashed outlines are \textsf{Line} objects that represent superseded changes.
+An \textsf{EventHistory} represents a series of events of the same type; it has an attribute \textsf{type} to identify the events’ type and can have many \textsf{Line}s. A \textsf{Line} has a \textsf{number} attribute to record the event number and a \textsf{value} that records the element involved in the event (Value is only used for events with types \textsf{add}, \textsf{remove}, and \textsf{move}). Each \textsf{FeatureHistory} can have many \textsf{EventHistories} to represent events that modify the values of the features. Each \textsf{ElementHistory} can have many \textsf{EventHistories} to represent events that affect the state of the elements (life-cycle and relations to multi-valued features). Figure \ref{fig:history_structure} shows an object diagram corresponding to the model in Figure \ref{fig:object_history}, which captures the model history shown in Listing \ref{lst:cbpmodel}. The grey rectangles are \textsf{History} objects related to the deleted parameter \textsf{combo}. The rectangles with dashed outlines are \textsf{Line} objects that represent superseded changes.
 
 The following section presents the different strategies used to identify superseded events that will be added to the Ignore List.
 
 %\vspace{-10pt}
 \subsection{Set and Unset Events}
 \label{subsec:set_and_unset_operations}
-During the lifecycle of a model, a single-valued feature can have its value set (assigned) or unset many times. Each event is persisted, but only the last assigned value needs to be considered. For example, in Listing \ref{lst:set_unset_example_1}, the feature \textsf{name} is set to the value “A”, unset, and finally set to the value “B”. In the final state of the model, \textsf{n1.name} = “B”. Thus, only line 4 is significant for the model’s final state and therefore lines 2 and 3 can be ignored when loading the model. For a \textsf{set} event, all preceding \textsf{set} and \textsf{unset} events can be ignored, but for an \textsf{unset} event, all \textsf{set} and \textsf{unset} events can be ignored. Executing it does not have any effect on the final state of a model if all the preceding events also have been ignored.
+During the lifecycle of a model, a single-valued feature can have its value set (assigned) or unset many times. Each event is persisted, but only the last assigned value needs to be considered. For example, in Listing \ref{lst:set_unset_example_1}, let's say that Alex create a new element with type \textsf{Class} and id \textsf{c1}. The feature \textsf{name} of the element is set from null to the value ``A'', unset back to null, and finally set to the value ``B''. In the final state of the model, \textsf{c1.name} = ``B''. Thus, only line 4 is significant for the model’s final state and therefore lines 2 and 3 can be ignored when loading the model. For a \textsf{set} event, all preceding \textsf{set} and \textsf{unset} events can be ignored, but for an \textsf{unset} event, all \textsf{set} and \textsf{unset} events can be ignored. Executing it does not have any effect on the final state of a model if all the preceding events also have been ignored.
 
 \vspace{-20pt}
 \begin{minipage}[t]{0.49\linewidth}
 \begin{lstlisting}[style=eol,caption={A CBP representation of attribute \textsf{name} assignments ended with SET.},label=lst:set_unset_example_1]
-create n1 of Node
-set n1.name from null to "A"
-unset n1.name from "A" to null
-set n1.name from null to "B"
+create c1 type Class
+set c1.name from null to "A"
+unset c1.name from "A" to null
+set c1.name from null to "B"
 \end{lstlisting}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.49\linewidth}
 \begin{lstlisting}[style=eol,caption={A CBP representation of attribute \textsf{name} assignments ended with UNSET.},label=lst:set_unset_example_2]
-create n1 of Node
-set n1.name from null to "A"
-set n1.name from null to "B"
-unset n1.name from "B" to null
+create c1 type Class
+set c1.name from null to "A"
+set c1.name from null to "B"
+unset c1.name from "B" to null
 \end{lstlisting}
 \end{minipage}
 
-Based on Listing \ref{lst:set_unset_example_1}, our approach creates an instance of \textsf{ElementHistory} \textsf{n1}, which contains an instance of \textsf{FeatureHistory} \textsf{name}. The \textsf{FeatureHistory} \textsf{name} consists of two \textsf{EventHistory} instances, with types \textsf{set} and \textsf{unset} (the instances are named \textsf{set} and \textsf{unset} respectively for brevity). The \textsf{set} records the $Line$ instances that hold the event numbers of the \textsf{set} events, and similarly for \textsf{unset}.
+Based on Listing \ref{lst:set_unset_example_1}, our approach creates an instance of \textsf{ElementHistory} \textsf{c1}, which contains an instance of \textsf{FeatureHistory} \textsf{name}. The \textsf{FeatureHistory} \textsf{name} consists of two \textsf{EventHistory} instances, with types \textsf{set} and \textsf{unset} (the instances are named \textsf{set} and \textsf{unset} respectively for brevity). The \textsf{set} records the $Line$ instances that hold the event numbers of the \textsf{set} events, and similarly for \textsf{unset}.
 
-From Listing \ref{lst:set_unset_example_1}, we can thus infer that \textsf{name}.\textsf{set}.\textsf{lines} = $\{2,4\}$ and \textsf{name}.\textsf{unset}. \textsf{lines} = $\{3\}$. The event numbers in both lists are used to determine that the events represented by lines 2 and 3 are superseded by the event in line 4, which is a \textsf{set} event, giving an \textsf{ignoreList} = $\{2, 3\}$. By the same process, for Listing \ref{lst:set_unset_example_2}, we can reason that \textsf{name}.\textsf{set}.\textsf{lines} = \{2,3\} and \textsf{name}.\textsf{unset}.\textsf{lines} = \{4\}. However, in this case, the highest-numbered event is an \textsf{unset}, all so line numbers are put into the Ignore List (\textsf{ignoreList} = $\{2, 3, 4\}$) (\textsf{unset} event can be ignored along with all preceding {\textsf{set} and \textsf{unset} events).
+From Listing \ref{lst:set_unset_example_1}, we can thus infer that \textsf{name}.\textsf{set}.\textsf{lines} = $\{2,4\}$ and \textsf{name}.\textsf{unset}. \textsf{lines} = $\{3\}$. The event numbers in both lists are used to determine that the events represented by lines 2 and 3 are superseded by the event in line 4, which is a \textsf{set} event, giving an \textsf{ignoreList} = $\{2, 3\}$. By the same process, for Listing \ref{lst:set_unset_example_2}, we can reason that \textsf{name}.\textsf{set}.\textsf{lines} = \{2,3\} and \textsf{name}.\textsf{unset}.\textsf{lines} = \{4\}. However, in this case, the highest-numbered event is an \textsf{unset}, all so line numbers are put into the Ignore List (\textsf{ignoreList} = $\{2, 3, 4\}$).
   
-  %\vspace{-10pt}
-  \subsection{Add, Remove, and Move Events}\label{subsec:add_remove_and_move_operations}
-  For a multi-valued feature, add, remove, and move events can be called many times to modify the feature. If an element is added to the feature, moved multiple times, and finally removed, then all the element’s preceding events can be ignored, as long as the order of the feature’s elements is not changed.
-  
-  Listing \ref{lst:add_move_reference} shows an example without a \textsf{move} event. In this example, nodes \textsf{n1}, \textsf{n2}, and \textsf{n3} are added to the \textsf{children} feature of \textsf{p} (lines 5–7). In the latest state of the model, \textsf{children} only contains \textsf{n1} and \textsf{n3}. As a result, the loading process could ignore the events that represent the \textsf{add} and \textsf{remove} events on \textsf{n1}.
-  
+%\vspace{-10pt}
+\subsection{Add, Remove, and Move Events}\label{subsec:add_remove_and_move_operations}
+For a multi-valued feature, add, remove, and move events can be called many times to modify the feature. If an element is added to the feature, moved multiple times, and finally removed, then all the element’s preceding events can be ignored, as long as the order of the feature’s elements is not changed.
+
+Listing \ref{lst:add_move_reference} shows an example without a \textsf{move} event. In this example, parameters \textsf{p1}, \textsf{p2}, and \textsf{p3} are added to the \textsf{parameters} feature of operation \textsf{attack} (lines 5–7). In the latest state of the model, feature \textsf{parameters} only contains \textsf{p1} and \textsf{p3}. As a result, the loading process could ignore the events that represent the \textsf{add} and \textsf{remove} events on \textsf{p1}.
+
 \vspace{-20pt}
 \begin{lstlisting}[style=eol,caption={A CBP of add and remove operations.},label=lst:add_move_reference]
-create p of Node // children = []
-create n1 of Node // children = []
-create n2 of Node // children = []
-create n3 of Node // children = []
-add n1 to p.children at 0 // children = [n1]
-add n2 to p.children at 1 // children = [n1, n2]
-add n3 to p.children at 2 // children = [n1, n2, n3]
-remove n2 from p.children at 1 // children = [n1, n3]
+create op of Operation // parameters = []
+create p1 of Parameter // parameters = []
+create p2 of Parameter // parameters = []
+create p3 of Parameter // parameters = []
+add p1 to op.parameters at 0 // parameters = [p1]
+add p2 to op.parameters at 1 // parameters = [p1, p2]
+add p3 to op.parameters at 2 // parameters = [p1, p2, p3]
+remove p2 from op.parameters at 1 // parameters = [p1, p3]
 \end{lstlisting}
 
+\vspace{-20pt}
 \begin{lstlisting}[style=eol,caption={A CBP representation of add, move, and remove operations.},label=lst:add_remove_move_reference]
-create p of Node // children = []
-create n1 of Node // children = []
-create n2 of Node // children = []
-create n3 of Node // children = []
-add n1 to p.children at 0 // children = [n1]
-add n2 to p.children at 1 // children = [n1, n2]
-add n3 to p.children at 2 // children = [n1, n2, n3]
-move n1 in p.children from 0 to 1 // children = [n2, n1, n3]
-remove n2 from p.children at 0 // children = [n1, n3]
+create op of Operation // parameters = []
+create p1 of Parameter // parameters = []
+create p2 of Parameter // parameters = []
+create p3 of Parameter // parameters = []
+add p1 to op.parameters at 0 // parameters = [p1]
+add p2 to op.parameters at 1 // parameters = [p1, p2]
+add p3 to op.parameters at 2 // parameters = [p1, p2, p3]
+move p1 in op.parameters from 0 to 1 // parameters = [p2, p1, p3]
+remove p2 from op.parameters at 0 // parameters = [p1, p3]
 \end{lstlisting}
-  
-  To create the Ignore List for Listing \ref{lst:add_move_reference}, we can deduce that \textsf{children}.\textsf{add}.\textsf{lines} = \{\{5, \textsf{n1}\}, \{6, \textsf{n2}\}, \{7, \textsf{n3}\}\} (5 is the line number and \textsf{n1} is the value) and \textsf{children}.\textsf{remove}.\textsf{lines} = \{\{8, \textsf{n1}\}\}. Since \textsf{n2} is removed from its containing feature (line 8), then executing its preceding add and remove events is unnecessary. Note that we retain the \textsf{create} event (line 3) as \textsf{n2} has not been deleted from the model—only removed from its containing feature. We can iterate through the add and move structures to identify the events on \textsf{n2} that should be removed, resulting in the \textsf{ignoreList} = \{6, 8\}.
-  
-  Listing \ref{lst:add_remove_move_reference} shows an example with a \textsf{move} event\footnote{The commented parts show the end states of \textsf{children} after each event}. Let’s say that a \textsf{move} event is inserted at line 8 (this insertion shifts the \textsf{remove} event of \textsf{n2} from line 8 to line 9). With the introduction of this \textsf{move} event, we now have the \textsf{children}.\textsf{add}.\textsf{lines} = \{\{5, \textsf{n1}\}, \{6, \textsf{n2}\}, \{7, \textsf{n3}\}\}, \textsf{children}.\textsf{move}.\textsf{lines} = \{\{8, \textsf{n1}\}\}, and \textsf{children}.\textsf{remove}.\textsf{lines} = \{\{9, \textsf{n2}\}\}. In the final state of the model, \textsf{children} should have \textsf{n1} and \textsf{n3} in order, \textsf{children} = [n1, n3].
-  
-  However, executing the previous strategy naïvely leads to an erroneous final state. Using \textsf{ignoreList} = \{6, 8\} produced by the naïve strategy leads to a different order of \textsf{n1} and \textsf{n3} in the final state of the model where \textsf{children} = [n3, n1] as shown by the naïve optimised CBP in Listing \ref{lst:naive_add_remove_move_reference}. To overcome this problem, *$IsMoved$ flags in Figure \ref{fig:object_history} are used to sign features and elements. If they have been moved—the flags are set to $true$. If an element’s *$IsMoved$ flag is true, then all of its line numbers related to \textsf{add}, \textsf{move}, \textsf{remove} events cannot be put into the \textsf{ignoreList}. The flags are set to $false$ if the feature is empty.
+
+To create the Ignore List for Listing \ref{lst:add_move_reference}, we can deduce that \textsf{parameters}.\textsf{add}.\textsf{lines} = \{\{5, \textsf{p1}\}, \{6, \textsf{p2}\}, \{7, \textsf{p3}\}\} (5 is the line number and \textsf{p1} is the value) and \textsf{parameters}.\textsf{remove}.\textsf{lines} = \{\{8, \textsf{p1}\}\}. Since \textsf{p2} is removed from its containing feature (line 8), then executing its preceding add and remove events is unnecessary. Note that we retain the \textsf{create} event (line 3) as \textsf{p2} has not been deleted from the model—only removed from its containing feature. We can iterate through the add and move structures to identify the events on \textsf{p2} that should be removed, resulting in the \textsf{ignoreList} = \{6, 8\}.
+
+Listing \ref{lst:add_remove_move_reference} shows an example with a \textsf{move} event\footnote{The commented parts show the end states of \textsf{parameters} after each event}. Let’s say that a \textsf{move} event is inserted at line 8 (this insertion shifts the \textsf{remove} event of \textsf{p2} from line 8 to line 9). With the introduction of this \textsf{move} event, we now have the \textsf{parameters}.\textsf{add}.\textsf{lines} = \{\{5, \textsf{p1}\}, \{6, \textsf{p2}\}, \{7, \textsf{p3}\}\}, \textsf{parameters}.\textsf{move}.\textsf{lines} = \{\{8, \textsf{p1}\}\}, and \textsf{parameters}.\textsf{remove}.\textsf{lines} = \{\{9, \textsf{p2}\}\}. In the final state of the model, \textsf{parameters} should have \textsf{p1} and \textsf{p3} in order, \textsf{parameters} = [p1, p3].
+
+However, executing the previous strategy naïvely leads to an erroneous final state. Using \textsf{ignoreList} = \{6, 8\} produced by the naïve strategy leads to a different order of \textsf{p1} and \textsf{p3} in the final state of the model where \textsf{parameters} = [p3, p1] as shown by the naïve optimised CBP in Listing \ref{lst:naive_add_remove_move_reference}. To overcome this problem, *$IsMoved$ flags in Figure \ref{fig:object_history} are used to sign features and elements. If they have been moved—the flags are set to $true$. If an element’s *$IsMoved$ flag is true, then all of its line numbers related to \textsf{add}, \textsf{move}, \textsf{remove} events cannot be put into the \textsf{ignoreList}. The flags are set to $false$ if the feature is empty.
   
 \vspace{-20pt}
 \begin{lstlisting}[style=eol,caption={A naïve optimised CBP representation of original CBP representation in Listing \ref{lst:add_remove_move_reference}}, label=lst:naive_add_remove_move_reference]
-create p of Node // children = []
-create n1 of Node // children = []
-create n2 of Node // children = []
-create n3 of Node // children = []
-add n1 to p.children at 0 // children = [n1]
-add n3 to p.children at 1 // children = [n1, n3]
-move n1 in p.children from 0 to 1 // children = [n3, n1]
+create op of Operation // parameters = []
+create p1 of Parameter // parameters = []
+create p2 of Parameter // parameters = []
+create p3 of Parameter // parameters = []
+add p1 to op.parameters at 0 // parameters = [p1]
+add p3 to op.parameters at 1 // parameters = [p1, p3]
+move p1 in op.parameters from 0 to 1 // parameters = [p3, p1]
 \end{lstlisting}
   
-  \subsection{Create and Delete Events}
-  \label{subsec:create_and_delete_operations}
+\subsection{Create and Delete Events}
+\label{subsec:create_and_delete_operations}
   
-  When an element is deleted, it is completely removed from the model. Therefore, all previous events ($create$, \textsf{set}, \textsf{unset}, \textsf{move}, \textsf{add}, \textsf{remove}, $delete$) on features of the element can be ignored. For example, when node \textsf{n3} in Listing \ref{lst:cbpmodel} is deleted, the events in lines 5–6 and 8–10 are superseded. If Listing \ref{lst:cbpmodel} is optimised—some of its events are ignored—when loading, it runs as if Listing \ref{lst:cbpmodel_optimised} is executed.
+  When an element is deleted, it is completely removed from the model. Therefore, all previous events (\textsf{create}, \textsf{set}, \textsf{unset}, \textsf{move}, \textsf{add}, \textsf{remove}, \textsf{delete}) on features of the element can be ignored. For example, when parameter \textsf{combo} in Listing \ref{lst:cbpmodel} is deleted, the events in lines 31-36 are superseded. If Listing \ref{lst:cbpmodel} is optimised -- some of its events are ignored -- when loading, then it runs as if the events are never executed.
   
-\vspace{-20pt}
-\begin{lstlisting}[style=eol,caption={Change-based representation of the model in Figure \ref{fig:tree_example} after removal of node \textsf{n3}.},label=lst:cbpmodel_optimised]
-create n1 of Node
-set n1.name from null to "A"
-create n2 of Node
-set n2.name from null to "B"
-add n2 to n1.children at index 0
-\end{lstlisting}
+%30 session "Alex-01"
+%create combo of Parameter
+%set combo.name from null to "combo"
+%add combo to attack.parameters at 3
+%unset combo.name from "combo" to null
+%remove combo from attack.parameters at 3
+%delete combo
   
-  Using Listing \ref{lst:cbpmodel}, we can construct the structure of histories that are related to element \textsf{n3} as follows: \textsf{n3}.$create$.\textsf{lines} = \{5\}, \textsf{n3}.\textsf{name}.\textsf{set}.\textsf{lines} = \{6\}, \textsf{n1}.\textsf{children}.\textsf{add}.\textsf{lines} = \{\{7, \textsf{n2}\}, \{8, \textsf{n3}\}\}, \textsf{n1}.\textsf{children}.\textsf{remove}.\textsf{lines} = \{\{9, \textsf{n3}\}\}, and \textsf{n3}.$delete$.\textsf{lines} = \{10\}. Thus, when element \textsf{n3} is deleted, by iterating through all these history structures, all line numbers associated with \textsf{n3} can be identified and added to \textsf{ignoreList} producing \textsf{ignoreList} = \{5, 6, 8, 9, 10\} so they can be ignored in the next model loading.
+Using Listing \ref{lst:cbpmodel}, we can construct the structure of histories that are related to element \textsf{combo} as follows: \textsf{combo}.\textsf{create}.\textsf{lines} = \{31\}, \textsf{combo}.\textsf{name}.\textsf{set}.\textsf{lines} = \{32\},
+\textsf{combo}.\textsf{name}.\textsf{unsetset}.\textsf{lines} = \{34\}, \textsf{attack}.\textsf{parameters}.\textsf{add}.\textsf{lines} = \{\{33, \textsf{combo}\}\}, \textsf{attack}.\textsf{parameters}.\textsf{remove}.\textsf{lines} = \{\{35, \textsf{combo}\}\}, and \textsf{combo}.\textsf{delete}.\textsf{lines} = \{36\}. Thus, when parameter \textsf{combo} is deleted, by iterating through all these history structures, all line numbers associated with \textsf{combo} can be identified and added to \textsf{ignoreList} producing \textsf{ignoreList} = \{31, 32, 33, 34, 35, 36\} so they can be ignored in the next model loading.
   
   \section{Evaluation}
   \label{sec:evaluation_4}
@@ -239,7 +212,7 @@ add n2 to n1.children at index 0
   
   For each combination of dimensions (loading time, saving time, loading memory footprint, saving memory footprint), persistence types (original CBP, optimised CBP, and XMI), and cases (BPMN2, Epsilon, and Wikipedia), we conducted measurements 22 times. The results of these measurements enabled us to perform the Welch’s t-test \cite{welch1947ttest} to find the significance of the comparisons for each case. This evaluation used a significance level of 5\%. If t-test’s $p$-$value$ $<$ 0.05, the null hypothesis (the $means$ of the compared persistence types are equal ($H_0$)) is rejected and the alternative hypothesis (the $means$ of the compared persistence types are not equal ($H_1$), is accepted.
   
-  For loading and saving time, this work measured the delta time required for loading and saving. For memory footprint, this work measured the delta of memory used before and after loading and saving. The results are presented below.
+  For loading and saving time, this work measured the delta time required for loading and saving. For memory footprint, this work measured the delta of memory used before and after loading and saving. The results are presented below. Please refer to Appendix \ref{sec:reproducing_experiments} to reproduce the results of this experiment.
   
   \subsection{Data Description}
   \label{subsec:data_description}
@@ -532,6 +505,10 @@ add n2 to n1.children at index 0
   \subsection{Discussion}
   \label{sec:discussion}
   For the original CBP loading, the total time required to load a model is $T_{CBP}$ = $T_E$ + $T_O$, where $T_E$ is the total time required to execute all events, and $T_O$ is the total time needed to complete other required routines (e.g. initialisation, reading files). For the optimised CBP, the total time to load a change-based model is reduced by the time saved-up by ignoring superseded events $T_I$, that is $T_{OCBP}$ = $T_E$ + $T_O$ $-$ $T_I$. Thus, it is expected that optimised CBP can load a model faster than original CBP. This statement is in accordance with our finding in Section \ref{subsec:loading_time_test} that the saved loading time corresponds to the number of ignored events. However, more investigation is required to determine the degree of their correlation, which will be addressed in our future work.
+  
+  \subsection{Threats to Validity}
+  \label{sec:threats_to_validity_5}
+  In this experiment, we have only tested the algorithms on synthesised models which may not be representative of the complexity and interconnectedness of models in other domains. Diverse characteristics of models in different domains can affect the effectiveness of the algorithm and therefore yield different outcomes. So far, CBP optimisation only supports ordered and unique features. Support for duplicate values means that removal of an item does not necessarily result in the item not being present in the feature value. Additional information must be captured to persist the number of copies and positions of the feature members to properly generate the ignore list.
   
   %\vspace{-5pt}
   \section{Conclusions}

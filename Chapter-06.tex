@@ -82,7 +82,7 @@ The resource implementation classes for NeoEMF and XMI are \textsf{HybridNeoEMFR
 \label{sec:evaluation_5}
 In this section, this work compares hybrid model persistence (EMF CBP with NeoEMF and with XMI) vs. state-based model persistence (NeoEMF or XMI only) on storage space usage, loading and saving time, and memory footprint, and it demonstrates that hybrid model persistence can still perform fast model loading and saving.
 
-The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU @ 2.50 GHz 2.59 GHz, 12 GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0 \textunderscore162-b12). For the evaluation, this work used models reverse-engineered from the Java source code of the Epsilon \cite{eclipse2017epsilon,eclipse2018epsilongit} and BPMN2 \cite{eclipse2017bpmn2} projects. For state-based representation of the models, this work used the MoDisco tool \cite{DBLP:journals/infsof/BruneliereCDM14} to generate XMI-based UML2 \cite{eclipse2017uml2} models that reflect the classes, fields, and operation signatures of the source code of the project and then imported the generated models into NeoEMF. This work also derived MoDiscoXML models \cite{eclipse2018modiscoxml} from the article on the United States in Wikipedia\cite{wikipedia2018us}. This work then used reverse-engineering to generate a change-based model persistence for each project, based on the differences between consecutive versions of the models.
+The evaluation was performed on Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i7-6500U CPU @ 2.50 GHz 2.59 GHz, 12 GB RAM, and the Java\textsuperscript{TM} SE Runtime Environment (build 1.8.0 \textunderscore162-b12). For the evaluation, this work used models reverse-engineered from the Java source code of the Epsilon \cite{eclipse2017epsilon,eclipse2018epsilongit} and BPMN2 \cite{eclipse2017bpmn2} projects. For state-based representation of the models, this work used the MoDisco tool \cite{DBLP:journals/infsof/BruneliereCDM14} to generate XMI-based UML2 \cite{eclipse2017uml2} models that reflect the classes, fields, and operation signatures of the source code of the project and then imported the generated models into NeoEMF. This work also derived MoDiscoXML models \cite{eclipse2018modiscoxml} from the article on the United States in Wikipedia\cite{wikipedia2018us}. This work then used reverse-engineering to generate a change-based model persistence for each project, based on the differences between consecutive versions of the models. Please refer to Appendix \ref{sec:reproducing_experiments} to reproduce the results of this experiment.
 
 \begin{table}[ht]
   \centering
@@ -211,6 +211,10 @@ This work evaluated the performance of our hybrid persistence prototype against 
 \end{table}
 
 As seen in Table \ref{table:time_memory_footprint}, all cases experience a slight slowdown on loading and saving time (hybrid approach’s $mean$ $>$ state-based approach’s $mean$). However, for almost all NeoEMF cases, the slowdown is not significant. This means that the side-effect of the hybrid approach on loading and saving time is still negligible. The hybrid approach also produces a higher memory footprint than the state-based-only approach.
+
+\subsection{Threats to Validity}
+\label{sec:threats_to_validity_6}
+Since change-based model persistence is a relatively new concept, there are hardly any such models available in public repositories that we could reuse for evaluating our prototype. So far, we have only tested the hybrid model persistence approach on synthesised models which may not be representative of the characteristics of models created by people.
 
 \section{Discussion}
 \label{sec:discussion_5}

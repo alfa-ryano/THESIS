@@ -132,18 +132,18 @@ EMF Store \cite{koegel2010emfstore} is an open-source tool that implements chang
 
 \textbf{Non-commutability}. In EMF Store, change events $c_{l}$ and $c_{r}$ are in conflict if applying them in different order to the same element $e_{o}$ produces two different eventual states \cite{koegel2010operation}. For example, Alice changed the \textsf{name} of class \textsf{Troll} to “Orc” (Listing \ref{lst:cbp_right}), while Bob renamed it to “Ogre” (Listing \ref{lst:cbp_left}). Applying Alice’s change first to Bob’s change makes the class’s \textsf{name} “Ogre”, but applying Bob’s change first results in “Orc”.
 \begin{equation} \label{eq:change_noncommutability}
-e_{o} + c_{l} + c_{r} \not\equiv e_{o} + c_{l} + c_{r} \Rightarrow c_{l}\;!\;c_{r}
+e_{o} + c_{l} + c_{r} \not\equiv e_{o} + c_{r} + c_{l} \Rightarrow c_{l}\;!\;c_{r}
 \end{equation}
 However, after examining the implementation \cite{eclipse2019emfstore}, even though two different change events produce equivalent eventual states, both change events are still treated as conflict by EMF Store (\ref{eq:ecbp_equal_end_states}). For example, both Bob and Alice changed the \textsf{name} of element \textsf{character} from “Character” to “Hero” (Listing \ref{lst:cbp_left} line \ref{line:cbp_left_34} and Listing \ref{lst:cbp_right} line \ref{line:cbp_right_39}). The reason is that, if we apply Bob’s set event first, it changes \textsf{character}’s \textsf{name} from “Character” to “Hero”. It is important to notice that after applying Bob’s set event, the eventual value of \textsf{character}’s \textsf{name} is “Hero”. Applying Alice’s set event with the previous value “Character” is inapplicable since it makes the sequence of the change events inconsistent. Bob’s set event produces the eventual value “Hero”, which is not the previous value changed by Alice’s set event, which is “Character”. The same inconsistency occurs even we apply these set events in a different order.
 \begin{equation} \label{eq:ecbp_equal_end_states}
 \begin{split}
-e_{o} + c_{l} + c_{r} \equiv e_{o} + c_{l} + c_{r} \Rightarrow c_{l}\;!\;c_{r}
+e_{o} + c_{l} + c_{r} \equiv e_{o} + c_{r} + c_{l} \Rightarrow c_{l}\;!\;c_{r}
 \end{split}
 \end{equation}
 Moreover, a conflict occurs even when two different sets of change events, $C_{L}$ and $C_{R}$, produce eventual states that are equal to their initial states (\ref{eq:ecbp_equal_to_original_states}). For example, if both Bob and Alice alter \textsf{character}’s \textsf{name} from “Character” to “Hero” and then modify it back to “Character”, both sets of change events are also treated in conflict.
 \begin{equation} \label{eq:ecbp_equal_to_original_states}
 \begin{split}
-e_{o} + C_{L} + C_{R} \equiv e_{o} + C_{R} + C_{L} \equiv e_{o} \Rightarrow C_{L}\;!\;C_{R}
+(e_{o} + C_{L} + C_{R} \equiv e_{o}) \wedge (e_{o} + C_{R} + C_{L} \equiv e_{o}) \Rightarrow C_{L}\;!\;C_{R}
 \end{split}
 \end{equation}
 \textbf{Co-modification}. This leads to a new definition that a conflict occurs when two different change events modify the same element or feature regardless of the eventual state that they produce.
@@ -734,6 +734,25 @@ The algorithm then iterates through the values of the set. For each value, it re
 \label{sec:unordered_conflict}
 Conflict detection for unordered, multi-valued features is handled at lines 16 to 29 in Algorithm \ref{alg:conflict_multi_valued_feature}. Instead of using function \textsf{getUnequalLeftAndRightValues}, it employs function \textsf{getXOR*AndOriginalValues}. This functions also returns all values from left and right sides that are not equal to their original states but only in terms of (in)existence, since indexing is not important in unordered features. The procedure to detect a conflict is similar to the procedure for ordered features. The difference is that, to determine whether a conflict is \textsf{PSEUDO}, it checks the existence of values using functions \textsf{is*Existed}.
 
+\section{Algorithm Complexity}
+\label{sec:conflict_algorithm_complexity}
+The algorithm complexity of state-based model conflict detection consists of two steps. The first step is deriving two sets of changes from two compared versions and their common original version, and the second step is determining conflicting changes from the two sets. In the first step, the time and space complexity is \textsf{2ND} since it performs state-based model differencing  twice (see Section \ref{sec:differencing_algorithm_analysis} for a single model differencing); differencing between left and original versions and right and original versions. In the second step, the complexity of time is \textsf{E} which is the number of elements, features, and values that are different, and the complexity of space is \textsf{X} which is the number of conflicts detected. So, overall, the time complexity of state-based model conflict detection is \textsf{O}(\textsf{2ND} + \textsf{E}) and its space complexity is \textsf{O}(\textsf{2ND} + \textsf{X)}.
+
+The best case in state-based model conflict detection is when the sizes of the the three versions are small (small \textsf{N}), and the number of of differences between them are also small (small \textsf{D}). In opposite, it perform worst when the size of the the three versions are large, and they are totally different. 
+
+Change-based model conflict detection follows similar phases as in change-based model differencing; it also performs event loading (Section \ref{sec:event_loading}) and tree construction (Section \ref{sec:tree_construction}) but replaces the diff computation (Section \ref{sec:diff_computation}) with conflict computation (Section \ref{sec:conflict_computation}). Therefore, event loading follows the same time and space complexity as in change-based model differencing, which depends on \textsf{C}, the total number of change events loaded from two compared versions. 
+
+In the tree construction, it adds an additional activity that maps change events to the elements, features, and values that they affect (Section \ref{sec:change_event_mapping}). This activity does not change the time and space complexity of tree construction since mapping in hash tables has time complexity of \textsf{O}(\textsf{1}) in average \cite{cormen2009introduction}, and the average space complexity is determined by the number of elements \textsf{O}(\textsf{n}) \cite{cormen2009introduction}. Therefore, we can infer that the mapping does not change the overall time complexity in tree construction, which depends on \textsf{C}, and the space complexity is still defined by \textsf{E}; the number of elements, features, and values affected by change events.  
+
+Similar to diff computation (Section \ref{sec:differencing_algorithm_analysis}), the conflict computation runs linearly by iterating through each affected element, feature, or value and determining their conflicting states caused by change events (Algorithms \ref{alg:conflict_detection}, \ref{alg:conflict_single_valued_feature}, and \ref{alg:conflict_multi_valued_feature}). Its time complexity is \textsf{E} which is the number of affected elements, features, and values that are in conflict. Its space complexity is \textsf{X}, the number of space allocated to hold the identified conflicts in memory. 
+
+The time complexity for the proposed change-based model conflict detection is \textsf{O}(\textsf{C} + \textsf{E}) where \textsf{C} is the number of change events that are loaded and executed to construct an element tree, while \textsf{E} is the number of elements, features, and values affected by the changes. Moreover, the space complexity is \textsf{O}(\textsf{C} + \textsf{E} + \textsf{X}) where \textsf{C} corresponds to the number of space to hold all the involved change events in memory, \textsf{E} is the space required to store elements, features, and values of an element tree in memory, and \textsf{X} is the space to store the identified conflicts in memory.
+
+In terms of time complexity, change-based model conflict detection works best in a condition where the number of change events and the number of affected elements, features, and values are small and worst when these numbers are large -- many changes are made and they affects many parts of a model. 
+
+In terms of space complexity, The best case happens when versions of a model undergo small changes, limited to certain parts of the model, and the changes produce only a small number of conflicts. The worst case for space complexity happens when a model undergoes large and significant changes. It is indicated by a large number of change events, a large number of affected elements, features, and values (changes are distributed evenly throughout the model), and the two versions produced are completely different.  
+
+
 \section{Accuracy of Conflict Detection}
 \label{sec:accuracy_of_conflict_detection}
 Conflicts detected by EMF CBP, EMF Compare, and EMF Store can be different because of the different approaches they use. In this section, we explain in more detail the differences between EMF CBP and EMF Compare and then between EMF CBP and EMF Store, concerning the conflicts they can and cannot detect. We use this classification of detected/undetected conflicts later in the evaluation to compare the accuracy of these tools.
@@ -788,7 +807,7 @@ For conflict detection in EMF CBP, the conflict detection time comprises loading
 
 To evaluate the accuracy of conflict detection by EMF CBP, EMF Compare, and EMF Store, we took the change events and states of models produced at the last measurement point of the mixed-operation experiment, and we used them to analyse the conflicts detected by the three tools, based on the classification in Section \ref{sec:accuracy_of_conflict_detection}.
 
-All measurements were performed on the same machine and software with the following specification: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40 GHz (56 processors), 528 GB main memory, Ubuntu 16.04.6 LTS operating system, OpenJDK Runtime Environment (build 1.8.0\_222-8u222-b10-1ubuntu2~16.04.york0-b10) with JVM \textsf{InitialHeapSize} 2 GB and \textsf{MaxHeapSize} 32 GB, EMF Store 1.9.0, EMF Compare 3.3.2, MoDisco 1.0.1, and EMF 2.12.0.
+All measurements were performed on the same machine and software with the following specification: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40 GHz (56 processors), 528 GB main memory, Ubuntu 16.04.6 LTS operating system, OpenJDK Runtime Environment (build 1.8.0\_222-8u222-b10-1ubuntu2~16.04.york0-b10) with JVM \textsf{InitialHeapSize} 2 GB and \textsf{MaxHeapSize} 32 GB, EMF Store 1.9.0, EMF Compare 3.3.2, MoDisco 1.0.1, and EMF 2.12.0. Please refer to Appendix \ref{sec:reproducing_experiments} to reproduce the results of this experiment.
 
 \section{Evaluation Results and Discussion}
 \label{sec:evaluation_discussion}
@@ -1000,7 +1019,11 @@ Figure \ref{fig:move-conflict-count-events} shows the results of the move-only e
 
 Using the data on conflicts from the last measurement point in Figure \ref{fig:move-conflict-count-events}, we see that, from 91.6 thousand conflicts detected by EMF Compare, 4.7 thousand (5.1\%) are derived move conflicts which cannot be detected by EMF CBP. By contrast, from 114.8 thousand conflicts detected by EMF CBP, there are 27.9 million (24.3\%) conflicts cannot be detected by EMF Compare. These include 20.3 thousand (17.7\%) real move conflicts and 7.6 thousand (6.6\%) single-valued containment conflicts (see Section \ref{sec:emf_cbp_vs_emf_compare}). We also see that, of the 115 thousand conflicts detected by EMF CBP, 17 thousand (14.8\%) are undetected by EMF Store because of the first-time move conflict, explained in Section \ref{sec:emf_cbp_vs_emf_store}. On the other hand, of the 29.5 thousand conflicts detected by EMF Store, only 2.5 thousand (8.5\%) cannot be detected by EMF CBP because of the two-sided reset conflict presented in Section \ref{sec:emf_cbp_vs_emf_store}.
 
-\subsection{Conclusions}
+\subsection{Threats to Validity}
+\label{sec:threats_to_validity_8}
+The evaluation of the proposed change-based comparison is limited to the Java metamodel only. Thus, there is no guarantee it will perform in a consistent manner on models conforming to different metamodels. Although, we have tried to cover as much as common changes made in EMF models (e.g., performing \textsf{add}/\textsf{remove}/\textsf{set}/\textsf{move} operations on \textsf{single}/\textsf{multi}-\textsf{valued} features, \textsf{attribute}/\textsf{reference} features, or \textsf{containment}/\textsf{non}-\textsf{containment} references), the random modification made in the evaluation does not largely reflect the evolution of models in the real world. This is challenging as different domains can have their own patterns of model evolution -- different problems, metamodels, modellers, etc.
+
+\section{Conclusions}
 \label{sec:conclusions_7}
 In this chapter, we have presented an approach to speed up model conflict detection by exploiting the nature of change-based persistence, which allows us to find conflicts between versions of a model by comparing only the last set of changes in the two versions. Based on the findings in the conflict detection evaluation, this study found that the proposed change-based model conflict detection approach outperforms the conflict detection approaches in EMF Compare and EMF Store. Nevertheless, models that have been excessively modified or that experience a significant reduction in model size could impair the performance of this conflict detection approach because a great number of change records must be read and loaded into memory.
 

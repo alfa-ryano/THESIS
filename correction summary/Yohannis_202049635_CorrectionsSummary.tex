@@ -1,0 +1,91 @@
+\documentclass[11pt, a4paper]{report}
+\linespread{1.5}
+
+\usepackage{graphicx}
+\usepackage{enumitem}
+
+\begin{document}  
+
+  \begin{titlepage}
+  \begin{center}
+    
+    \textbf{\Large Corrections Summary}
+    
+    \vfill
+    
+    \textbf{\Large Change-Based Model Differencing\\and Conflict Detection}
+    
+    \vfill
+    \begin{figure}[ht]
+      \centering
+      \includegraphics[width=0.5\linewidth]{../images/uoy}
+      \label{fig:uoy}
+    \end{figure}
+    \vfill
+    
+    Alfa Ryano Yohannis\\
+    ary506@york.ac.uk
+    
+    \vspace{1cm}
+    
+    Supervisors:\\
+    Dimitris Kolovos\\
+    Fiona Polack\\
+    Horacio Hoyos Rodriguez
+    \vspace{1cm}
+    
+    Department of Computer Science\\
+    University of York\\
+    United Kingdom\\
+    \vspace{1cm}
+    \today
+    
+    \vfill
+    A Thesis Submitted in Partial Fulfilment of the Requirements\\
+    for the Degree of Doctor of Philosophy in Computer Science
+    
+  \end{center}
+\end{titlepage}
+
+\chapter*{Corrections Summary}
+
+\begin{enumerate}[font=\bfseries]
+\item A small section should be added to the conclusion presenting a methodology for use of the presented changes based persistence approach. I.e. when should one use state-based and change-based, and how might this look in practice.
+\\\textbf{Correction:}\\
+Section 9.5 in Chapter 9 has been added to present the methodology on how and when to implement change-based persistence approach in practice.   
+
+\item An example should be added illustrating why tools such as Git are not suitable and the new approach is needed.
+\\\textbf{Correction:}\\
+An example that illustrates why tools such as Git is not suitable and the new approach is needed has been added in Section 2.3.
+
+\item The examples in Chapter 5 should be changed to match the working example from the rest of the thesis.
+\\\textbf{Correction:}\\
+The examples in Chapter 5, starting from Section 5.2 to 5.3.4, have been replaced with examples that extend the running example introduced in Chapter 4.
+
+\item A discussion highlighting how others can reproduce the results should be added either to the research methodology section or as an appendix. This should include a link to a downloadable container (or similar) that contains all models and tests.
+\\\textbf{Correction:}\\
+Appendix B has been added to give instructions on how reproduce the evaluation results in Chapters 5, 6, 7, and 8. The Appendix contains the links that point to the source code of this research's prototype, tests, and models that were used for evaluation.
+
+\item Comments on the complexity of each of the algorithms should be added throughout, for example a few sentences stating what kind of models may cause poor performance.
+\\\textbf{Correction:}\\
+Sections 7.5 and 8.5 have been added to discuss on the complexity of algorithms for state and change-based model differencing and conflict detection.
+
+\item A discussion on validity of the presented results across other domains (e.g. outside 3 tiered MDE approaches) should be added to the conclusion.
+\\\textbf{Correction:}\\
+Section 9.4.2 in Chapter 9 has been added to discuss on the validity of the presented results across other domains (e.g. outside 3 tiered MDE approaches).
+
+\item The notations used throughout equations in Chapter 8 should be clarified/changed as discussed in the viva.
+\\\textbf{Correction:}\\
+The notations in Equations 8.4, 8.5, and 8.6 in Chapter 8 have been fixed as discussed in the viva.
+
+\item The points highlighted in the attached PDF should be addressed. These include minor typos (annoted via comment boxes) and points for clarification (annoted via blue text).
+\\\textbf{Correction:}\\
+All minor typos highlighted in the attached PDF have been fixed. Some points that needs clarification also have been addressed by adding some explanation to improve the readability and understandability of the report. The updates can be tracked in the Yohannis\_202049635\_ CorrectedThesisTracked.pdf companion file. 
+
+\item A ``Threats to validity section'' for each of the conducted experiments.
+\\\textbf{Correction:}\\
+Sections 5.4.6, 6.5.3, 7.6.3, and 8.8.3 are the threats-to-validity sections  that have been added for each of the conducted experiments. 
+
+\end{enumerate}
+
+\end{document}

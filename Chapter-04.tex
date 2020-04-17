@@ -8,7 +8,7 @@ This chapter presents a novel approach to change-based model persistence, includ
 
 The concept of change-based persistence presented in the literature review must be translated for a modelling framework if it is to be applied for model persistence. To gain all the benefits of change-based persistence, an implementation that can save and load a model in change-based persistence must be developed first. The implementation should be able to capture all relevant changes of a model and persist them into a file. It must also be able to de-serialise changes from the file and (re)execute them in order to (re)construct the model. This research has developed a prototype of such a tool, designed to work with EMF models and meta-models.
 
-Before exploring how change-based persistence is implemented, this chapter introduces a running example to explain the solutions proposed in this study and how model differencing and conflict detection are performed in existing tools, such as in EMF Compare \cite{emfcompare2018developer} and EMF Store \cite{emfstore2019what}. This example is used throughout this thesis to explain the proposed solutions as well.
+Before exploring how change-based persistence is implemented, this chapter introduces a running example to explain the solutions proposed in this study and how model differencing and conflict detection are performed in existing tools, such as in EMF Compare \cite{emfcompare2018developer} and EMF Store \cite{emfstore2019what}.
 
 The rest of this chapter is structured as follows. Section \ref{sec:running_example_1} introduces the running example.
 Sections \ref{sec:proposed_approach} presents an overview of the proposed approach.
@@ -51,68 +51,6 @@ Figure \ref{fig:class_diagram_rpg} shows three versions of an incomplete model c
 \end{figure*}
 
 In this scenario, Jane has set up an initial model of a Role Playing Game (RPG) (Figure \ref{fig:class_diagram_origin}). She then assigned this work to Bob and Alice. Both Alice and Bob continued to work on the model and made some modifications, seen in Figures \ref{fig:class_diagram_left} and \ref{fig:class_diagram_right} respectively. Persisting these models in the standard XMI \cite{omg2018xmi} format produces three files as shown in Listings \ref{lst:xmimodel_origin}, \ref{lst:xmimodel_left}, and \ref{lst:xmimodel_right}. In this running example, every element has its globally unique ID. Thus, if Bob and Alice create two elements independently, they will not be allocated the same ID. For example, the generalisations that Bob and Alice added in Listings \ref{lst:xmimodel_left} and \ref{lst:xmimodel_right} have different IDs, \textsf{leftGen} and \textsf{rightGen} respectively.
-
-\vspace{-20pt}
-\begin{lstlisting}[style=xmi,caption={Simplified XMI file of the original version in Figure \ref{fig:class_diagram_origin}.},label=lst:xmimodel_origin]
-<uml:Model>
-  <packagedElement type=Class id="character" name="Character">
-    <operation id="attack" name="attack">
-      <parameter id="gem" name="gem"/>
-      <parameter id="target" name="target"/>
-      <parameter id="weapon" name="weapon"/>
-   </operation>
-  </packagedElement>
-  <packagedElement type=Class id="troll" name="Troll"/>
-  <packagedElement type=Class id="giant" name="Giant">
-    <operation id="cast" name="cast"/>
-  </packagedElement>
-  <packagedElement type=Class id="knight" name="Knight">
-    <operation id="smash" name="smash"/>
-  </packagedElement>
-  <packagedElement type=Class id="mage" name="Mage"/>
-</uml:Model>
-\end{lstlisting}
-
-\vspace{-20pt}
-\begin{lstlisting}[style=xmi,caption={Simplified XMI file of the left version in Figure \ref{fig:class_diagram_left}.},label=lst:xmimodel_left]
-<uml:Model>
-  <packagedElement type=Class id="character" name="Hero">
-    <operation id="attack" name="attack">
-      <parameter id="weapon" name="weapon"/>
-      <parameter id="gem" name="gem"/>
-      <parameter id="target" name="target"/>
-    </operation>
-  </packagedElement>
-  <packagedElement type=Class id="troll" name="Ogre"/>
-  <packagedElement type=Class id="knight" name="Knight">
-    <generalization id="leftGen" general="character"/>
-    <operation id="smash" name="smash"/>
-  </packagedElement>
-  <packagedElement type=Class id="mage" name="Mage"/>
-</uml:Model>
-\end{lstlisting}
-
-\vspace{-20pt}
-\begin{lstlisting}[style=xmi,caption={Simplified XMI file of the right version of Figure \ref{fig:class_diagram_right}.},label=lst:xmimodel_right]
-<uml:Model>
-  <packagedElement type=Class id="character" name="Character">
-    <operation id="attack" name="attack">
-      <parameter id="gem" name="gem"/>
-      <parameter id="weapon" name="weapon"/>
-      <parameter id="target" name="target"/>
-    </operation>
-  </packagedElement>
-  <packagedElement type=Class id="troll" name="Orc"/>
-  <packagedElement type=Class id="giant" name="Giant">
-    <operation id="smash" name="smash"/>
-  </packagedElement>
-  <packagedElement type=Class id="knight" name="Knight"/>
-  <packagedElement type=Class id="mage" name="Mage">
-    <generalization id="rightGen" general="character"/>
-    <operation id="cast" name="cast"/>
-  </packagedElement>
-</uml:Model>
-\end{lstlisting}
 
 An alternative way to persist these three models would be to persist the sequence of all changes through which they were constructed, not to persist their state. This approach was first introduced in \cite{DBLP:conf/models/YohannisKP17}, and it is illustrated in the next section. This example is extended in Section \ref{sec:runnnig_example_continue} to facilitate explaining the change-based model differencing proposed in this research.
 
@@ -240,7 +178,7 @@ The \textsf{ChangeEventAdapter} receives EMF change notifications in its \textsf
 To integrate seamlessly with the EMF framework and to eventually support multiple concrete change-based serialisation formats (e.g. XML-formatted representation for readability and binary for performance/size), the prototype implemented a \textsf{CBPResource} abstract class that extends EMF’s built-in \textsf{ResourceImpl} class. The role of the abstract class is to encapsulate all change recording functionality while the role of its concrete subclasses is to implement serialisation and de-serialisation.
 To save a model, \textsf{CBPXMLResourceImpl} persists changes in a line-based format where every change is serialised as a single-line XML document. In this way, when a model changes, the prototype can append the new changes to the end of the model file without needing to serialise the entire model again.
 To load a model, \textsf{CBPXMLResourceImpl} de-serialises every line in the document as a change event and then re-executes it to reconstruct the model.
-The prototype also includes a \textsf{CBPXMLResourceFactory} class that extends EMF’s \textsf{ResourceFactoryImpl} as the factory class for change-based models. Figure \ref{fig:resources} shows the relationships between these classes.
+The prototype also includes a \textsf{CBPXMLResourceFactory} class that extends EMF’s \textsf{ResourceFactoryImpl} as the factory class for change-based models. Figure \ref{fig:resources} shows the relationships between these classes.format 
 
 \begin{figure}[th]
   \centering
@@ -250,7 +188,7 @@ The prototype also includes a \textsf{CBPXMLResourceFactory} class that extends 
 \end{figure}
 
 Listing \ref{lst:javacode_resource} shows how to use the prototype in Java code. Lines 1–8 demonstrate how to initialise and save a model using the prototype. First, the code creates an instance of \textsf{CBPResource}, \textsf{cbpResource}, using \textsf{CBPXMLResourceFactory} and specifies its file as \textsf{helloworld.cbpxml} using \textsf{URI}. The code then executes method \textsf{startNewSession} of \textsf{cbpResource}. This method adds a change event to indicate the start of the editing session as depicted at line 1 in Listings \ref{lst:cbp_origin} and \ref{lst:cbp_left}.
-The code then uses \textsf{UMLFactory} to create an element, \textsf{model}, of UML2’s \textsf{Model}. The code adds element \textsf{model} into \textsf{cbpResource} and sets the name to ‘Hello World’. The code then saves the model in change-based format using method \textsf{save} and then unloads \textsf{cbpResource}. Lines 9–12 demonstrate how to replay (load) the model that had been saved and then print the name of the first element in \textsf{cbpResource}, which is expected to print “Hello World”.
+The code then uses \textsf{UMLFactory} to create an element, \textsf{model}, of UML2’s \textsf{Model}. The code adds \textsf{model} into \textsf{cbpResource} and sets the name to ‘Hello World’. The code then saves the model in change-based format using \textsf{save} and then unloads \textsf{cbpResource}. Lines 9–12 demonstrate how to replay (load) the model that had been saved and then print the name of the first element in \textsf{cbpResource}, which is expected to print “Hello World”.
 
 \vspace{-20pt}
 \begin{lstlisting}[style=java,caption={An example how to use \textsf{CBPResource} in Java code.},label=lst:javacode_resource]
@@ -296,5 +234,5 @@ Through persisting models’ change history, this research aims to enable high-p
 
 In this chapter, a running example was introduced. This example is used throughout this thesis to explain the solutions proposed in this study. A prototype of a change-based persistence format also was presented, including its requirements and a design of the implementation that meets the requirements. Some potential benefits and novel capabilities that a change-based persistence can contribute and the challenges that might restrain delivering them also have been presented.
 
-This chapter also has partially addressed the first research question of this study, \textbf{How can models be persisted in a change-based format, and how does change-based persistence perform, compared to state-based persistence, in terms of loading and saving models?} (RQ1). To persist models in a change-based format, a prototype has been developed. It captures relevant notifications returned by the notification facilities provided by EMF every time a change is applied to an EMF model. It then transforms the notifications into different classes of change events representing different types of changes (e.g., set, unset, add, remove, move, create, and delete) that conform to the model and meta-model infrastructure of EMF. Every captured change event is then persisted by appending it into an XML-like-formatted file when the model is saved. The model can be (re)loaded by de-serialising the file and (re)executing all the persisted change events—replaying the historical construction of the model.
+This chapter also has partially addressed the first research question of this study, \textbf{How can models be persisted in a change-based format, and how does change-based persistence perform, compared to state-based persistence, in terms of loading and saving models?} (RQ1). To persist models in a change-based format, a prototype has been developed. It captures relevant notifications returned by the notification facilities provided by EMF every time a change is applied to an EMF model. It then transforms the notifications into different classes of change events representing different types of changes (e.g., set, unset, add, remove, move, create, and delete) that conform to the model and meta-model infrastructure of EMF. Every captured change event is then persisted by appending it into an XML-like-formatted file when the model is saved. The model can be (re)loaded by de-serialising the file and (re)executing all the persisted change events—replaying the historical construction of the model. Please refer to Appendix \ref{sec:reproducing_experiments} to download the source code of the prototype.
 
